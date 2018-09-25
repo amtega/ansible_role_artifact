@@ -1,0 +1,31 @@
+---
+# Standard uri artifcat download tasks
+
+- name: download http/https artifacts
+  uri:
+    body: "{{ item.body | default(omit) }}"
+    body_format: "{{ item.body_format | default(omit) }}"
+    client_cert: "{{ item.client_cert | default(omit) }}"
+    client_key: "{{ item.client_key | default(omit) }}"
+    creates: "{{ item.creates | default(omit) }}"
+    dest: "{{ item.dest | default(omit) }}"
+    follow_redirects: "{{ item.follow_redirects | default(omit) }}"
+    force_basic_auth: "{{ item.force_basic_auth | default(omit) }}"
+    headers: "{{ item.headers | default(omit) }}"
+    method: "{{ item.method | default(omit) }}"
+    others: "{{ item.others | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+    removes: "{{ item.removes | default(omit) }}"
+    return_content: "{{ item.return_content | default(omit) }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+    url: "{{ item.url }}"
+    user: "{{ item.user | default(omit) }}"
+    validate_certs: "{{ item.validate_certs | default(omit) }}"
+  register: artifact_http_result
+  loop: >-
+    {{ artifact_list | selectattr('type', 'in', ['http', 'https']) | list }}
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+    - role::artifact
+    - role::artifact::http

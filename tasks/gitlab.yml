@@ -1,0 +1,25 @@
+---
+# Gitlab/Github artifcat download tasks
+
+- name: download gitlab/github artifacts
+  uri:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    headers: "{{ headers }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+    creates: "{{ item.creates | default(omit) }}"
+    removes: "{{ item.removes | default(omit) }}"
+    validate_certs: "{{ item.validate_certs | default(omit) }}"
+  register: artifact_gitlab_result
+  loop: >-
+    {{ artifact_list | selectattr('type', 'in', ['gitlab', 'github']) | list }}
+  loop_control:
+    label: "{{ item.name }}"
+  vars:
+    headers_with_token:
+      PRIVATE-TOKEN: "{{ item.private_token | default('') }}"
+    headers: >-
+      {{ (item.private_token is defined) | ternary(headers_with_token, {}) }}
+  tags:
+    - role::artifact
+    - role::artifact::gitlab

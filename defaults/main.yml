@@ -1,2 +1,36 @@
 ---
 # Role default lower priority variables
+
+# Dict with the artifact to download. The supported formats for this dict are
+# the following:
+#
+# Gitlab / GitHub artifacts:
+#
+# {
+#   name: <name>             # Name of the artifact for information purposes
+#   type: gitlab
+#   url: <url>               # Gitlab / Github url to the artifact
+#   dest: <dest>             # Where to save the artifact
+#   private_token: <token>   # Private token to use if the repository is private
+#   creates: <file>          # When this filename already exists skip download
+#   removes: <file>          # When this filename does not exist skip download
+#   timeout: 120             # Timeout for the download
+#   validate_certs: false    # Validate or not the server certificates
+# }
+#
+# HTTP/HTTPS artifacts:
+#
+# {
+#   name: <name>             # Name of the artifact for information purposes
+#   type: http
+#
+#   <plus all attributes supported by ansible uri module>
+# }
+
+artifact:
+
+# List of dicts with the artifacts to download if you want to manage more than
+# one
+
+artifact_list:
+  - "{{ artifact }}"

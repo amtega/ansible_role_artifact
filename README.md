@@ -1,34 +1,57 @@
-# role_name
+# Amtega issue role
 
-A brief description of the role goes here.
+This is an [Ansible](http://www.ansible.com) role to download several kinds or artifacts. Currently http/https and gitlab/github artifacts are supported.
 
 ## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+[Ansible 2.6+](http://docs.ansible.com/ansible/latest/intro_installation.html)
 
 ## Role Variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+A list of all the default variables for this role is available in `defaults/main.yml`.
+
+The role setups the following facts:
+
+- artifact_http_result: results of the http/https artifacts download.
+- artifact_gitlab_result: results of the gitlab/github artifacts download.
 
 ## Dependencies
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None.
 
 ## Example Playbook
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+This is an example playbook:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+``` yaml
+---
+- name: artifact role sample
+  hosts: localhost
+  roles:  
+    - amtega.artifact
+  vars:
+    artifact:
+      name: myartifact
+      type: gitlab
+      url: https://mygitlab.org/path_to_artifact/artifact.tar.gz
+      dest: /tmp
+      private_token: my_gitlab_private_token
+```
 
 ## Testing
 
-A description of how to run tests of the role if available.
+Tests are based on docker containers. You can setup docker engine quickly using the playbook `files/setup.yml` available in the role [amtega.docker_engine](https://galaxy.ansible.com/amtega/docker_engine).
+
+Once you have docker, you can run the tests with the following commands:
+
+```shell
+$ cd amtega.artifact/tests
+$ ansible-playbook main.yml
+```
 
 ## License
 
-Copyright (C) <YEAR> AMTEGA - Xunta de Galicia
+Copyright (C) 2018 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify
 it under the terms of:
@@ -44,5 +67,4 @@ GNU General Public License for more details or European Union Public License for
 
 ## Author Information
 
-- author_name 1.
-- author_name N.
+- Juan Antonio Valiño García.

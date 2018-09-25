@@ -1,2 +1,8 @@
 ---
 # Role tasks
+
+- block:
+    - import_tasks: http.yml
+    - import_tasks: gitlab.yml
+  tags:
+    - role::artifact
