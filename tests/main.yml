@@ -1,2 +1,68 @@
 ---
 # Tasks for testing role
+
+- name: configure docker sandbox environment
+  hosts: localhost
+  roles:
+    - role: amtega.docker_presets
+      docker_presets_images_json_query: >-
+        [? starts_with(name, `centos-6`)
+           || starts_with(name, `centos-7`)
+           || starts_with(name, `fedora-27`)
+           || starts_with(name, `fedora-28`) ]
+  tags:
+    - sandbox
+
+- name: run idempotence test
+  hosts: localhost
+  roles:
+    - role: amtega.docker_sandbox
+      docker_sandbox_state: started
+  tags:
+    - sandbox
+
+- name: test artifact role
+  hosts: docker_sandbox_containers
+  roles:
+    - amtega.artifact
+  vars:
+    artifact_list:
+      - name: ansible_readme
+        type: gitlab
+        url: https://raw.githubusercontent.com/ansible/ansible/devel/README.rst
+        dest: /tmp
+        creates: /tmp/README.rst
+
+      - name: tomcat
+        type: https
+        url: >-
+          {{ "https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.9/bin/"
+             + "apache-tomcat-8.5.9.tar.gz" }}
+        dest: /tmp
+        creates: /tmp/apache-tomcat-8.5.9.tar.gz
+  tasks:
+    - name: check ansible artifact download
+      stat:
+        path: /tmp/README.rst
+      register: check_ansible_result
+
+    - name: check tomcat artifact download
+      stat:
+        path: /tmp/apache-tomcat-8.5.9.tar.gz
+      register: check_tomcat_result
+
+    - name: check that all artifacts were downloaded
+      assert:
+        that:
+          - check_ansible_result.stat.exists
+          - check_tomcat_result.stat.exists
+  tags:
+    - idempotence
+
+- name: cleanup docker sandbox
+  hosts: localhost
+  roles:
+    - role: amtega.docker_sandbox
+      docker_sandbox_state: absent
+  tags:
+    - sandbox
