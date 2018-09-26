@@ -27,14 +27,16 @@
     - amtega.artifact
   vars:
     artifact_list:
-      - name: ansible_readme
-        type: gitlab
-        url: https://raw.githubusercontent.com/ansible/ansible/devel/README.rst
+      - type: gitlab
+        host: https://github.com
+        project: ansible/ansible
+        branch: master
+        path: /
+        file: README.rst
         dest: /tmp
         creates: /tmp/README.rst
 
-      - name: tomcat
-        type: https
+      - type: https
         url: >-
           {{ "https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.9/bin/"
              + "apache-tomcat-8.5.9.tar.gz" }}

@@ -1,9 +1,16 @@
 ---
 # Gitlab/Github artifcat download tasks
 
-- name: download gitlab/github artifacts
+- name: download artifacts from gitlab/github
   uri:
-    url: "{{ item.url }}"
+    url: >-
+      {{ item.host
+         + item.project
+         + "/raw/"
+         + item.branch
+         + item.path
+         + "/"
+         + item.file }}
     dest: "{{ item.dest }}"
     headers: "{{ headers }}"
     timeout: "{{ item.timeout | default(omit) }}"
@@ -14,7 +21,7 @@
   loop: >-
     {{ artifact_list | selectattr('type', 'in', ['gitlab', 'github']) | list }}
   loop_control:
-    label: "{{ item.name }}"
+    label: "{{ item.file }}"
   vars:
     headers_with_token:
       PRIVATE-TOKEN: "{{ item.private_token | default('') }}"

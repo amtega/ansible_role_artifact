@@ -4,27 +4,54 @@
 # Dict with the artifact to download. The supported formats for this dict are
 # the following:
 #
-# Gitlab / GitHub artifacts:
-#
+# Gitlab / GitHub artifacts:#
 # {
-#   name: <name>             # Name of the artifact for information purposes
 #   type: gitlab
-#   url: <url>               # Gitlab / Github url to the artifact
+#   host: <gitlab host>      # Gitlab / Github host
+#   project: <project>       # Project that contains the artifact
+#   branch: <branch>         # Project branch to use
+#   path: <path>             # Path within project that contains the file
+#   file: <file>             # File to download
 #   dest: <dest>             # Where to save the artifact
 #   private_token: <token>   # Private token to use if the repository is private
-#   creates: <file>          # When this filename already exists skip download
-#   removes: <file>          # When this filename does not exist skip download
-#   timeout: 120             # Timeout for the download
-#   validate_certs: false    # Validate or not the server certificates
+#
+# The following variables are alse supported with the same restrictions that
+# the ansible `uri` module:
+#
+#   creates:
+#   removes:
+#   timeout:
+#   validate_certs:
 # }
 #
-# HTTP/HTTPS artifacts:
 #
+# HTTP/HTTPS artifacts:#
 # {
 #   name: <name>             # Name of the artifact for information purposes
 #   type: http
+#   host: <host>             # HTTP/HTTPS host
+#   path: <path>             # Path that contains the file
+#   file: <file>             # File to download
 #
-#   <plus all attributes supported by ansible uri module>
+# The following variables are alse supported with the same restrictions that
+# the ansible `uri` module:
+#
+#   body:
+#   body_format:
+#   client_cert:
+#   client_key:
+#   creates:
+#   dest:
+#   follow_redirects:
+#   force_basic_auth:
+#   headers:
+#   method:
+#   others:
+#   password:
+#   removes:
+#   return_content:
+#   timeout:
+#   user:
 # }
 
 artifact:

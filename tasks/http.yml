@@ -1,7 +1,7 @@
 ---
 # Standard uri artifcat download tasks
 
-- name: download http/https artifacts
+- name: download artifacts from http/https server
   uri:
     body: "{{ item.body | default(omit) }}"
     body_format: "{{ item.body_format | default(omit) }}"
@@ -18,7 +18,7 @@
     removes: "{{ item.removes | default(omit) }}"
     return_content: "{{ item.return_content | default(omit) }}"
     timeout: "{{ item.timeout | default(omit) }}"
-    url: "{{ item.url }}"
+    url: "{{ item.host }}/{{ item.path }}/{{ item.file }}"
     user: "{{ item.user | default(omit) }}"
     validate_certs: "{{ item.validate_certs | default(omit) }}"
   register: artifact_http_result

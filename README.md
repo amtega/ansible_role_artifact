@@ -10,11 +10,6 @@ This is an [Ansible](http://www.ansible.com) role to download several kinds or a
 
 A list of all the default variables for this role is available in `defaults/main.yml`.
 
-The role setups the following facts:
-
-- artifact_http_result: results of the http/https artifacts download.
-- artifact_gitlab_result: results of the gitlab/github artifacts download.
-
 ## Dependencies
 
 None.
