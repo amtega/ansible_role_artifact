@@ -4,5 +4,6 @@
 - block:
     - import_tasks: http.yml
     - import_tasks: gitlab.yml
+    - import_tasks: facts.yml
   tags:
     - role::artifact

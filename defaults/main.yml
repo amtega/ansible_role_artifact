@@ -6,6 +6,8 @@
 #
 # Gitlab / GitHub artifacts:#
 # {
+#   id: <artifactid>         # For identification purposes. Same restrictions
+#                            # as ansible variable names
 #   type: gitlab
 #   host: <gitlab host>      # Gitlab / Github host
 #   project: <project>       # Project that contains the artifact
@@ -18,8 +20,6 @@
 # The following variables are alse supported with the same restrictions that
 # the ansible `uri` module:
 #
-#   creates:
-#   removes:
 #   timeout:
 #   validate_certs:
 # }
@@ -27,7 +27,8 @@
 #
 # HTTP/HTTPS artifacts:#
 # {
-#   name: <name>             # Name of the artifact for information purposes
+#   id: <artifactid>         # For identification purposes. Same restrictions
+#                            # as ansible variable names
 #   type: http
 #   host: <host>             # HTTP/HTTPS host
 #   path: <path>             # Path that contains the file
@@ -36,22 +37,32 @@
 # The following variables are alse supported with the same restrictions that
 # the ansible `uri` module:
 #
-#   body:
-#   body_format:
+#   attributes:
+#   backup:
+#   checksum:
 #   client_cert:
 #   client_key:
-#   creates:
 #   dest:
-#   follow_redirects:
+#   force:
 #   force_basic_auth:
+#   group:
 #   headers:
-#   method:
+#   mode:
 #   others:
-#   password:
-#   removes:
-#   return_content:
+#   owner:
+#   selevel:
+#   serole:
+#   setype:
+#   seuser:
+#   sha256sum:
 #   timeout:
-#   user:
+#   tmp_dest:                # By default is the same as dest
+#   unsafe_writes:
+#   url:
+#   url_password:
+#   url_username:
+#   use_proxy:
+#   validate_certs:
 # }
 
 artifact:
@@ -61,3 +72,14 @@ artifact:
 
 artifact_list:
   - "{{ artifact }}"
+
+#
+# Proxy settings
+#
+
+artifact_http_proxy: >-
+  {{ ansible_facts.env.http_proxy | default('') }}
+artifact_https_proxy: >-
+  {{ ansible_facts.env.https_proxy | default('') }}
+artifact_no_proxy: >-
+  {{ ansible_facts.env.no_proxy | default('') }}

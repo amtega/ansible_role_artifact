@@ -14,3 +14,16 @@ artifact_supported_versions:
   centos: 6
   fedora: 27
   rhel: 7
+
+# Proxy environment settings
+
+artifact_http_proxy_config:
+    http_proxy: "{{ artifact_http_proxy | default('') }}"
+    https_proxy: "{{ artifact_https_proxy | default('') }}"
+    http_no_proxy: "{{ artifact_no_proxy | default('') }}"
+
+artifact_http_proxy_environment: >-
+  {{ (artifact_http_proxy is defined
+      or artifact_https_proxy is defined
+      or artifact_no_proxy is defined)
+     | ternary(artifact_http_proxy_config, {}) }}

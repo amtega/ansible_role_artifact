@@ -10,6 +10,12 @@ This is an [Ansible](http://www.ansible.com) role to download several kinds or a
 
 A list of all the default variables for this role is available in `defaults/main.yml`.
 
+For each artifact the role setups a fact named `artifact_result_<artifactid>` with the following structure:
+
+{
+  download_path: <path to the downloaded artifact>
+}
+
 ## Dependencies
 
 None.
