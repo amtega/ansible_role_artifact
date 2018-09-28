@@ -24,7 +24,7 @@
     timeout: "{{ item.timeout | default(omit) }}"
     tmp_dest:  "{{ item.tmp_dest | default(item.dest) }}"
     unsafe_writes:  "{{ item.unsafe_writes | default(omit) }}"
-    url: "{{ item.host }}/{{ item.path }}/{{ item.file }}"
+    url: "{{ item.host }}/{{ item.path | default('') }}/{{ item.file }}"
     url_password:  "{{ item.url_password | default(omit) }}"
     url_username: "{{ item.url_username | default(omit) }}"
     use_proxy: "{{ item.use_proxy | default(omit) }}"

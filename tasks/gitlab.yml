@@ -5,10 +5,11 @@
   get_url:
     url: >-
       {{ item.host
+         + "/"
          + item.project
          + "/raw/"
          + item.branch
-         + item.path
+         + item.path | default("")
          + "/"
          + item.file }}
     dest: "{{ item.dest }}"
