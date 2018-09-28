@@ -28,21 +28,31 @@
     - amtega.artifact
   vars:
     artifact_list:
-      - type: gitlab
+      - id: artifact1
+        type: gitlab
+        host: https://gitlab.com
+        project: demo-group/gitlab-ce
+        branch: master
+        file: README.md
+        dest: /tmp
+        validate_certs: false
+
+      - id: artifact2
+        type: github
         host: https://github.com
         project: ansible/ansible
-        branch: master
-        path: /
+        branch: devel
         file: README.rst
         dest: /tmp
-        creates: /tmp/README.rst
+        validate_certs: false
 
-      - type: https
-        url: >-
-          {{ "https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.9/bin/"
-             + "apache-tomcat-8.5.9.tar.gz" }}
+      - id: artifact3
+        type: https
+        host: https://archive.apache.org
+        path: /dist/tomcat/tomcat-8/v8.5.9/bin
+        file: apache-tomcat-8.5.9.tar.gz
         dest: /tmp
-        creates: /tmp/apache-tomcat-8.5.9.tar.gz
+        validate_certs: false
   tasks:
     - name: check ansible artifact download
       stat:
