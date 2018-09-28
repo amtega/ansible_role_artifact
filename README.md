@@ -34,11 +34,14 @@ This is an example playbook:
     - amtega.artifact
   vars:
     artifact:
-      id: myartifact
-      type: gitlab
-      url: https://mygitlab.org/path_to_artifact/artifact.tar.gz
+      id: artifact1
+      type: github
+      host: https://github.com
+      project: ansible/ansible
+      branch: master
+      file: README.rst
       dest: /tmp
-      private_token: my_gitlab_private_token
+      validate_certs: false
 ```
 
 ## Testing
