@@ -1,4 +1,4 @@
-# Amtega issue role
+# Amtega artifact role
 
 This is an [Ansible](http://www.ansible.com) role to download several kinds or artifacts. Currently http/https and gitlab/github artifacts are supported.
 
