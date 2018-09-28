@@ -4,7 +4,8 @@
 # Dict with the artifact to download. The supported formats for this dict are
 # the following:
 #
-# Gitlab / GitHub artifacts:#
+# Gitlab / GitHub artifacts:
+#
 # {
 #   id: <artifactid>         # For identification purposes. Same restrictions
 #                            # as ansible variable names
@@ -17,15 +18,16 @@
 #   dest: <dest>             # Where to save the artifact
 #   private_token: <token>   # Private token to use if the repository is private
 #
-# The following variables are alse supported with the same restrictions that
-# the ansible `uri` module:
+# The following variables are also supported with the same restrictions that
+# the ansible `get_url` module:
 #
 #   timeout:
 #   validate_certs:
 # }
 #
 #
-# HTTP/HTTPS artifacts:#
+# HTTP/HTTPS artifacts:
+#
 # {
 #   id: <artifactid>         # For identification purposes. Same restrictions
 #                            # as ansible variable names
@@ -35,7 +37,7 @@
 #   file: <file>             # File to download
 #
 # The following variables are alse supported with the same restrictions that
-# the ansible `uri` module:
+# the ansible `get_url` module:
 #
 #   attributes:
 #   backup:

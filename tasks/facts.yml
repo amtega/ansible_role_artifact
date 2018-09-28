@@ -10,7 +10,7 @@
       loop_control:
         label: "{{ item.id }}"
 
-    - name: setup facts about artifacts download results
+    - name: setup artficats facts
       set_fact:
         "{{ item.fact_name }}": "{{ item.fact_value }}"
       loop: "{{ facts }}"

@@ -5,6 +5,7 @@
 
 artifact_supported_distributions:
   - centos
+  - debian
   - fedora
   - rhel
 
@@ -12,6 +13,7 @@ artifact_supported_distributions:
 
 artifact_supported_versions:
   centos: 6
+  debian: 9
   fedora: 27
   rhel: 7
 

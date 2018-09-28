@@ -2,7 +2,7 @@
 # Standard uri artifact download tasks
 
 - name: download artifacts from http/https server
-  uri:
+  get_url:
     attributes: "{{ item.attributes | default(omit) }}"
     backup: "{{ item.backup | default(omit) }}"
     checksum: "{{ item.checksum | default(omit) }}"

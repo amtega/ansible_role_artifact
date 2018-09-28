@@ -10,11 +10,13 @@ This is an [Ansible](http://www.ansible.com) role to download several kinds or a
 
 A list of all the default variables for this role is available in `defaults/main.yml`.
 
-For each artifact the role setups a fact named `artifact_result_<artifactid>` with the following structure:
+For each artifact the role setups a fact named `artifact_result_<artifactid>` with the following dict structure:
 
+```yaml
 {
   download_path: <path to the downloaded artifact>
 }
+```
 
 ## Dependencies
 
@@ -32,7 +34,7 @@ This is an example playbook:
     - amtega.artifact
   vars:
     artifact:
-      name: myartifact
+      id: myartifact
       type: gitlab
       url: https://mygitlab.org/path_to_artifact/artifact.tar.gz
       dest: /tmp
