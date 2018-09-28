@@ -1,0 +1,25 @@
+---
+# Role facts tasks
+
+- block:
+    - name: get info about artifacts download destination
+      stat:
+        path: "{{ item.dest }}"
+      register: artifact_dest_result
+      loop: "{{ artifact_list }}"
+      loop_control:
+        label: "{{ item.id }}"
+
+    - name: setup artficats facts
+      set_fact:
+        "{{ item.fact_name }}": "{{ item.fact_value }}"
+      loop: "{{ facts }}"
+      loop_control:
+        label: "{{ item.fact_name }}"
+      vars:
+        facts: "{{ lookup('template', 'facts.yml.j2') | from_yaml }}"
+  vars:
+    distribution: "{{ ansible_facts.distribution | lower }}"
+  tags:
+    - role::artifact
+    - role::artifact::facts

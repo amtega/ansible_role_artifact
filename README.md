@@ -10,10 +10,13 @@ This is an [Ansible](http://www.ansible.com) role to download several kinds or a
 
 A list of all the default variables for this role is available in `defaults/main.yml`.
 
-The role setups the following facts:
+For each artifact the role setups a fact named `artifact_result_<artifactid>` with the following dict structure:
 
-- artifact_http_result: results of the http/https artifacts download.
-- artifact_gitlab_result: results of the gitlab/github artifacts download.
+```yaml
+{
+  download_path: <path to the downloaded artifact>
+}
+```
 
 ## Dependencies
 
@@ -31,11 +34,14 @@ This is an example playbook:
     - amtega.artifact
   vars:
     artifact:
-      name: myartifact
-      type: gitlab
-      url: https://mygitlab.org/path_to_artifact/artifact.tar.gz
+      id: artifact1
+      type: github
+      host: https://github.com
+      project: ansible/ansible
+      branch: master
+      file: README.rst
       dest: /tmp
-      private_token: my_gitlab_private_token
+      validate_certs: false
 ```
 
 ## Testing

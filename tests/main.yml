@@ -8,6 +8,7 @@
       docker_presets_images_json_query: >-
         [? starts_with(name, `centos-6`)
            || starts_with(name, `centos-7`)
+           || starts_with(name, `debian-9`)
            || starts_with(name, `fedora-27`)
            || starts_with(name, `fedora-28`) ]
   tags:
@@ -27,19 +28,31 @@
     - amtega.artifact
   vars:
     artifact_list:
-      - name: ansible_readme
+      - id: artifact1
         type: gitlab
-        url: https://raw.githubusercontent.com/ansible/ansible/devel/README.rst
+        host: https://gitlab.com
+        project: demo-group/gitlab-ce
+        branch: master
+        file: README.md
         dest: /tmp
-        creates: /tmp/README.rst
+        validate_certs: false
 
-      - name: tomcat
-        type: https
-        url: >-
-          {{ "https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.9/bin/"
-             + "apache-tomcat-8.5.9.tar.gz" }}
+      - id: artifact2
+        type: github
+        host: https://github.com
+        project: ansible/ansible
+        branch: devel
+        file: README.rst
         dest: /tmp
-        creates: /tmp/apache-tomcat-8.5.9.tar.gz
+        validate_certs: false
+
+      - id: artifact3
+        type: https
+        host: https://archive.apache.org
+        path: /dist/tomcat/tomcat-8/v8.5.9/bin
+        file: apache-tomcat-8.5.9.tar.gz
+        dest: /tmp
+        validate_certs: false
   tasks:
     - name: check ansible artifact download
       stat:
