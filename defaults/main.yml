@@ -4,49 +4,38 @@
 # Dict with the artifact to download. The supported formats for this dict are
 # the following:
 #
-# Gitlab / GitHub artifacts:
-#
 # {
+#
+# Attributes supported by all artifact types:
+#
 #   id: <artifactid>         # For identification purposes. Same restrictions
 #                            # as ansible variable names
-#   type: gitlab
-#   host: <gitlab host>      # Gitlab / Github host
+#   type: <type>             # Can be http, https, gitlab and github
+#   host: <host>             # Host where the artifact resides
+#   path: <path>             # Path that contains the file. If
+#                            # not specified top level path is used
+#   file: <file>             # File to download
+#   dest: <dest>             # Directory where to save the artifact
+#   download: <yes_no>       # Download or not the artifact. Default is yes
+#   retries: <n>             # Number of retries. Default is 3
+#   delay: <s>               # Secondos between retries. Default is 1
+#
+# Attributes supported by gitlab/github artifacts:
+#
 #   project: <project>       # Project that contains the artifact
 #   branch: <branch>         # Project branch to use
-#   path: <path>             # Path within project that contains the file. If
-#                            # not specified top level path is used.
-#   file: <file>             # File to download
-#   dest: <dest>             # Where to save the artifact
 #   private_token: <token>   # Private token to use if the repository is private
+#   timeout: <n>             # Download timeout
+#   validate_certs: <yes_no> # Validate certificates or not
 #
-# The following variables are also supported with the same restrictions that
-# the ansible `get_url` module:
-#
-#   timeout:
-#   validate_certs:
-# }
-#
-#
-# HTTP/HTTPS artifacts:
-#
-# {
-#   id: <artifactid>         # For identification purposes. Same restrictions
-#                            # as ansible variable names
-#   type: http
-#   host: <host>             # HTTP/HTTPS host
-#   path: <path>             # Path that contains the file. If not specified top
-#                            # level path is used.
-#   file: <file>             # File to download
-#
-# The following variables are alse supported with the same restrictions that
-# the ansible `get_url` module:
+# Attributes supported by http/htyps artifacts. This attributes have same
+# restrictions that the ansible `get_url` module:
 #
 #   attributes:
 #   backup:
 #   checksum:
 #   client_cert:
 #   client_key:
-#   dest:
 #   force:
 #   force_basic_auth:
 #   group:

@@ -2,14 +2,6 @@
 # Role facts tasks
 
 - block:
-    - name: get info about artifacts download destination
-      stat:
-        path: "{{ item.dest }}"
-      register: artifact_dest_result
-      loop: "{{ artifact_list }}"
-      loop_control:
-        label: "{{ item.id }}"
-
     - name: setup artficats facts
       set_fact:
         "{{ item.fact_name }}": "{{ item.fact_value }}"

@@ -1,9 +1,5 @@
 {% for artifact in artifact_list %}
 - fact_name: "artifact_result_{{ artifact.id }}"
   fact_value:
-{% if artifact_dest_result.results[loop.index0].stat.isdir %}
     download_path: "{{ artifact.dest }}/{{ artifact.file }}"
-{% else %}
-    download_path: "{{ artifact.dest }}"
-{% endif %}
 {% endfor %}
