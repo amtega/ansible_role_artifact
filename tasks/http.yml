@@ -24,12 +24,16 @@
     timeout: "{{ item.timeout | default(omit) }}"
     tmp_dest:  "{{ item.tmp_dest | default(item.dest) }}"
     unsafe_writes:  "{{ item.unsafe_writes | default(omit) }}"
-    url: "{{ item.host }}/{{ item.path | default('') }}/{{ item.file }}"
+    url: "{{ item.host }}{{ item.path | default('/') }}/{{ item.file }}"
     url_password:  "{{ item.url_password | default(omit) }}"
     url_username: "{{ item.url_username | default(omit) }}"
     use_proxy: "{{ item.use_proxy | default(omit) }}"
     validate_certs: "{{ item.validate_certs | default(omit) }}"
   register: artifact_http_result
+  retries: "{{ item.retries | default(artifact_retries) }}"
+  delay: "{{ item.delay | default(artifact_delay) }}"
+  until: artifact_http_result is succeeded
+  when: item.download | default(true)
   loop: >-
     {{ artifact_list | selectattr('type', 'in', ['http', 'https']) | list }}
   loop_control:

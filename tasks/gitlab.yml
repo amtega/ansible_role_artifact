@@ -18,6 +18,10 @@
     timeout: "{{ item.timeout | default(omit) }}"
     validate_certs: "{{ item.validate_certs | default(omit) }}"
   register: artifact_gitlab_result
+  retries: "{{ item.retries | default(artifact_retries) }}"
+  delay: "{{ item.delay | default(artifact_delay) }}"
+  until: artifact_gitlab_result is succeeded
+  when: item.download | default(true)
   loop: >-
     {{ artifact_list | selectattr('type', 'in', ['gitlab', 'github']) | list }}
   loop_control:
