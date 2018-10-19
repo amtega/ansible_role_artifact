@@ -2,6 +2,7 @@
 # Role dependencies
 
 galaxy_info:
+  role_name: artifact
   author: Juan Antonio Valiño García
   description: Download several kinds or artifacts
   company: AMTEGA - Xunta de Galicia
