@@ -1,7 +1,7 @@
 ---
 # Role default lower priority variables
 
-# Dict with the artifact to download. The supported formats for this dict are
+# Dict with the artifacts to download. The supported formats for this dict are
 # the following:
 #
 # {

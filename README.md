@@ -15,6 +15,7 @@ For each artifact the role setups a fact named `artifact_result_<artifactid>` wi
 ```yaml
 {
   download_path: <path to the downloaded artifact>
+  changed: <true if artifact changed, false in other case>
 }
 ```
 
