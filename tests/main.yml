@@ -53,6 +53,14 @@
         file: apache-tomcat-8.5.9.tar.gz
         dest: /tmp
         validate_certs: false
+
+      - id: artifact4
+        type: https
+        host: https://archive.apache.org
+        path: /dist/tomcat/tomcat-8/v8.5.9/bin
+        file: apache-tomcat-8.5.9.tar.gz
+        dest: /tmp
+        validate_certs: false
   tasks:
     - name: check ansible artifact download
       stat:
@@ -69,6 +77,10 @@
         that:
           - check_ansible_result.stat.exists
           - check_tomcat_result.stat.exists
+          - artifact_result_artifact1.changed
+          - artifact_result_artifact2.changed
+          - artifact_result_artifact3.changed
+          - not artifact_result_artifact4.changed
   tags:
     - idempotence
 
