@@ -74,14 +74,3 @@ artifact:
 
 artifact_list:
   - "{{ artifact }}"
-
-#
-# Proxy settings
-#
-
-artifact_http_proxy: >-
-  {{ ansible_facts.env.http_proxy | default('') }}
-artifact_https_proxy: >-
-  {{ ansible_facts.env.https_proxy | default('') }}
-artifact_no_proxy: >-
-  {{ ansible_facts.env.no_proxy | default('') }}

@@ -4,7 +4,7 @@ This is an [Ansible](http://www.ansible.com) role to download several kinds or a
 
 ## Requirements
 
-[Ansible 2.6+](http://docs.ansible.com/ansible/latest/intro_installation.html)
+[Ansible 2.7+](http://docs.ansible.com/ansible/latest/intro_installation.html)
 
 ## Role Variables
 
@@ -21,7 +21,8 @@ For each artifact the role setups a fact named `artifact_result_<artifactid>` wi
 
 ## Dependencies
 
-None.
+- [amtega.check_platform](https://galaxy.ansible.com/amtega/check_platform)
+- [amtega.proxy_client](https://galaxy.ansible.com/amtega/proxy_client). If you need internet access to download packages fill this role variables.
 
 ## Example Playbook
 

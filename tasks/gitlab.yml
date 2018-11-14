@@ -50,7 +50,7 @@
     headers: >-
       {{ (artifact_item.private_token is defined)
          | ternary(headers_with_token, {}) }}
-  environment: "{{ artifact_http_proxy_environment }}"
+  environment: "{{ proxy_client_environment }}"
   tags:
     - role::artifact
     - role::artifact::gitlab
