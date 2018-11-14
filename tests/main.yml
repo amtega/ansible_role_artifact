@@ -77,9 +77,9 @@
         that:
           - check_ansible_result.stat.exists
           - check_tomcat_result.stat.exists
-          - artifact_result_artifact1.changed
-          - artifact_result_artifact2.changed
-          - artifact_result_artifact3.changed
+          - artifact_result_artifact1.changed is defined
+          - artifact_result_artifact2.changed is defined
+          - artifact_result_artifact3.changed is defined
           - not artifact_result_artifact4.changed
   tags:
     - idempotence
@@ -90,4 +90,5 @@
     - role: amtega.docker_sandbox
       docker_sandbox_state: absent
   tags:
+    - cleanup
     - sandbox
