@@ -22,7 +22,7 @@ For each artifact the role setups a fact named `artifact_result_<artifactid>` wi
 ## Dependencies
 
 - [amtega.check_platform](https://galaxy.ansible.com/amtega/check_platform)
-- [amtega.proxy_client](https://galaxy.ansible.com/amtega/proxy_client). If you need internet access to download packages fill this role variables.
+- [amtega.proxy_client](https://galaxy.ansible.com/amtega/proxy_client). If you need a proxy for internet access fill this role variables.
 
 ## Example Playbook
 
