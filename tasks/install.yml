@@ -1,0 +1,44 @@
+---
+# Install tasks
+
+- block:
+    - block:
+        - name: install ius community repository
+          yum:
+            name: https://rhel6.iuscommunity.org/ius-release.rpm
+            state: present
+
+        - name: install git2u package
+          yum:
+            name: git2u
+            state: present
+      when:
+        - ansible_facts.distribution | lower in ['centos', 'rhel']
+        - ansible_facts.distribution_version is version("7", "<")
+
+    - block:
+        - name: enable backports repository
+          apt_repository:
+            repo: deb http://http.debian.net/debian wheezy-backports main
+            state: present
+            update_cache: yes
+
+        - name: prepare git-lfs repository
+          shell: "curl -s {{ script_url }} | sudo bash"
+          args:
+            warn: false
+          vars:
+            script_url: >-
+              {{ "https://packagecloud.io/"
+                 + "install/repositories/github/git-lfs/script.deb.sh" }}
+
+        - name: install git-lfs package
+          package:
+            name: git-lfs
+            state: present
+      when: ansible_facts.distribution | lower == "debian"
+
+  environment: "{{ proxy_client_environment }}"
+  tags:
+    - role::artifact
+    - role::artifact::install

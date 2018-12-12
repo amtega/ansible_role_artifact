@@ -39,7 +39,8 @@
               --depth 1
             responses:
               (?i)username: "{{ artifact_item.username | default('') }}"
-              (?i)password: "{{ artifact_item.password | default('') }}"
+              (?i)password: >-
+                {{ artifact_item.password | default('') | string }}
           args:
             chdir: "{{ artifact_item.dest }}"
           register: artifact_gitlab_clone_result
@@ -52,20 +53,17 @@
             loop_var: artifact_item
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
-          until: artifact_http_result is succeeded
+          until: artifact_gitlab_clone_result is succeeded
           retries: "{{ artifact_item.retries | default(artifact_retries) }}"
           delay: "{{ artifact_item.delay | default(artifact_delay) }}"
 
-        - name: extract artifact from gitlab/github project
+        - name: reset gitlab/github project clone to head
           shell: >-
-              cd {{ artifact_gitlab_tmp }} ;
-              git reset HEAD . ;
-              git checkout -- {{ artifact_gitlab_file_path }} ;
-              mv {{ artifact_gitlab_file_path }} {{ artifact_item.dest }}
+              git reset HEAD .
           args:
-            chdir: "{{ artifact_item.dest }}"
-          register: artifact_gitlab_extract_result
-          failed_when: artifact_gitlab_extract_result.rc != 0
+            chdir: "{{ artifact_gitlab_tmp }}"
+          register: artifact_gitlab_reset_result
+          failed_when: artifact_gitlab_reset_result.rc != 0
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -74,9 +72,45 @@
             loop_var: artifact_item
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
-          until: artifact_http_result is succeeded
+
+        - name: checkout artifact from gitlab/github project
+          expect:
+            command: "git checkout -- {{ artifact_gitlab_file_path }}"
+            responses:
+              (?i)username: "{{ artifact_item.username | default('') }}"
+              (?i)password: >-
+                {{ artifact_item.password | default('') | string }}
+          args:
+            chdir: "{{ artifact_gitlab_tmp }}"
+          register: artifact_gitlab_checkout_result
+          failed_when: artifact_gitlab_checkout_result.rc != 0
+          loop: >-
+            {{ artifact_list
+               | selectattr('type', 'in', ['gitlab', 'github'])
+               | list }}
+          loop_control:
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
+          until: artifact_gitlab_checkout_result is succeeded
           retries: "{{ artifact_item.retries | default(artifact_retries) }}"
           delay: "{{ artifact_item.delay | default(artifact_delay) }}"
+
+        - name: move artifact to destination
+          shell: >-
+              mv {{ artifact_gitlab_file_path }} {{ artifact_item.dest }}
+          args:
+            chdir: "{{ artifact_gitlab_tmp }}"
+          register: artifact_gitlab_move_result
+          failed_when: artifact_gitlab_move_result.rc != 0
+          loop: >-
+            {{ artifact_list
+               | selectattr('type', 'in', ['gitlab', 'github'])
+               | list }}
+          loop_control:
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
 
         - name: cleanup temporary directory with gitlab/github project clone
           file:
@@ -104,7 +138,9 @@
         artifact_gitlab_file_path: >-
           {{ (artifact_item.path is defined
                and artifact_item.path | length > 0)
-             | ternary(artifact_item.path | default("")
+             | ternary(artifact_item.path
+                       | default("")
+                       | regex_replace("^/(.*)", "\1")
                        + "/"
                        + artifact_item.file,
                        artifact_item.file) }}
