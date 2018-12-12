@@ -41,15 +41,25 @@ dependencies:
 
   - role: amtega.packages
     packages_os:
-      all:
-        all:
+      centos:
+        7:
           git: present
+          git-lfs: present
       debian:
         all:
+          curl: present
+          git: present
           python-pexpect: present
       fedora:
         all:
+          git: present
+          git-lfs: present
           python-pexpect: present
+      rhel:
+        7:
+          git: present
+          git-lfs: present
+
     packages_python:
       centos:
         all:

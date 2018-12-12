@@ -1,9 +1,31 @@
 ---
 # Role tasks
 
-- block:
-    - import_tasks: http.yml
-    - import_tasks: gitlab.yml
-    - import_tasks: facts.yml
+- include_tasks: check.yml
   tags:
     - role::artifact
+    - role::artifact::check
+
+- include_tasks: install.yml
+  when: >-
+    (ansible_facts.distribution | lower in ["centos", "rhel"]
+     and ansible_facts.distribution_version is version("7", "<"))
+    or ansible_facts.distribution | lower == "debian"
+  tags:
+    - role::artifact
+    - role::artifact::install
+
+- include_tasks: http.yml
+  tags:
+    - role::artifact
+    - role::artifact::http
+
+- include_tasks: gitlab.yml
+  tags:
+    - role::artifact
+    - role::artifact::gitab
+
+- include_tasks: facts.yml
+  tags:
+    - role::artifact
+    - role::artifact::facts
