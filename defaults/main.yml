@@ -19,42 +19,32 @@
 #   dest: <dest>             # Directory where to save the artifact
 #   download: <yes_no>       # Download or not the artifact. Default is yes
 #   retries: <n>             # Number of retries. Default is 3
-#   delay: <s>               # Secondos between retries. Default is 1
+#   delay: <s>               # Seconds between retries. Default is 1
 #
-# The following list of attributes have same restrictions that the ansible
-# `get_url` module
+# Additionally the following list of attributes are also supported, with the
+# same restrictions that the ansible `get_url` module:
 #
 #   attributes:
-#   backup:
-#   checksum:
-#   client_cert:
-#   client_key:
 #   force:
 #   group:
-#   headers:
 #   mode:
-#   others:
 #   owner:
 #   selevel:
 #   serole:
 #   setype:
 #   seuser:
-#   sha256sum:
-#   timeout:
 #   tmp_dest:                # By default is the same as dest
-#   unsafe_writes:
-#   use_proxy:
 #   validate_certs:
 #
 # ==============================================================================
 # Attributes supported by gitlab/github artifacts
 # ==============================================================================
 #
-#   project: <project>       # Project that contains the artifact
-#   branch: <branch>         # Project branch to use
-#   private_token: <token>   # Private token to use if the repository is private
-#   timeout: <n>             # Download timeout
-#   validate_certs: <yes_no> # Validate certificates or not
+#   project: <project>   # Project that contains the artifact
+#   branch: <branch>     # Project branch to use
+#   username: <username> # Left emtpy for public repos
+#   password: <password> # You can use a token instead of the user password.
+#                        # Left emtpy for public repos
 #
 # ==============================================================================
 # Attributes supported by http/https artifacts
@@ -65,6 +55,20 @@
 #   force_basic_auth:
 #   url_password:
 #   url_username:
+#
+# Additionally the following list of attributes are also supported, with the
+# same restrictions that the ansible `get_url` module:
+#
+#   backup:
+#   checksum:
+#   client_cert:
+#   client_key:
+#   headers:
+#   others:
+#   sha256sum:
+#   timeout:
+#   unsafe_writes:
+#   use_proxy:
 # }
 
 artifact:

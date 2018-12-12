@@ -38,3 +38,26 @@ dependencies:
 
   - role: amtega.proxy_client
     proxy_client_permanent: no
+
+  - role: amtega.packages
+    packages_os:
+      all:
+        all:
+          git: present
+      debian:
+        all:
+          python-pexpect: present
+      fedora:
+        all:
+          python-pexpect: present
+    packages_python:
+      centos:
+        all:
+          pexpect: latest
+      rhel:
+        all:
+          pexpect: latest
+    when: >-
+      artifact_list
+      | selectattr('type', 'in', ['gitlab', 'github'])
+      | list > 0
