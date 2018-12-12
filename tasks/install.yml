@@ -24,8 +24,9 @@
             update_cache: yes
 
         - name: prepare git-lfs repository
-          shell: >-
-            curl -s {{ script_url }} | sudo bash
+          shell: "curl -s {{ script_url }} | sudo bash"
+          args:
+            warn: false
           vars:
             script_url: >-
               {{ "https://packagecloud.io/"
