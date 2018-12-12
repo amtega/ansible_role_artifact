@@ -2,7 +2,10 @@
 - fact_name: "artifact_result_{{ artifact.id }}"
   fact_value:
     download_path: "{{ artifact.dest }}/{{ artifact.file }}"
-    changed: {{ artifact_gitlab_result.results[loop.index0] is changed }}
+    changed: {{ artifact_gitlab_clone_result.results[loop.index0] is changed
+                or artifact_gitlab_extract_result.results[loop.index0] is changed
+                or artifact_gitlab_cleanup_result.results[loop.index0] is changed
+                or artifact_gitlab_attributes_result.results[loop.index0] is changed }}
 {% endfor %}
 
 {% for artifact in artifact_list | selectattr('type', 'in', ['http', 'https']) | list %}

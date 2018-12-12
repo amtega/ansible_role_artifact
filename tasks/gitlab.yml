@@ -1,55 +1,135 @@
 ---
-# Gitlab/Github artifact download tasks
+# GitLab/GitHub artifact download tasks
 
-- name: download artifacts from gitlab/github
-  get_url:
-    attributes: "{{ artifact_item.attributes | default(omit) }}"
-    backup: "{{ artifact_item.backup | default(omit) }}"
-    checksum: "{{ artifact_item.checksum | default(omit) }}"
-    client_cert: "{{ artifact_item.client_cert | default(omit) }}"
-    client_key: "{{ artifact_item.client_key | default(omit) }}"
-    dest: "{{ artifact_item.dest }}"
-    force: "{{ artifact_item.force | default(omit) }}"
-    group: "{{ artifact_item.group | default(omit) }}"
-    headers: "{{ headers }}"
-    mode: "{{ artifact_item.mode | default(omit) }}"
-    others: "{{ artifact_item.others | default(omit) }}"
-    owner: "{{ artifact_item.owner | default(omit) }}"
-    selevel: "{{ artifact_item.selevel | default(omit) }}"
-    serole: "{{ artifact_item.serole | default(omit) }}"
-    setype: "{{ artifact_item.setype | default(omit) }}"
-    seuser: "{{ artifact_item.seuser | default(omit) }}"
-    sha256sum:  "{{ artifact_item.sha256sum | default(omit) }}"
-    timeout: "{{ artifact_item.timeout | default(omit) }}"
-    tmp_dest:  "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
-    unsafe_writes:  "{{ artifact_item.unsafe_writes | default(omit) }}"
-    url: >-
-      {{ artifact_item.host
-         + "/"
-         + artifact_item.project
-         + "/raw/"
-         + artifact_item.branch
-         + artifact_item.path | default("")
-         + "/"
-         + artifact_item.file }}
-    use_proxy: "{{ artifact_item.use_proxy | default(omit) }}"
-    validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
-  register: artifact_gitlab_result
-  retries: "{{ artifact_item.retries | default(artifact_retries) }}"
-  delay: "{{ artifact_item.delay | default(artifact_delay) }}"
-  until: artifact_gitlab_result is succeeded
+- block:
+    - name: check gitlab/github artifact download
+      stat:
+        path: "{{ artifact_item.dest }}/{{ artifact_item.file }}"
+      register: artifact_gitlab_check_result
+      loop: >-
+        {{ artifact_list
+           | selectattr('type', 'in', ['gitlab', 'github'])
+           | list }}
+      loop_control:
+        loop_var: artifact_item
+        label: "{{ artifact_item.id }}"
+
+    - block:
+        - name: create temporary directory for gitlab/github project clone
+          tempfile:
+            path: "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
+            state: directory
+          register: artifact_gitlab_tmp_result
+          loop: >-
+            {{ artifact_list
+               | selectattr('type', 'in', ['gitlab', 'github'])
+               | list }}
+          loop_control:
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
+
+        - name: clone gitlab/github project into temporay directory
+          expect:
+            command: >-
+              git clone -n
+              {{ artifact_item.host }}/{{ artifact_item.project }}.git
+              {{ artifact_gitlab_tmp }}
+              -b {{ artifact_item.branch }}
+              --depth 1
+            responses:
+              (?i)username: "{{ artifact_item.username | default('') }}"
+              (?i)password: "{{ artifact_item.password | default('') }}"
+          args:
+            chdir: "{{ artifact_item.dest }}"
+          register: artifact_gitlab_clone_result
+          failed_when: artifact_gitlab_clone_result.rc != 0
+          loop: >-
+            {{ artifact_list
+               | selectattr('type', 'in', ['gitlab', 'github'])
+               | list }}
+          loop_control:
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
+          until: artifact_http_result is succeeded
+          retries: "{{ artifact_item.retries | default(artifact_retries) }}"
+          delay: "{{ artifact_item.delay | default(artifact_delay) }}"
+
+        - name: extract artifact from gitlab/github project
+          shell: >-
+              cd {{ artifact_gitlab_tmp }} ;
+              git reset HEAD . ;
+              git checkout -- {{ artifact_gitlab_file_path }} ;
+              mv {{ artifact_gitlab_file_path }} {{ artifact_item.dest }}
+          args:
+            chdir: "{{ artifact_item.dest }}"
+          register: artifact_gitlab_extract_result
+          failed_when: artifact_gitlab_extract_result.rc != 0
+          loop: >-
+            {{ artifact_list
+               | selectattr('type', 'in', ['gitlab', 'github'])
+               | list }}
+          loop_control:
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
+          until: artifact_http_result is succeeded
+          retries: "{{ artifact_item.retries | default(artifact_retries) }}"
+          delay: "{{ artifact_item.delay | default(artifact_delay) }}"
+
+        - name: cleanup temporary directory with gitlab/github project clone
+          file:
+            path: "{{ artifact_gitlab_tmp }}"
+            state: absent
+          register: artifact_gitlab_cleanup_result
+          loop: >-
+            {{ artifact_list
+               | selectattr('type', 'in', ['gitlab', 'github'])
+               | list }}
+          loop_control:
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
+      when: not artifact_download_exists or artifact_item.force | default(false)
+      environment:
+        GIT_SSL_NO_VERIFY: "{{ (not artifact_item.validate_certs) | int }}"
+      vars:
+        artifact_gitlab_check_results: >-
+          {{ artifact_gitlab_check_result.results }}
+        artifact_download_exists: >-
+          {{ artifact_gitlab_check_results[artifact_item_index].stat.exists }}
+        artifact_gitlab_tmp: >-
+          {{ artifact_gitlab_tmp_result.results[artifact_item_index].path }}
+        artifact_gitlab_file_path: >-
+          {{ (artifact_item.path is defined
+               and artifact_item.path | length > 0)
+             | ternary(artifact_item.path | default("")
+                       + "/"
+                       + artifact_item.file,
+                       artifact_item.file) }}
+
+    - name: setup download attributes
+      file:
+        path: "{{ artifact_item.dest | default('') }}/{{ artifact_item.file }}"
+        attributes: "{{ artifact_item.attributes | default(omit) }}"
+        group: "{{ artifact_item.group | default(omit) }}"
+        mode: "{{ artifact_item.mode | default(omit) }}"
+        owner: "{{ artifact_item.owner | default(omit) }}"
+        selevel: "{{ artifact_item.selevel | default(omit) }}"
+        serole: "{{ artifact_item.serole | default(omit) }}"
+        setype: "{{ artifact_item.setype | default(omit) }}"
+        seuser: "{{ artifact_item.seuser | default(omit) }}"
+      register: artifact_gitlab_attributes_result
+      loop: >-
+        {{ artifact_list
+           | selectattr('type', 'in', ['gitlab', 'github'])
+           | list }}
+      loop_control:
+        loop_var: artifact_item
+        label: "{{ artifact_item.id }}"
+
   when: artifact_item.download | default(true)
-  loop: >-
-    {{ artifact_list | selectattr('type', 'in', ['gitlab', 'github']) | list }}
-  loop_control:
-    loop_var: artifact_item
-    label: "{{ artifact_item.id }}"
-  vars:
-    headers_with_token:
-      PRIVATE-TOKEN: "{{ artifact_item.private_token | default('') }}"
-    headers: >-
-      {{ (artifact_item.private_token is defined)
-         | ternary(headers_with_token, {}) }}
   environment: "{{ proxy_client_environment }}"
   tags:
     - role::artifact
