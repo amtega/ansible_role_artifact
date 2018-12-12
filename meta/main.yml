@@ -41,6 +41,9 @@ dependencies:
 
   - role: amtega.packages
     packages_os:
+      all:
+        all:
+          git: present
       debian:
         all:
           python-pexpect: present
@@ -54,4 +57,7 @@ dependencies:
       rhel:
         all:
           pexpect: latest
-    when: artifact_list | selectattr('type', 'equalto', 'git') | list > 0
+    when: >-
+      artifact_list
+      | selectattr('type', 'in', ['gitlab', 'github'])
+      | list > 0

@@ -43,7 +43,7 @@
           args:
             chdir: "{{ artifact_item.dest }}"
           register: artifact_gitlab_clone_result
-          failed_when: artifact_gitlab_clone_result.rc != 0
+          failed_when: artifact_gitlab_clone_result.rc | default(0) != 0
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
