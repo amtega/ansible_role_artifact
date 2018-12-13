@@ -1,4 +1,7 @@
+{% set ns = namespace(found=false) %}
+
 {%- macro fact(artifact) %}
+{% set ns.found = true %}
 {% set result = artifact_stat_result.results | selectattr("artifact_item.id", "equalto", artifact.id) | list | first %}
 {% set checksum = result.stat.checksum %}
 - fact_name: "artifact_result_{{ artifact.id }}"
@@ -22,3 +25,7 @@
 {{- fact(artifact) }}
     changed: {{ artifact_http_result.results[loop.index0] is changed }}
 {% endfor %}
+
+{% if not ns.found %}
+[]
+{% endif %}
