@@ -42,7 +42,9 @@
         host: https://github.com
         project: ansible/ansible
         branch: devel
-        file: README.rst
+        file: COPYING
+        checksum_algorithm: sha1
+        checksum: 338650eb7a42dd9bc1f1c6961420f2633b24932d
         dest: /tmp
         validate_certs: false
 
@@ -51,6 +53,8 @@
         host: https://archive.apache.org
         path: /dist/tomcat/tomcat-8/v8.5.9/bin
         file: apache-tomcat-8.5.9.tar.gz
+        checksum_algorithm: sha1
+        checksum: 3c800e7affdf93bf4dbcf44bd852904449b786f6
         dest: /tmp
         validate_certs: false
 
@@ -62,25 +66,33 @@
         dest: /tmp
         validate_certs: false
   tasks:
-    - name: check ansible artifact download
+    - name: check gitlab artifact download
       stat:
-        path: /tmp/README.rst
-      register: check_ansible_result
+        path: /tmp/README.md
+      register: check_gitlab_result
 
-    - name: check tomcat artifact download
+    - name: check github artifact download
+      stat:
+        path: /tmp/COPYING
+      register: check_github_result
+
+    - name: check http/https artifact download
       stat:
         path: /tmp/apache-tomcat-8.5.9.tar.gz
-      register: check_tomcat_result
+      register: check_http_result
 
-    - name: check that all artifacts were downloaded
+    - name: check that all artifacts were downloaded correctly
       assert:
         that:
-          - check_ansible_result.stat.exists
-          - check_tomcat_result.stat.exists
+          - check_gitlab_result.stat.exists
+          - check_github_result.stat.exists
+          - check_http_result.stat.exists
           - artifact_result_artifact1.changed is defined
           - artifact_result_artifact2.changed is defined
           - artifact_result_artifact3.changed is defined
           - not artifact_result_artifact4.changed
+          - artifact_result_artifact2.checksum == artifact_list[1].checksum
+          - artifact_result_artifact3.checksum == artifact_list[2].checksum
   tags:
     - idempotence
 

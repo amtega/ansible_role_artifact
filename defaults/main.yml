@@ -9,17 +9,21 @@
 # Attributes supported by all artifact types
 # ==============================================================================
 #
-#   id: <artifactid>         # For identification purposes. Same restrictions
-#                            # as ansible variable names
-#   type: <type>             # Can be http, https, gitlab and github
-#   host: <host>             # Host where the artifact resides
-#   path: <path>             # Path that contains the file. If
-#                            # not specified top level path is used
-#   file: <file>             # File to download
-#   dest: <dest>             # Directory where to save the artifact
-#   download: <yes_no>       # Download or not the artifact. Default is yes
-#   retries: <n>             # Number of retries. Default is 3
-#   delay: <s>               # Seconds between retries. Default is 1
+#   id: <artifactid>          # For identification purposes. Same restrictions
+#                             # as ansible variable names
+#   type: <type>              # Can be http, https, gitlab and github
+#   host: <host>              # Host where the artifact resides
+#   path: <path>              # Path that contains the file. If
+#                             # not specified top level path is used
+#   file: <file>              # File to download
+#   dest: <dest>              # Directory where to save the artifact
+#   checksum_algorithm: <alg> # Algorithm to determine checksum of file. Can be
+#                             # md5, sha1, sha224, sha256, sha384, sha512.
+#                             # Default is sha256
+#   checksum: <checksum>      # Checksum that should have de download (optional)
+#   download: <yes_no>        # Download or not the artifact. Default is yes
+#   retries: <n>              # Number of retries. Default is 3
+#   delay: <s>                # Seconds between retries. Default is 1
 #
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url` module:
@@ -60,12 +64,10 @@
 # same restrictions that the ansible `get_url` module:
 #
 #   backup:
-#   checksum:
 #   client_cert:
 #   client_key:
 #   headers:
 #   others:
-#   sha256sum:
 #   timeout:
 #   unsafe_writes:
 #   use_proxy:
