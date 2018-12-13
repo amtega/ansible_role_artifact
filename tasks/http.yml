@@ -5,7 +5,6 @@
   get_url:
     attributes: "{{ artifact_item.attributes | default(omit) }}"
     backup: "{{ artifact_item.backup | default(omit) }}"
-    checksum: "{{ artifact_item.checksum | default(omit) }}"
     client_cert: "{{ artifact_item.client_cert | default(omit) }}"
     client_key: "{{ artifact_item.client_key | default(omit) }}"
     dest: "{{ artifact_item.dest | default(omit) }}"
@@ -20,7 +19,6 @@
     serole: "{{ artifact_item.serole | default(omit) }}"
     setype: "{{ artifact_item.setype | default(omit) }}"
     seuser: "{{ artifact_item.seuser | default(omit) }}"
-    sha256sum:  "{{ artifact_item.sha256sum | default(omit) }}"
     timeout: "{{ artifact_item.timeout | default(omit) }}"
     tmp_dest:  "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
     unsafe_writes:  "{{ artifact_item.unsafe_writes | default(omit) }}"

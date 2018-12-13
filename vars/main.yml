@@ -5,3 +5,7 @@
 
 artifact_retries: 3
 artifact_delay: 1
+
+# Defaults for checksum
+
+artifact_checksum_algorithm: sha256

@@ -1,0 +1,36 @@
+---
+# Checksum tasks
+
+- block:
+    - name: calculate artifacts checksum
+      stat:
+        path: "{{ artifact_item.dest | default('') }}/{{ artifact_item.file }}"
+        checksum_algorithm: >-
+          {{ artifact_item.checksum_algorithm
+             | default(artifact_checksum_algorithm) }}
+        get_checksum: yes
+      register: artifact_stat_result
+      loop: "{{ artifact_list }}"
+      loop_control:
+        loop_var: artifact_item
+        label: "{{ artifact_item.id }}"
+
+    - name: fail if artifacts checksums does not match
+      fail:
+        msg: downloaded artifact checksum does not match
+      when:
+        - artifact_item.checksum | default('') | length > 0
+        - artifact_item.checksum != artifact_checksums[artifact_item_index]
+      loop: "{{ artifact_list }}"
+      loop_control:
+        loop_var: artifact_item
+        index_var: artifact_item_index
+        label: "{{ artifact_item.id }}"
+      vars:
+        artifact_checksums: >-
+          {{ artifact_stat_result.results
+             | map(attribute="stat.checksum")
+             | list }}
+  tags:
+    - role::artifact
+    - role::artifact::checksum

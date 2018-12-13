@@ -145,7 +145,7 @@
                        + artifact_item.file,
                        artifact_item.file) }}
 
-    - name: setup download attributes
+    - name: setup artifact attributes
       file:
         path: "{{ artifact_item.dest | default('') }}/{{ artifact_item.file }}"
         attributes: "{{ artifact_item.attributes | default(omit) }}"
@@ -164,7 +164,6 @@
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
-
   when: artifact_item.download | default(true)
   environment: "{{ proxy_client_environment }}"
   tags:
