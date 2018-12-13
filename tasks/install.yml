@@ -22,9 +22,11 @@
             repo: deb http://http.debian.net/debian wheezy-backports main
             state: present
             update_cache: yes
+          register: artifact_enable_backports_result
 
         - name: prepare git-lfs repository
           shell: "curl -s {{ script_url }} | sudo bash"
+          when: artifact_enable_backports_result is changed
           args:
             warn: false
           vars:
