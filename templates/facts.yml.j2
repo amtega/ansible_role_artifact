@@ -2,30 +2,38 @@
 
 {%- macro fact(artifact) %}
 {% set ns.found = true %}
-{% set result = artifact_stat_result.results | selectattr("artifact_item.id", "equalto", artifact.id) | list | first %}
-{% set checksum = result.stat.checksum %}
-- fact_name: "artifact_result_{{ artifact.id }}"
-  fact_value:
-    download_path: "{{ artifact.dest }}/{{ artifact.file }}"
-    checksum_algorithm: {{ artifact.checksum_algorithm | default(artifact_checksum_algorithm) }}
-    checksum: {{ checksum }}
+{% set result = artifact_stat_result.results
+                | selectattr("artifact_item.id", "equalto", artifact.id)
+                | list
+                | first %}
+{% set checksum = result.stat.checksum | default(none) %}
+"{{ artifact.id }}":
+  download_path: "{{ artifact.dest }}/{{ artifact.file }}"
+{% if checksum is not none %}
+  checksum_algorithm: {{ artifact.checksum_algorithm | default(artifact_checksum_algorithm) }}
+  checksum: {{ checksum }}
+{% endif %}
 {%- endmacro %}
 
-{% for artifact in artifact_list | selectattr('type', 'in', ['gitlab', 'github']) | list %}
+{% for artifact in artifact_list
+                   | selectattr('type', 'in', ['gitlab', 'github'])
+                   | list %}
 {{- fact(artifact) }}
-    changed: {{ artifact_gitlab_clone_result.results[loop.index0] is changed
-                or artifact_gitlab_reset_result.results[loop.index0] is changed
-                or artifact_gitlab_checkout_result.results[loop.index0] is changed
-                or artifact_gitlab_move_result.results[loop.index0] is changed
-                or artifact_gitlab_cleanup_result.results[loop.index0] is changed
-                or artifact_gitlab_attributes_result.results[loop.index0] is changed }}
+  changed: {{ artifact_gitlab_clone_result.results[loop.index0] is changed
+              or artifact_gitlab_reset_result.results[loop.index0] is changed
+              or artifact_gitlab_checkout_result.results[loop.index0] is changed
+              or artifact_gitlab_move_result.results[loop.index0] is changed
+              or artifact_gitlab_cleanup_result.results[loop.index0] is changed
+              or artifact_gitlab_attributes_result.results[loop.index0] is changed }}
 {% endfor %}
 
-{% for artifact in artifact_list | selectattr('type', 'in', ['http', 'https']) | list %}
+{% for artifact in artifact_list
+                   | selectattr('type', 'in', ['http', 'https'])
+                   | list %}
 {{- fact(artifact) }}
-    changed: {{ artifact_http_result.results[loop.index0] is changed }}
+  changed: {{ artifact_http_result.results[loop.index0] is changed }}
 {% endfor %}
 
 {% if not ns.found %}
-[]
+{}
 {% endif %}
