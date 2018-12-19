@@ -70,4 +70,5 @@ dependencies:
     when: >-
       artifact_list
       | selectattr('type', 'in', ['gitlab', 'github'])
-      | list > 0
+      | list
+      | length > 0
