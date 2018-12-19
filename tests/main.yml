@@ -81,18 +81,20 @@
         path: /tmp/apache-tomcat-8.5.9.tar.gz
       register: check_http_result
 
+    - debug: var=artifact_result
+
     - name: check that all artifacts were downloaded correctly
       assert:
         that:
           - check_gitlab_result.stat.exists
           - check_github_result.stat.exists
           - check_http_result.stat.exists
-          - artifact_result_artifact1.changed is defined
-          - artifact_result_artifact2.changed is defined
-          - artifact_result_artifact3.changed is defined
-          - not artifact_result_artifact4.changed
-          - artifact_result_artifact2.checksum == artifact_list[1].checksum
-          - artifact_result_artifact3.checksum == artifact_list[2].checksum
+          - artifact_result.artifact1 is defined
+          - artifact_result.artifact2 is defined
+          - artifact_result.artifact3 is defined
+          - not artifact_result.artifact4.changed
+          - artifact_result.artifact2.checksum == artifact_list[1].checksum
+          - artifact_result.artifact3.checksum == artifact_list[2].checksum
   tags:
     - idempotence
 

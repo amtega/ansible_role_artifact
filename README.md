@@ -10,13 +10,17 @@ This is an [Ansible](http://www.ansible.com) role to download several kinds or a
 
 A list of all the default variables for this role is available in `defaults/main.yml`.
 
-For each artifact the role setups a fact named `artifact_result_<artifactid>` with the following dict structure:
+The role setups a fact named `artifact_result` with the following dict structure:
 
 ```yaml
-{
-  download_path: <path to the downloaded artifact>
-  changed: <true if artifact changed, false in other case>
-}
+artfiact_result:
+  <artifact1_id>:
+    download_path: <path to the downloaded artifact>
+    changed: <true if artifact changed, false in other case>
+    checksum: <checksum>
+    checksum_algorithm: <checksum algorithm>
+  <artifact1_id>: ...
+  <artifactN_id>: ...  
 ```
 
 ## Dependencies
