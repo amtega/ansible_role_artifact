@@ -6,6 +6,7 @@
       stat:
         path: "{{ artifact_item.dest }}/{{ artifact_item.file }}"
       register: artifact_gitlab_check_result
+      no_log: yes
       loop: >-
         {{ artifact_list
            | selectattr('type', 'in', ['gitlab', 'github'])
@@ -20,6 +21,7 @@
             path: "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
             state: directory
           register: artifact_gitlab_tmp_result
+          no_log: yes
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -45,6 +47,7 @@
             chdir: "{{ artifact_item.dest }}"
           register: artifact_gitlab_clone_result
           failed_when: artifact_gitlab_clone_result.rc | default(0) != 0
+          no_log: yes
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -64,6 +67,7 @@
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_reset_result
           failed_when: artifact_gitlab_reset_result.rc != 0
+          no_log: yes
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -84,6 +88,7 @@
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_checkout_result
           failed_when: artifact_gitlab_checkout_result.rc != 0
+          no_log: yes
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -103,6 +108,7 @@
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_move_result
           failed_when: artifact_gitlab_move_result.rc != 0
+          no_log: yes
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -117,6 +123,7 @@
             path: "{{ artifact_gitlab_tmp }}"
             state: absent
           register: artifact_gitlab_cleanup_result
+          no_log: yes
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -157,6 +164,7 @@
         setype: "{{ artifact_item.setype | default(omit) }}"
         seuser: "{{ artifact_item.seuser | default(omit) }}"
       register: artifact_gitlab_attributes_result
+      no_log: yes
       loop: >-
         {{ artifact_list
            | selectattr('type', 'in', ['gitlab', 'github'])
