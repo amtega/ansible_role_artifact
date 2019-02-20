@@ -6,7 +6,7 @@
       stat:
         path: "{{ artifact_item.dest }}/{{ artifact_item.file }}"
       register: artifact_gitlab_check_result
-      no_log: yes
+      no_log: "{{ artifact_item.no_log | default(true) }}"
       loop: >-
         {{ artifact_list
            | selectattr('type', 'in', ['gitlab', 'github'])
@@ -21,7 +21,7 @@
             path: "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
             state: directory
           register: artifact_gitlab_tmp_result
-          no_log: yes
+          no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -43,11 +43,12 @@
               (?i)username: "{{ artifact_item.username | default('') }}"
               (?i)password: >-
                 {{ artifact_item.password | default('') | string }}
+            timeout: "{{ artifact_item.timeout | default(omit) }}"
           args:
             chdir: "{{ artifact_item.dest }}"
           register: artifact_gitlab_clone_result
           failed_when: artifact_gitlab_clone_result.rc | default(0) != 0
-          no_log: yes
+          no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -67,7 +68,7 @@
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_reset_result
           failed_when: artifact_gitlab_reset_result.rc != 0
-          no_log: yes
+          no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -88,7 +89,7 @@
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_checkout_result
           failed_when: artifact_gitlab_checkout_result.rc != 0
-          no_log: yes
+          no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -108,7 +109,7 @@
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_move_result
           failed_when: artifact_gitlab_move_result.rc != 0
-          no_log: yes
+          no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -123,7 +124,7 @@
             path: "{{ artifact_gitlab_tmp }}"
             state: absent
           register: artifact_gitlab_cleanup_result
-          no_log: yes
+          no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
             {{ artifact_list
                | selectattr('type', 'in', ['gitlab', 'github'])
@@ -133,8 +134,6 @@
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
       when: not artifact_download_exists or artifact_item.force | default(false)
-      environment:
-        GIT_SSL_NO_VERIFY: "{{ (not artifact_item.validate_certs) | int }}"
       vars:
         artifact_gitlab_check_results: >-
           {{ artifact_gitlab_check_result.results }}
@@ -164,7 +163,7 @@
         setype: "{{ artifact_item.setype | default(omit) }}"
         seuser: "{{ artifact_item.seuser | default(omit) }}"
       register: artifact_gitlab_attributes_result
-      no_log: yes
+      no_log: "{{ artifact_item.no_log | default(true) }}"
       loop: >-
         {{ artifact_list
            | selectattr('type', 'in', ['gitlab', 'github'])
@@ -173,7 +172,10 @@
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
   when: artifact_item.download | default(true)
-  environment: "{{ proxy_client_environment }}"
+  environment: >-
+    {{ proxy_client_environment
+       | combine(
+          { "GIT_SSL_NO_VERIFY": (not artifact_item.validate_certs) | int }) }}
   tags:
     - role::artifact
     - role::artifact::gitlab

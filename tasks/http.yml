@@ -34,7 +34,7 @@
   delay: "{{ artifact_item.delay | default(artifact_delay) }}"
   until: artifact_http_result is succeeded
   when: artifact_item.download | default(true)
-  no_log: yes
+  no_log: "{{ artifact_item.no_log | default(true) }}"
   loop: >-
     {{ artifact_list | selectattr('type', 'in', ['http', 'https']) | list }}
   loop_control:

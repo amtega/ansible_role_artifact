@@ -24,6 +24,7 @@
 #   download: <yes_no>        # Download or not the artifact. Default is yes
 #   retries: <n>              # Number of retries. Default is 3
 #   delay: <s>                # Seconds between retries. Default is 1
+#   no_log: <yes_no>          # Hide sensitive info. Default is yes
 #
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url` module:
@@ -49,6 +50,7 @@
 #   username: <username> # Left emtpy for public repos
 #   password: <password> # You can use a token instead of the user password.
 #                        # Left emtpy for public repos
+#   timeout: <seconds>   # Download timeout
 #
 # ==============================================================================
 # Attributes supported by http/https artifacts
