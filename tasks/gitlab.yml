@@ -31,76 +31,106 @@
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
 
-        - name: clone gitlab/github project into temporay directory
-          expect:
-            command: >-
-              git clone -n
-              {{ artifact_item.host }}/{{ artifact_item.project }}.git
-              {{ artifact_gitlab_tmp }}
-              -b {{ artifact_item.branch }}
-              --depth 1
-            responses:
-              (?i)username: "{{ artifact_item.username | default('') }}"
-              (?i)password: >-
-                {{ artifact_item.password | default('') | string }}
-            timeout: "{{ artifact_item.timeout | default(omit) }}"
-          args:
-            chdir: "{{ artifact_item.dest }}"
-          register: artifact_gitlab_clone_result
-          failed_when: artifact_gitlab_clone_result.rc | default(0) != 0
-          no_log: "{{ artifact_item.no_log | default(true) }}"
-          loop: >-
-            {{ artifact_list
-               | selectattr('type', 'in', ['gitlab', 'github'])
-               | list }}
-          loop_control:
-            loop_var: artifact_item
-            index_var: artifact_item_index
-            label: "{{ artifact_item.id }}"
-          until: artifact_gitlab_clone_result is succeeded
-          retries: "{{ artifact_item.retries | default(artifact_retries) }}"
-          delay: "{{ artifact_item.delay | default(artifact_delay) }}"
+        - block:
+            - name: clone gitlab/github project into temporay directory
+              expect:
+                command: >-
+                  git
+                  {{ git_http_proxy_opt }}
+                  {{ git_https_proxy_opt }}
+                  clone -n
+                  {{ artifact_item.host }}/{{ artifact_item.project }}.git
+                  {{ artifact_gitlab_tmp }}
+                  -b {{ artifact_item.branch }}
+                  --depth 1
+                responses:
+                  (?i)username: "{{ artifact_item.username | default('') }}"
+                  (?i)password: >-
+                    {{ artifact_item.password | default('') | string }}
+                timeout: "{{ artifact_item.timeout | default(omit) }}"
+              args:
+                chdir: "{{ artifact_item.dest }}"
+              register: artifact_gitlab_clone_result
+              failed_when: artifact_gitlab_clone_result.rc | default(0) != 0
+              no_log: "{{ artifact_item.no_log | default(true) }}"
+              loop: >-
+                {{ artifact_list
+                   | selectattr('type', 'in', ['gitlab', 'github'])
+                   | list }}
+              loop_control:
+                loop_var: artifact_item
+                index_var: artifact_item_index
+                label: "{{ artifact_item.id }}"
+              until: artifact_gitlab_clone_result is succeeded
+              retries: "{{ artifact_item.retries | default(artifact_retries) }}"
+              delay: "{{ artifact_item.delay | default(artifact_delay) }}"
 
-        - name: reset gitlab/github project clone to head
-          shell: >-
-              git reset HEAD .
-          args:
-            chdir: "{{ artifact_gitlab_tmp }}"
-          register: artifact_gitlab_reset_result
-          failed_when: artifact_gitlab_reset_result.rc != 0
-          no_log: "{{ artifact_item.no_log | default(true) }}"
-          loop: >-
-            {{ artifact_list
-               | selectattr('type', 'in', ['gitlab', 'github'])
-               | list }}
-          loop_control:
-            loop_var: artifact_item
-            index_var: artifact_item_index
-            label: "{{ artifact_item.id }}"
+            - name: reset gitlab/github project clone to head
+              shell: >-
+                  git reset HEAD .
+              args:
+                chdir: "{{ artifact_gitlab_tmp }}"
+              register: artifact_gitlab_reset_result
+              failed_when: artifact_gitlab_reset_result.rc != 0
+              no_log: "{{ artifact_item.no_log | default(true) }}"
+              loop: >-
+                {{ artifact_list
+                   | selectattr('type', 'in', ['gitlab', 'github'])
+                   | list }}
+              loop_control:
+                loop_var: artifact_item
+                index_var: artifact_item_index
+                label: "{{ artifact_item.id }}"
 
-        - name: checkout artifact from gitlab/github project
-          expect:
-            command: "git checkout -- {{ artifact_gitlab_file_path }}"
-            responses:
-              (?i)username: "{{ artifact_item.username | default('') }}"
-              (?i)password: >-
-                {{ artifact_item.password | default('') | string }}
-          args:
-            chdir: "{{ artifact_gitlab_tmp }}"
-          register: artifact_gitlab_checkout_result
-          failed_when: artifact_gitlab_checkout_result.rc != 0
-          no_log: "{{ artifact_item.no_log | default(true) }}"
-          loop: >-
-            {{ artifact_list
-               | selectattr('type', 'in', ['gitlab', 'github'])
-               | list }}
-          loop_control:
-            loop_var: artifact_item
-            index_var: artifact_item_index
-            label: "{{ artifact_item.id }}"
-          until: artifact_gitlab_checkout_result is succeeded
-          retries: "{{ artifact_item.retries | default(artifact_retries) }}"
-          delay: "{{ artifact_item.delay | default(artifact_delay) }}"
+            - name: checkout artifact from gitlab/github project
+              expect:
+                command: >-
+                  git
+                  {{ git_http_proxy_opt }}
+                  {{ git_https_proxy_opt }}
+                  checkout
+                  -- {{ artifact_gitlab_file_path }}
+                responses:
+                  (?i)username: "{{ artifact_item.username | default('') }}"
+                  (?i)password: >-
+                    {{ artifact_item.password | default('') | string }}
+                timeout: "{{ artifact_item.timeout | default(omit) }}"
+              args:
+                chdir: "{{ artifact_gitlab_tmp }}"
+              register: artifact_gitlab_checkout_result
+              failed_when: artifact_gitlab_checkout_result.rc != 0
+              no_log: "{{ artifact_item.no_log | default(true) }}"
+              loop: >-
+                {{ artifact_list
+                   | selectattr('type', 'in', ['gitlab', 'github'])
+                   | list }}
+              loop_control:
+                loop_var: artifact_item
+                index_var: artifact_item_index
+                label: "{{ artifact_item.id }}"
+              until: artifact_gitlab_checkout_result is succeeded
+              retries: "{{ artifact_item.retries | default(artifact_retries) }}"
+              delay: "{{ artifact_item.delay | default(artifact_delay) }}"
+
+          environment:
+            GIT_SSL_NO_VERIFY: "{{ (not artifact_item.validate_certs) | int }}"
+          vars:
+            git_http_proxy_opt: >-
+              {{ (proxy_client_environment.http_proxy
+                  | default('')
+                  | length > 0)
+                 | ternary('-c "http.proxy='
+                           + proxy_client_environment.http_proxy | default('')
+                           + '"',
+                           '' ) }}
+            git_https_proxy_opt: >-
+              {{ (proxy_client_environment.https_proxy
+                  | default('')
+                  | length > 0)
+                 | ternary('-c "https.proxy='
+                           + proxy_client_environment.https_proxy | default('')                           | default('')
+                           + '"',
+                           '' ) }}
 
         - name: move artifact to destination
           shell: >-
@@ -172,10 +202,7 @@
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
   when: artifact_item.download | default(true)
-  environment: >-
-    {{ proxy_client_environment
-       | combine(
-          { "GIT_SSL_NO_VERIFY": (not artifact_item.validate_certs) | int }) }}
+  environment: "{{ proxy_client_environment }}"
   tags:
     - role::artifact
     - role::artifact::gitlab
