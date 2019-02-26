@@ -28,7 +28,7 @@
 - include_tasks: checksum.yml
   tags:
     - role::artifact
-    - role::artifact::checksum    
+    - role::artifact::checksum
 
 - include_tasks: facts.yml
   tags:
