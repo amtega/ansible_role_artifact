@@ -10,7 +10,10 @@
              | default(artifact_checksum_algorithm) }}
         get_checksum: yes
       register: artifact_stat_result
-      loop: "{{ artifact_list }}"
+      loop: >-
+        {{ artifact_to_manage
+           | selectattr('type', 'in', ['gitlab', 'github', 'http', 'https'])
+           | list }}
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
@@ -21,7 +24,10 @@
       when:
         - artifact_item.checksum | default('') | length > 0
         - artifact_item.checksum != artifact_checksums[artifact_item_index]
-      loop: "{{ artifact_list }}"
+      loop: >-
+        {{ artifact_to_manage
+           | selectattr('type', 'in', ['gitlab', 'github', 'http', 'https'])
+           | list }}
       loop_control:
         loop_var: artifact_item
         index_var: artifact_item_index
