@@ -1,17 +1,16 @@
 {% set ns = namespace(found=false) %}
 
-{%- macro fact(artifact) %}
+{%- macro fact(artifact, result={}) %}
 {% set ns.found = true %}
-{% set result = artifact_stat_result.results
-                | selectattr("artifact_item.id", "equalto", artifact.id)
-                | list
-                | first %}
-{% set checksum = result.stat.checksum | default(none) %}
+
 "{{ artifact.id }}":
+
+{% if artifact.type in ['gitlab', 'github', 'http', 'https'] %}
   download_path: "{{ artifact.dest }}/{{ artifact.file }}"
-{% if checksum is not none %}
-  checksum_algorithm: {{ artifact.checksum_algorithm | default(artifact_checksum_algorithm) }}
-  checksum: {{ checksum }}
+{% endif %}
+
+{% if artifact.type in ['maven'] %}
+  download_path: "{{ result.dest }}"
 {% endif %}
 {%- endmacro %}
 
@@ -32,6 +31,13 @@
                    | list %}
 {{- fact(artifact) }}
   changed: {{ artifact_http_result.results[loop.index0] is changed }}
+{% endfor %}
+
+{% for artifact in artifact_list
+                   | selectattr('type', 'in', ['maven'])
+                   | list %}
+{{- fact(artifact, artifact_maven_result.results[loop.index0]) }}
+  changed: {{ artifact_maven_result.results[loop.index0] is changed }}
 {% endfor %}
 
 {% if not ns.found %}

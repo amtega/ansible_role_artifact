@@ -25,8 +25,8 @@
     url: >-
       {{ artifact_item.host }}{{ artifact_item.path
                                  | default('/') }}/{{ artifact_item.file }}
-    url_password:  "{{ artifact_item.url_password | default(omit) }}"
-    url_username: "{{ artifact_item.url_username | default(omit) }}"
+    url_password:  "{{ artifact_item.password | default(omit) }}"
+    url_username: "{{ artifact_item.username | default(omit) }}"
     use_proxy: "{{ artifact_item.use_proxy | default(omit) }}"
     validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
   register: artifact_http_result

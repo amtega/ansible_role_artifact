@@ -28,7 +28,7 @@
     - amtega.artifact
   vars:
     artifact_list:
-      - id: artifact1
+      - id: gitlab
         type: gitlab
         host: https://gitlab.com
         project: demo-group/gitlab-ce
@@ -38,7 +38,7 @@
         validate_certs: false
         no_log: no
 
-      - id: artifact2
+      - id: ansible
         type: github
         host: https://github.com
         project: ansible/ansible
@@ -50,7 +50,7 @@
         validate_certs: false
         no_log: no
 
-      - id: artifact3
+      - id: tomcat1
         type: https
         host: https://archive.apache.org
         path: /dist/tomcat/tomcat-8/v8.5.9/bin
@@ -61,11 +61,22 @@
         validate_certs: false
         no_log: no
 
-      - id: artifact4
+      - id: tomcat2
         type: https
         host: https://archive.apache.org
         path: /dist/tomcat/tomcat-8/v8.5.9/bin
         file: apache-tomcat-8.5.9.tar.gz
+        dest: /tmp
+        validate_certs: false
+        no_log: no
+
+      - id: spring
+        type: maven
+        artifact_id: spring-jdbc
+        group_id: org.springframework
+        host: http://central.maven.org
+        path: /maven2
+        version: 5.1.5.RELEASE
         dest: /tmp
         validate_certs: false
         no_log: no
@@ -85,7 +96,10 @@
         path: /tmp/apache-tomcat-8.5.9.tar.gz
       register: check_http_result
 
-    - debug: var=artifact_result
+    - name: check maven artifact download
+      stat:
+        path: /tmp/spring-jdbc-5.1.5.RELEASE.jar
+      register: check_maven_result
 
     - name: check that all artifacts were downloaded correctly
       assert:
@@ -93,12 +107,12 @@
           - check_gitlab_result.stat.exists
           - check_github_result.stat.exists
           - check_http_result.stat.exists
-          - artifact_result.artifact1 is defined
-          - artifact_result.artifact2 is defined
-          - artifact_result.artifact3 is defined
-          - not artifact_result.artifact4.changed
-          - artifact_result.artifact2.checksum == artifact_list[1].checksum
-          - artifact_result.artifact3.checksum == artifact_list[2].checksum
+          - check_maven_result.stat.exists
+          - artifact_result.gitlab is defined
+          - artifact_result.ansible is defined
+          - artifact_result.tomcat1 is defined
+          - not artifact_result.tomcat2.changed
+          - not artifact_result.spring.changed
   tags:
     - idempotence
 

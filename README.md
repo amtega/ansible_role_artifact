@@ -1,6 +1,6 @@
 # Amtega artifact role
 
-This is an [Ansible](http://www.ansible.com) role to download several kinds or artifacts. Currently http/https and gitlab/github artifacts are supported.
+This is an [Ansible](http://www.ansible.com) role to download several kinds or artifacts. Currently http/https, maven and gitlab/github artifacts are supported.
 
 ## Requirements
 
@@ -17,8 +17,6 @@ artfiact_result:
   <artifact1_id>:
     download_path: <path to the downloaded artifact>
     changed: <true if artifact changed, false in other case>
-    checksum: <checksum>
-    checksum_algorithm: <checksum algorithm>
   <artifact1_id>: ...
   <artifactN_id>: ...  
 ```

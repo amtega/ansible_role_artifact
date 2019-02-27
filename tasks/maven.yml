@@ -1,0 +1,62 @@
+---
+# Maven artifact download tasks
+
+
+#
+# - name: test
+#   hosts: localhost
+#   tasks:
+#     - name: test
+#       maven_artifact:
+#         group_id: org.javagalician
+#         artifact_id: javagalician-java6
+#         version: 1.1
+#         repository_url: http://nexus.xunta.local/nexus/service/local/repositories/releases/content
+#         username: "{{ ANSIBLE_USER }}"
+#         password: "{{ ANSIBLE_PASSWORD }}"
+#         dest: /tmp
+#       register: t
+
+    # - debug: var=t
+
+
+- name: download artifacts from maven repository
+  maven_artifact:
+    artifact_id: "{{ artifact_item.artifact_id | default(omit) }}"
+    attributes: "{{ artifact_item.attributes | default(omit) }}"
+    classifier: "{{ artifact_item.classifier | default(omit) }}"
+    dest: "{{ artifact_item.dest | default(omit) }}"
+    extension: "{{ artifact_item.extension | default(omit) }}"
+    group: "{{ artifact_item.group | default(omit) }}"
+    group_id: "{{ artifact_item.group_id | default(omit) }}"
+    keep_name: "{{ artifact_item.keep_name | default(omit) }}"
+    mode: "{{ artifact_item.mode | default(omit) }}"
+    owner: "{{ artifact_item.owner | default(omit) }}"
+    password: "{{ artifact_item.password | default(omit) }}"
+    repository_url: >-
+      {{ artifact_item.host }}{{ artifact_item.path | default('/') }}
+    selevel: "{{ artifact_item.selevel | default(omit) }}"
+    serole: "{{ artifact_item.serole | default(omit) }}"
+    setype: "{{ artifact_item.setype | default(omit) }}"
+    seuser: "{{ artifact_item.seuser | default(omit) }}"
+    state: present
+    timeout: "{{ artifact_item.timeout | default(omit) }}"
+    unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
+    username: "{{ artifact_item.username | default(omit) }}"
+    validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
+    verify_checksum: "{{ artifact_item.verify_checksum | default(omit) }}"
+    version: "{{ artifact_item.version | default(omit) }}"
+  register: artifact_maven_result
+  retries: "{{ artifact_item.retries | default(artifact_retries) }}"
+  delay: "{{ artifact_item.delay | default(artifact_delay) }}"
+  until: artifact_maven_result is succeeded
+  when: artifact_item.download | default(true)
+  no_log: "{{ artifact_item.no_log | default(true) }}"
+  loop: "{{ artifact_list | selectattr('type', 'in', ['maven']) | list }}"
+  loop_control:
+      loop_var: artifact_item
+      label: "{{ artifact_item.id }}"
+  environment: "{{ proxy_client_environment }}"
+  tags:
+    - role::artifact
+    - role::artifact::maven

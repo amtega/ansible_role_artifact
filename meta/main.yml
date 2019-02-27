@@ -41,6 +41,9 @@ dependencies:
 
   - role: amtega.packages
     packages_os:
+      all:
+        all:
+          python-lxml: present
       centos:
         7:
           git: present

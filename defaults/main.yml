@@ -11,68 +11,95 @@
 #
 #   id: <artifactid>          # For identification purposes. Same restrictions
 #                             # as ansible variable names
-#   type: <type>              # Can be http, https, gitlab and github
+#   type: <type>              # Can be http, https, maven, gitlab and github
 #   host: <host>              # Host where the artifact resides
 #   path: <path>              # Path that contains the file. If
 #                             # not specified top level path is used
-#   file: <file>              # File to download
 #   dest: <dest>              # Directory where to save the artifact
-#   checksum_algorithm: <alg> # Algorithm to determine checksum of file. Can be
-#                             # md5, sha1, sha224, sha256, sha384, sha512.
-#                             # Default is sha256
-#   checksum: <checksum>      # Checksum that should have de download (optional)
 #   download: <yes_no>        # Download or not the artifact. Default is yes
 #   retries: <n>              # Number of retries. Default is 3
 #   delay: <s>                # Seconds between retries. Default is 1
 #   no_log: <yes_no>          # Hide sensitive info. Default is yes
 #
 # Additionally the following list of attributes are also supported, with the
-# same restrictions that the ansible `get_url` module:
+# same restrictions that the ansible `get_url/maven_artifact` modules:
 #
-#   attributes:
-#   force:
-#   group:
-#   mode:
-#   owner:
-#   selevel:
-#   serole:
-#   setype:
-#   seuser:
-#   tmp_dest:                # By default is the same as dest
-#   validate_certs:
+#   attributes: <attr>
+#   group: <group>
+#   mode: <mode>
+#   owner: <owner>
+#   selevel: <selevel>
+#   serole: <serole>
+#   setype: <setype>
+#   seuser: <seuser>
+#   validate_certs: <yes_no>
 #
 # ==============================================================================
 # Attributes supported by gitlab/github artifacts
 # ==============================================================================
 #
-#   project: <project>   # Project that contains the artifact
-#   branch: <branch>     # Project branch to use
-#   username: <username> # Left emtpy for public repos
-#   password: <password> # You can use a token instead of the user password.
-#                        # Left emtpy for public repos
-#   timeout: <seconds>   # Download timeout
+#   project: <project>        # Project that contains the artifact
+#   branch: <branch>          # Project branch to use
+#   file: <file>              # File to download
+#   username: <username>      # Left emtpy for public repos
+#   password: <password>      # You can use a token instead of the user password
+#                             # Left emtpy for public repos
+#   timeout: <seconds>        # Download timeout
+#   tmp_dest: <tmp_dest>      # Temporary directory for download operations
+#                             # (default is the same as dest)
+#   force: <yes_no>           # Force or not the download
+#   checksum_algorithm: <alg> # Algorithm to determine checksum of file. Can be
+#                             # md5, sha1, sha224, sha256, sha384, sha512.
+#                             # Default is sha256
+#   checksum: <checksum>      # Checksum that should have de download (optional)
 #
 # ==============================================================================
 # Attributes supported by http/https artifacts
 # ==============================================================================
 #
-# This attributes have same # restrictions that the ansible `get_url` module
-#
-#   force_basic_auth:
-#   url_password:
-#   url_username:
+#   file: <file>              # File to download
+#   username: <username>      # HTTP basic authentication username
+#   password: <password>      # HTTP basic authentication password
+#   checksum_algorithm: <alg> # Algorithm to determine checksum of file. Can be
+#                             # md5, sha1, sha224, sha256, sha384, sha512.
+#                             # Default is sha256
+#   checksum: <checksum>      # Checksum that should have de download (optional)
 #
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url` module:
 #
-#   backup:
-#   client_cert:
-#   client_key:
-#   headers:
-#   others:
-#   timeout:
-#   unsafe_writes:
-#   use_proxy:
+#   force_basic_auth: <yes_no>
+#   backup: <yes_no>
+#   client_cert: <cert>
+#   client_key: <key>
+#   headers: <headers>
+#   others: <others>
+#   timeout: <timeout>
+#   tmp_dest: <tmp_dest>      # Temporary directory for download operations
+#                             # (default is the same as dest)
+#   unsafe_writes: <yes_no>
+#   use_proxy: <yes_no>
+#   force: <yes_no>           # Force or not the download
+#
+# ==============================================================================
+# Attributes supported by maven artifacts
+# ==============================================================================
+#
+# The following list of attributes are supported, with the same restrictions
+# that the ansible `maven_artifact` module:
+#
+#   artifact_id: <artifact_id>
+#   classifier: <classifier>
+#   dest: <dest>
+#   extension: <extension>
+#   group_id: <group_id>
+#   keep_name: <keep_name>
+#   password: <password>
+#   timeout: <timeout>
+#   unsafe_writes: <unsafe_writes>
+#   username: <username>
+#   verify_checksum: <verify_checksum>
+#   version: <version>
 # }
 
 artifact:

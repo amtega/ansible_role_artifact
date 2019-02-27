@@ -25,6 +25,11 @@
     - role::artifact
     - role::artifact::gitab
 
+- include_tasks: maven.yml
+  tags:
+    - role::artifact
+    - role::artifact::maven
+
 - include_tasks: checksum.yml
   tags:
     - role::artifact
