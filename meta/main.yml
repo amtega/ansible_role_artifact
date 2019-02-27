@@ -35,15 +35,27 @@ dependencies:
       debian: 9
       fedora: 27
       rhel: 6
+    tags:
+      - role::artifact
+
+  - role: amtega.select_hostvars
+    select_hostvars_pattern: "^artifact_.*"
+    select_hostvars_exclude_pattern: "^artifact_list$"
+    select_hostvars_attributes:
+      - id
+    select_hostvars_fact_name: artifact_hostvars
+    select_hostvars_output_type: list
+    when: artifact_load_from_hostvars
+    tags:
+      - role::artifact
 
   - role: amtega.proxy_client
     proxy_client_permanent: no
+    tags:
+      - role::artifact
 
   - role: amtega.packages
     packages_os:
-      all:
-        all:
-          python-lxml: present
       centos:
         7:
           git: present
@@ -71,7 +83,22 @@ dependencies:
         all:
           pexpect: latest
     when: >-
-      artifact_list
-      | selectattr('type', 'in', ['gitlab', 'github'])
+      artifact_to_manage
+      | selectattr("type", "in", ["gitlab", "github"])
       | list
       | length > 0
+    tags:
+      - role::artifact
+
+  - role: amtega.packages
+    packages_os:
+      all:
+        all:
+          python-lxml: present
+    when: >-
+      artifact_to_manage
+      | selectattr("type", "in", ["maven"])
+      | list
+      | length > 0
+    tags:
+      - role::artifact

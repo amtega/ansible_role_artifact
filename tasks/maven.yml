@@ -1,25 +1,6 @@
 ---
 # Maven artifact download tasks
 
-
-#
-# - name: test
-#   hosts: localhost
-#   tasks:
-#     - name: test
-#       maven_artifact:
-#         group_id: org.javagalician
-#         artifact_id: javagalician-java6
-#         version: 1.1
-#         repository_url: http://nexus.xunta.local/nexus/service/local/repositories/releases/content
-#         username: "{{ ANSIBLE_USER }}"
-#         password: "{{ ANSIBLE_PASSWORD }}"
-#         dest: /tmp
-#       register: t
-
-    # - debug: var=t
-
-
 - name: download artifacts from maven repository
   maven_artifact:
     artifact_id: "{{ artifact_item.artifact_id | default(omit) }}"
@@ -52,7 +33,7 @@
   until: artifact_maven_result is succeeded
   when: artifact_item.download | default(true)
   no_log: "{{ artifact_item.no_log | default(true) }}"
-  loop: "{{ artifact_list | selectattr('type', 'in', ['maven']) | list }}"
+  loop: "{{ artifact_to_manage | selectattr('type', 'in', ['maven']) | list }}"
   loop_control:
       loop_var: artifact_item
       label: "{{ artifact_item.id }}"

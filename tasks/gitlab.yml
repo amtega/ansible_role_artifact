@@ -8,7 +8,7 @@
       register: artifact_gitlab_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
       loop: >-
-        {{ artifact_list
+        {{ artifact_to_manage
            | selectattr('type', 'in', ['gitlab', 'github'])
            | list }}
       loop_control:
@@ -23,7 +23,7 @@
           register: artifact_gitlab_tmp_result
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
-            {{ artifact_list
+            {{ artifact_to_manage
                | selectattr('type', 'in', ['gitlab', 'github'])
                | list }}
           loop_control:
@@ -54,7 +54,7 @@
               failed_when: artifact_gitlab_clone_result.rc | default(0) != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
               loop: >-
-                {{ artifact_list
+                {{ artifact_to_manage
                    | selectattr('type', 'in', ['gitlab', 'github'])
                    | list }}
               loop_control:
@@ -74,7 +74,7 @@
               failed_when: artifact_gitlab_reset_result.rc != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
               loop: >-
-                {{ artifact_list
+                {{ artifact_to_manage
                    | selectattr('type', 'in', ['gitlab', 'github'])
                    | list }}
               loop_control:
@@ -101,7 +101,7 @@
               failed_when: artifact_gitlab_checkout_result.rc != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
               loop: >-
-                {{ artifact_list
+                {{ artifact_to_manage
                    | selectattr('type', 'in', ['gitlab', 'github'])
                    | list }}
               loop_control:
@@ -141,7 +141,7 @@
           failed_when: artifact_gitlab_move_result.rc != 0
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
-            {{ artifact_list
+            {{ artifact_to_manage
                | selectattr('type', 'in', ['gitlab', 'github'])
                | list }}
           loop_control:
@@ -156,7 +156,7 @@
           register: artifact_gitlab_cleanup_result
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
-            {{ artifact_list
+            {{ artifact_to_manage
                | selectattr('type', 'in', ['gitlab', 'github'])
                | list }}
           loop_control:
@@ -195,7 +195,7 @@
       register: artifact_gitlab_attributes_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
       loop: >-
-        {{ artifact_list
+        {{ artifact_to_manage
            | selectattr('type', 'in', ['gitlab', 'github'])
            | list }}
       loop_control:

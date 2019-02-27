@@ -26,6 +26,7 @@ artfiact_result:
 - [amtega.check_platform](https://galaxy.ansible.com/amtega/check_platform)
 - [amtega.packages](https://galaxy.ansible.com/amtega/packages) if you are using Gitlab/Github artifacts.
 - [amtega.proxy_client](https://galaxy.ansible.com/amtega/proxy_client). If you need a proxy for internet access fill this role variables.
+- - [amtega.select_hostvars](https://galaxy.ansible.com/amtega/select_hostvars)
 
 ## Example Playbook
 

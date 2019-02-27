@@ -14,7 +14,7 @@
 {% endif %}
 {%- endmacro %}
 
-{% for artifact in artifact_list
+{% for artifact in artifact_to_manage
                    | selectattr('type', 'in', ['gitlab', 'github'])
                    | list %}
 {{- fact(artifact) }}
@@ -26,14 +26,14 @@
               or artifact_gitlab_attributes_result.results[loop.index0] is changed }}
 {% endfor %}
 
-{% for artifact in artifact_list
+{% for artifact in artifact_to_manage
                    | selectattr('type', 'in', ['http', 'https'])
                    | list %}
 {{- fact(artifact) }}
   changed: {{ artifact_http_result.results[loop.index0] is changed }}
 {% endfor %}
 
-{% for artifact in artifact_list
+{% for artifact in artifact_to_manage
                    | selectattr('type', 'in', ['maven'])
                    | list %}
 {{- fact(artifact, artifact_maven_result.results[loop.index0]) }}

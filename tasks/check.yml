@@ -4,7 +4,7 @@
 - name: check artifacts config
   assert:
     that:
-      - artifact_list | selectattr("id", "undefined") | list | length == 0
+      - artifact_to_manage | selectattr("id", "undefined") | list | length == 0
   vars:
     distribution: "{{ ansible_facts.distribution | lower }}"
   tags:

@@ -9,3 +9,10 @@ artifact_delay: 1
 # Defaults for checksum
 
 artifact_checksum_algorithm: sha256
+
+# Artifact list to manage (included the items loaded from hostvars)
+
+artifact_to_manage: >-
+  {{ artifact_list
+     + ((artifact_load_from_hostvars)
+        | ternary(artifact_hostvars | default([]) | flatten, [])) }}
