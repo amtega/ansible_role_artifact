@@ -1,7 +1,7 @@
 ---
 # jenkins artifact download tasks
 
-- name: download artifacts from jenkis server
+- name: Download artifacts from jenkis server
   get_url:
     attributes: "{{ artifact_item.attributes | default(omit) }}"
     backup: "{{ artifact_item.backup | default(omit) }}"

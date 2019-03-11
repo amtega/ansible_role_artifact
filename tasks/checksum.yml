@@ -2,7 +2,7 @@
 # Checksum tasks
 
 - block:
-    - name: calculate artifacts checksum
+    - name: Calculate artifacts checksum
       stat:
         path: >-
           {{ artifact_item.dest | default('') }}/{{ artifact_item_file }}
@@ -30,7 +30,7 @@
                        + "."
                        + artifact_item.extension | default('')) }}
 
-    - name: fail if artifacts checksums does not match
+    - name: Fail if artifacts checksums does not match
       fail:
         msg: downloaded artifact checksum does not match
       when:

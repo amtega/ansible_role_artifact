@@ -2,7 +2,7 @@
 # GitLab/GitHub artifact download tasks
 
 - block:
-    - name: check gitlab/github artifact download
+    - name: Check gitlab/github artifact download
       stat:
         path: "{{ artifact_item.dest }}/{{ artifact_item.file }}"
       register: artifact_gitlab_check_result
@@ -16,7 +16,7 @@
         label: "{{ artifact_item.id }}"
 
     - block:
-        - name: create temporary directory for gitlab/github project clone
+        - name: Create temporary directory for gitlab/github project clone
           tempfile:
             path: "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
             state: directory
@@ -32,7 +32,7 @@
             label: "{{ artifact_item.id }}"
 
         - block:
-            - name: clone gitlab/github project into temporay directory
+            - name: Clone gitlab/github project into temporay directory
               expect:
                 command: >-
                   git
@@ -65,7 +65,7 @@
               retries: "{{ artifact_item.retries | default(artifact_retries) }}"
               delay: "{{ artifact_item.delay | default(artifact_delay) }}"
 
-            - name: reset gitlab/github project clone to head
+            - name: Reset gitlab/github project clone to head
               shell: >-
                   git reset HEAD .
               args:
@@ -82,7 +82,7 @@
                 index_var: artifact_item_index
                 label: "{{ artifact_item.id }}"
 
-            - name: checkout artifact from gitlab/github project
+            - name: Checkout artifact from gitlab/github project
               expect:
                 command: >-
                   git
@@ -132,7 +132,7 @@
                            + '"',
                            '' ) }}
 
-        - name: move artifact to destination
+        - name: Move artifact to destination
           shell: >-
               mv {{ artifact_gitlab_file_path }} {{ artifact_item.dest }}
           args:
@@ -149,7 +149,7 @@
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
 
-        - name: cleanup temporary directory with gitlab/github project clone
+        - name: Cleanup temporary directory with gitlab/github project clone
           file:
             path: "{{ artifact_gitlab_tmp }}"
             state: absent
@@ -181,7 +181,7 @@
                        + artifact_item.file,
                        artifact_item.file) }}
 
-    - name: setup artifact attributes
+    - name: Setup artifact attributes
       file:
         path: "{{ artifact_item.dest | default('') }}/{{ artifact_item.file }}"
         attributes: "{{ artifact_item.attributes | default(omit) }}"

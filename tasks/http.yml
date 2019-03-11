@@ -1,7 +1,7 @@
 ---
 # http artifact download tasks
 
-- name: download artifacts from http/https server
+- name: Download artifacts from http/https server
   get_url:
     attributes: "{{ artifact_item.attributes | default(omit) }}"
     backup: "{{ artifact_item.backup | default(omit) }}"

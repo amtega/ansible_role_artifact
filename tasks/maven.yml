@@ -1,7 +1,7 @@
 ---
 # Maven artifact download tasks
 
-- name: download artifacts from maven repository
+- name: Download artifacts from maven repository
   maven_artifact:
     artifact_id: "{{ artifact_item.artifact_id | default(omit) }}"
     attributes: "{{ artifact_item.attributes | default(omit) }}"

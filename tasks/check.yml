@@ -1,7 +1,7 @@
 ---
 # Role check tasks
 
-- name: check artifacts config
+- name: Check artifacts config
   assert:
     that:
       - artifact_to_manage | selectattr("id", "undefined") | list | length == 0
