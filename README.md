@@ -61,9 +61,20 @@ $ cd amtega.artifact/tests
 $ ansible-playbook main.yml
 ```
 
+To enable jenkins artefact type testing you need to pass the following extra vars, or define them for the group `docker_sandbox_containers` in the inventory:
+
+- `artifact_tests_jenkins_host`: jenkins host
+- `artifact_tests_jenkins_path`: path inside host where jenkins is running. Default is `/`
+- `artifact_tests_jenkins_job_name`: jenkins job name
+- `artifact_tests_jenkins_artifact_id`: jenkins artifact id
+- `artifact_tests_jenkins_version`: jenkins artifact version
+- `artifact_tests_jenkins_extension`: jenkis artifact file extension
+- `artifact_tests_jenkins_username`: jenkins username (optional)
+- `artifact_tests_jenkins_password`: jenkins password (optional)
+
 ## License
 
-Copyright (C) 2018 AMTEGA - Xunta de Galicia
+Copyright (C) 2019 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify it under the terms of:
 

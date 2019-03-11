@@ -30,6 +30,11 @@
     - role::artifact
     - role::artifact::maven
 
+- include_tasks: jenkins.yml
+  tags:
+    - role::artifact
+    - role::artifact::jenkins
+
 - include_tasks: checksum.yml
   tags:
     - role::artifact

@@ -4,7 +4,8 @@
 - block:
     - name: calculate artifacts checksum
       stat:
-        path: "{{ artifact_item.dest | default('') }}/{{ artifact_item.file }}"
+        path: >-
+          {{ artifact_item.dest | default('') }}/{{ artifact_item_file }}
         checksum_algorithm: >-
           {{ artifact_item.checksum_algorithm
              | default(artifact_checksum_algorithm) }}
@@ -12,11 +13,22 @@
       register: artifact_stat_result
       loop: >-
         {{ artifact_to_manage
-           | selectattr('type', 'in', ['gitlab', 'github', 'http', 'https'])
+           | selectattr('type',
+                        'in',
+                        ['gitlab', 'github', 'http', 'https', 'jenkins'])
            | list }}
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
+      vars:
+        artifact_item_file: >-
+          {{ (artifact_item.type in ['gitlab', 'github', 'http', 'https'])
+             | ternary(artifact_item.file,
+                       artifact_item.artifact_id | default('')
+                       + "-"
+                       + artifact_item.version | default('')
+                       + "."
+                       + artifact_item.extension | default('')) }}
 
     - name: fail if artifacts checksums does not match
       fail:
@@ -26,7 +38,9 @@
         - artifact_item.checksum != artifact_checksums[artifact_item_index]
       loop: >-
         {{ artifact_to_manage
-           | selectattr('type', 'in', ['gitlab', 'github', 'http', 'https'])
+           | selectattr('type',
+                        'in',
+                        ['gitlab', 'github', 'http', 'https', 'jenkins'])
            | list }}
       loop_control:
         loop_var: artifact_item

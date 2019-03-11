@@ -40,6 +40,13 @@
   changed: {{ artifact_maven_result.results[loop.index0] is changed }}
 {% endfor %}
 
+{% for artifact in artifact_to_manage
+                   | selectattr('type', 'in', ['jenkins'])
+                   | list %}
+{{- fact(artifact) }}
+  changed: {{ artifact_jenkins_result.results[loop.index0] is changed }}
+{% endfor %}
+
 {% if not ns.found %}
 {}
 {% endif %}
