@@ -19,7 +19,7 @@
     - block:
         - name: enable backports repository
           apt_repository:
-            repo: deb http://http.debian.net/debian wheezy-backports main
+            repo: deb http://http.debian.net/debian stretch-backports main
             state: present
             update_cache: yes
           register: artifact_enable_backports_result
