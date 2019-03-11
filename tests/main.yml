@@ -1,7 +1,7 @@
 ---
 # Tasks for testing role
 
-- name: configure docker sandbox environment
+- name: Configure docker sandbox environment
   hosts: localhost
   roles:
     - role: amtega.docker_presets
@@ -14,7 +14,7 @@
   tags:
     - sandbox
 
-- name: run idempotence test
+- name: Run idempotence test
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
@@ -22,10 +22,10 @@
   tags:
     - sandbox
 
-- name: prepare docker containers for test
+- name: Prepare docker containers for test
   hosts: docker_sandbox_containers
   tasks:
-    - name: setup maven artifact
+    - name: Setup maven artifact
       set_fact:
         artifact_maven:
           id: maven
@@ -39,7 +39,7 @@
           validate_certs: false
           no_log: no
 
-    - name: setup jenkins artifact
+    - name: Setup jenkins artifact
       set_fact:
         artifact_jenkins:
           - id: jenkins
@@ -64,7 +64,7 @@
   tags:
     - idempotence
 
-- name: test artifact role
+- name: Test artifact role
   hosts: docker_sandbox_containers
   roles:
     - amtega.artifact
@@ -113,22 +113,22 @@
         validate_certs: false
         no_log: no
   tasks:
-    - name: check gitlab artifact download
+    - name: Check gitlab artifact download
       stat:
         path: /tmp/README.md
       register: check_gitlab_result
 
-    - name: check github artifact download
+    - name: Check github artifact download
       stat:
         path: /tmp/COPYING
       register: check_github_result
 
-    - name: check http/https artifact download
+    - name: Check http/https artifact download
       stat:
         path: /tmp/apache-tomcat-8.5.9.tar.gz
       register: check_http_result
 
-    - name: check jenkins artifact download
+    - name: Check jenkins artifact download
       stat:
         path: >-
           {{ "/tmp/"
@@ -140,30 +140,46 @@
       register: check_jenkins_result
       vars:
         artifact: "{{ artifact_jenkins.0 }}"
+      when:
+        - artifact_tests_jenkins_host is defined
+        - artifact_tests_jenkins_job_name is defined
+        - artifact_tests_jenkins_artifact_id is defined
+        - artifact_tests_jenkins_version is defined
+        - artifact_tests_jenkins_extension is defined
 
-    - name: check maven artifact download
+    - name: Check maven artifact download
       stat:
         path: /tmp/spring-jdbc-5.1.5.RELEASE.jar
       register: check_maven_result
 
-    - name: check that all artifacts were downloaded correctly
+    - name: Check that artifacts were downloaded correctly
       assert:
         that:
           - check_gitlab_result.stat.exists
           - check_github_result.stat.exists
           - check_http_result.stat.exists
           - check_maven_result.stat.exists
-          - check_jenkins_result.stat.exists
           - artifact_result.gitlab is defined
           - artifact_result.ansible is defined
           - artifact_result.tomcat1 is defined
           - artifact_result.maven is defined
-          - artifact_result.jenkins is defined
           - not artifact_result.tomcat2.changed
+
+    - name: Check that jenkins artifacts were downloaded correctly
+      assert:
+        that:
+          - check_jenkins_result.stat.exists
+          - artifact_result.jenkins is defined
+      when:
+        - artifact_tests_jenkins_host is defined
+        - artifact_tests_jenkins_job_name is defined
+        - artifact_tests_jenkins_artifact_id is defined
+        - artifact_tests_jenkins_version is defined
+        - artifact_tests_jenkins_extension is defined
   tags:
     - idempotence
 
-- name: cleanup docker sandbox
+- name: Cleanup docker sandbox
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
