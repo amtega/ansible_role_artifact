@@ -1,5 +1,5 @@
 ---
-# Standard uri artifact download tasks
+# http artifact download tasks
 
 - name: download artifacts from http/https server
   get_url:
@@ -21,7 +21,7 @@
     seuser: "{{ artifact_item.seuser | default(omit) }}"
     timeout: "{{ artifact_item.timeout | default(omit) }}"
     tmp_dest:  "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
-    unsafe_writes:  "{{ artifact_item.unsafe_writes | default(omit) }}"
+    unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
     url: >-
       {{ artifact_item.host }}{{ artifact_item.path
                                  | default('/') }}/{{ artifact_item.file }}
