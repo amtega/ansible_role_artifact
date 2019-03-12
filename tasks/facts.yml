@@ -2,7 +2,7 @@
 # Role facts tasks
 
 - block:
-    - name: setup artifacts facts
+    - name: Setup artifacts facts
       set_fact:
         artifact_result: "{{ lookup('template', 'facts.yml.j2') | from_yaml }}"
   vars:

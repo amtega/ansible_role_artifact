@@ -100,6 +100,36 @@
 #   username: <username>
 #   verify_checksum: <verify_checksum>
 #   version: <version>
+#
+# ==============================================================================
+# Attributes supported by jenkins artifacts
+# ==============================================================================
+#
+#   jenkins_path: <path>      # URl Path where jenkins resides. Default is /
+#   job_name: <job>           # Jenkins job name
+#   path: <path>              # Jenkins artifact path inside workspace
+#   file: <file>              # Jenkins artifact file name
+#   extension: <ext>          # Jenkins artifact file extension
+#   username: <username>      # Jenkins username
+#   password: <password>      # Jenkins password
+#   checksum_algorithm: <alg> # Algorithm to determine checksum of file. Can be
+#                             # md5, sha1, sha224, sha256, sha384, sha512.
+#                             # Default is sha256
+#   checksum: <checksum>      # Checksum that should have de download (optional)
+#
+# Additionally the following list of attributes are also supported, with the
+# same restrictions that the ansible `get_url` module:
+#
+#   backup: <yes_no>
+#   client_cert: <cert>
+#   client_key: <key>
+#   others: <others>
+#   timeout: <timeout>
+#   tmp_dest: <tmp_dest>      # Temporary directory for download operations
+#                             # (default is the same as dest)
+#   unsafe_writes: <yes_no>
+#   use_proxy: <yes_no>
+#   force: <yes_no>           # Force or not the download
 # }
 
 # artifact:

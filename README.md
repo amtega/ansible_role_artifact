@@ -2,10 +2,6 @@
 
 This is an [Ansible](http://www.ansible.com) role to download several kinds or artifacts. Currently http/https, maven and gitlab/github artifacts are supported.
 
-## Requirements
-
-[Ansible 2.7+](http://docs.ansible.com/ansible/latest/intro_installation.html)
-
 ## Role Variables
 
 A list of all the default variables for this role is available in `defaults/main.yml`.
@@ -20,13 +16,6 @@ artfiact_result:
   <artifact1_id>: ...
   <artifactN_id>: ...  
 ```
-
-## Dependencies
-
-- [amtega.check_platform](https://galaxy.ansible.com/amtega/check_platform)
-- [amtega.packages](https://galaxy.ansible.com/amtega/packages) if you are using Gitlab/Github artifacts.
-- [amtega.proxy_client](https://galaxy.ansible.com/amtega/proxy_client). If you need a proxy for internet access fill this role variables.
-- - [amtega.select_hostvars](https://galaxy.ansible.com/amtega/select_hostvars)
 
 ## Example Playbook
 
@@ -61,9 +50,19 @@ $ cd amtega.artifact/tests
 $ ansible-playbook main.yml
 ```
 
+To enable jenkins artefact type testing you need to pass the following extra vars, or define them for the group `docker_sandbox_containers` in the inventory:
+
+- `artifact_tests_jenkins_host`: jenkins host
+- `artifact_tests_jenkins_jenkins_path`: URL path where jenkins resides. Default is `/`
+- `artifact_tests_jenkins_job_name`: jenkins job name
+- `artifact_tests_jenkins_path`: jenkins artifact path within workspace. Default is `/`
+- `artifact_tests_jenkins_file`: jenkins artifact file name
+- `artifact_tests_jenkins_username`: jenkins username (optional)
+- `artifact_tests_jenkins_password`: jenkins password (optional)
+
 ## License
 
-Copyright (C) 2018 AMTEGA - Xunta de Galicia
+Copyright (C) 2019 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify it under the terms of:
 

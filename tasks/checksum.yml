@@ -2,9 +2,10 @@
 # Checksum tasks
 
 - block:
-    - name: calculate artifacts checksum
+    - name: Calculate artifacts checksum
       stat:
-        path: "{{ artifact_item.dest | default('') }}/{{ artifact_item.file }}"
+        path: >-
+          {{ artifact_item.dest | default('') }}/{{ artifact_item.file }}
         checksum_algorithm: >-
           {{ artifact_item.checksum_algorithm
              | default(artifact_checksum_algorithm) }}
@@ -12,13 +13,15 @@
       register: artifact_stat_result
       loop: >-
         {{ artifact_to_manage
-           | selectattr('type', 'in', ['gitlab', 'github', 'http', 'https'])
+           | selectattr('type',
+                        'in',
+                        ['gitlab', 'github', 'http', 'https', 'jenkins'])
            | list }}
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
 
-    - name: fail if artifacts checksums does not match
+    - name: Fail if artifacts checksums does not match
       fail:
         msg: downloaded artifact checksum does not match
       when:
@@ -26,7 +29,9 @@
         - artifact_item.checksum != artifact_checksums[artifact_item_index]
       loop: >-
         {{ artifact_to_manage
-           | selectattr('type', 'in', ['gitlab', 'github', 'http', 'https'])
+           | selectattr('type',
+                        'in',
+                        ['gitlab', 'github', 'http', 'https', 'jenkins'])
            | list }}
       loop_control:
         loop_var: artifact_item

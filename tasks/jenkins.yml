@@ -1,7 +1,7 @@
 ---
-# http artifact download tasks
+# jenkins artifact download tasks
 
-- name: Download artifacts from http/https server
+- name: Download artifacts from jenkis server
   get_url:
     attributes: "{{ artifact_item.attributes | default(omit) }}"
     backup: "{{ artifact_item.backup | default(omit) }}"
@@ -9,9 +9,8 @@
     client_key: "{{ artifact_item.client_key | default(omit) }}"
     dest: "{{ artifact_item.dest | default(omit) }}"
     force: "{{ artifact_item.force | default(omit) }}"
-    force_basic_auth: "{{ artifact_item.force_basic_auth | default(omit) }}"
+    force_basic_auth: yes
     group: "{{ artifact_item.group | default(omit) }}"
-    headers: "{{ artifact_item.headers | default(omit) }}"
     mode: "{{ artifact_item.mode | default(omit) }}"
     others: "{{ artifact_item.others | default(omit) }}"
     owner: "{{ artifact_item.owner | default(omit) }}"
@@ -23,24 +22,30 @@
     tmp_dest:  "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
     unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
     url: >-
-      {{ artifact_item.host }}{{ artifact_item.path
-                                 | default('/') }}/{{ artifact_item.file }}
+      {{ artifact_item.host
+         + artifact_item.jenkins_path | default('/')
+         + "/job/"
+         + artifact_item.job_name
+         + "/ws/"
+         + artifact_item.path | default('/')
+         + "/"
+         + artifact_item.file }}
     url_password:  "{{ artifact_item.password | default(omit) }}"
     url_username: "{{ artifact_item.username | default(omit) }}"
     use_proxy: "{{ artifact_item.use_proxy | default(omit) }}"
     validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
-  register: artifact_http_result
+  register: artifact_jenkins_result
   retries: "{{ artifact_item.retries | default(artifact_retries) }}"
   delay: "{{ artifact_item.delay | default(artifact_delay) }}"
-  until: artifact_http_result is succeeded
+  until: artifact_jenkins_result is succeeded
   when: artifact_item.download | default(true)
   no_log: "{{ artifact_item.no_log | default(true) }}"
   loop: >-
-    {{ artifact_to_manage | selectattr('type', 'in', ['http', 'https']) | list }}
+    {{ artifact_to_manage | selectattr('type', 'in', ['jenkins']) | list }}
   loop_control:
     loop_var: artifact_item
     label: "{{ artifact_item.id }}"
   environment: "{{ proxy_client_environment }}"
   tags:
     - role::artifact
-    - role::artifact::http
+    - role::artifact::jenkins

@@ -3,12 +3,12 @@
 
 - block:
     - block:
-        - name: install ius community repository
+        - name: Install ius community repository
           yum:
             name: https://rhel6.iuscommunity.org/ius-release.rpm
             state: present
 
-        - name: install git2u package
+        - name: Install git2u package
           yum:
             name: git2u
             state: present
@@ -17,14 +17,14 @@
         - ansible_facts.distribution_version is version("7", "<")
 
     - block:
-        - name: enable backports repository
+        - name: Enable backports repository
           apt_repository:
-            repo: deb http://http.debian.net/debian wheezy-backports main
+            repo: deb http://http.debian.net/debian stretch-backports main
             state: present
             update_cache: yes
           register: artifact_enable_backports_result
 
-        - name: prepare git-lfs repository
+        - name: Prepare git-lfs repository
           shell: "curl -s {{ script_url }} | sudo bash"
           when: artifact_enable_backports_result is changed
           args:
@@ -34,7 +34,7 @@
               {{ "https://packagecloud.io/"
                  + "install/repositories/github/git-lfs/script.deb.sh" }}
 
-        - name: install git-lfs package
+        - name: Install git-lfs package
           package:
             name: git-lfs
             state: present
