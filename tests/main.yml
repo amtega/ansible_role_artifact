@@ -45,11 +45,11 @@
           - id: jenkins
             type: jenkins
             host: "{{ artifact_tests_jenkins_host }}"
-            path: "{{ artifact_tests_jenkins_path | default('/') }}"
+            jenkins_path: >-
+              {{ artifact_tests_jenkins_jenkins_path | default('/') }}
             job_name: "{{ artifact_tests_jenkins_job_name }}"
-            artifact_id: "{{ artifact_tests_jenkins_artifact_id }}"
-            version: "{{ artifact_tests_jenkins_version }}"
-            extension: "{{ artifact_tests_jenkins_extension }}"
+            path: "{{ artifact_tests_jenkins_path | default('/') }}"
+            file: "{{ artifact_tests_jenkins_file }}"
             username: "{{ artifact_tests_jenkins_username | default(omit) }}"
             password: "{{ artifact_tests_jenkins_password | default(omit) }}"
             dest: /tmp
@@ -57,10 +57,10 @@
             no_log: no
       when:
         - artifact_tests_jenkins_host is defined
+        - artifact_tests_jenkins_jenkins_path is defined
         - artifact_tests_jenkins_job_name is defined
-        - artifact_tests_jenkins_artifact_id is defined
-        - artifact_tests_jenkins_version is defined
-        - artifact_tests_jenkins_extension is defined
+        - artifact_tests_jenkins_path is defined
+        - artifact_tests_jenkins_file is defined
   tags:
     - idempotence
 

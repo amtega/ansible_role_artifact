@@ -23,18 +23,13 @@
     unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
     url: >-
       {{ artifact_item.host
-         + artifact_item.path | default('/')
+         + artifact_item.jenkins_path | default('/')
          + "/job/"
          + artifact_item.job_name
-         + "/"
          + "/ws/"
-         + artifact_item.artifact_id
-         + "/target/"
-         + artifact_item.artifact_id
-         + "-"
-         + artifact_item.version
-         + "."
-         + artifact_item.extension }}
+         + artifact_item.path | default('/')
+         + "/"
+         + artifact_item.file }}
     url_password:  "{{ artifact_item.password | default(omit) }}"
     url_username: "{{ artifact_item.username | default(omit) }}"
     use_proxy: "{{ artifact_item.use_proxy | default(omit) }}"

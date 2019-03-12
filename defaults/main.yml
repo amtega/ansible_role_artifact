@@ -105,9 +105,10 @@
 # Attributes supported by jenkins artifacts
 # ==============================================================================
 #
+#   jenkins_path: <path>      # URl Path where jenkins resides. Default is /
 #   job_name: <job>           # Jenkins job name
-#   artifact_id: <artifactid> # Jenkins artifact id
-#   version: <version>        # Jenkins artifact version
+#   path: <path>              # Jenkins artifact path inside workspace
+#   file: <file>              # Jenkins artifact file name
 #   extension: <ext>          # Jenkins artifact file extension
 #   username: <username>      # Jenkins username
 #   password: <password>      # Jenkins password

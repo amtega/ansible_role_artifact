@@ -5,7 +5,7 @@
     - name: Calculate artifacts checksum
       stat:
         path: >-
-          {{ artifact_item.dest | default('') }}/{{ artifact_item_file }}
+          {{ artifact_item.dest | default('') }}/{{ artifact_item.file }}
         checksum_algorithm: >-
           {{ artifact_item.checksum_algorithm
              | default(artifact_checksum_algorithm) }}
@@ -20,15 +20,6 @@
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
-      vars:
-        artifact_item_file: >-
-          {{ (artifact_item.type in ['gitlab', 'github', 'http', 'https'])
-             | ternary(artifact_item.file,
-                       artifact_item.artifact_id | default('')
-                       + "-"
-                       + artifact_item.version | default('')
-                       + "."
-                       + artifact_item.extension | default('')) }}
 
     - name: Fail if artifacts checksums does not match
       fail:
