@@ -40,6 +40,11 @@
     - role::artifact
     - role::artifact::checksum
 
+- include_tasks: unarchive.yml
+  tags:
+    - role::artifact
+    - role::artifact::checksum
+
 - include_tasks: facts.yml
   tags:
     - role::artifact

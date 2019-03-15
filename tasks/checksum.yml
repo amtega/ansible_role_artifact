@@ -5,41 +5,46 @@
     - name: Calculate artifacts checksum
       stat:
         path: >-
-          {{ artifact_item.dest | default('') }}/{{ artifact_item.file }}
+          {{ artifact_item.dest | default("")
+             + "/"
+             + artifact_item.dest_file
+               | default(artifact_item.file) }}
         checksum_algorithm: >-
           {{ artifact_item.checksum_algorithm
              | default(artifact_checksum_algorithm) }}
         get_checksum: yes
-      register: artifact_stat_result
+      register: artifact_checksum_stat_result
       loop: >-
         {{ artifact_to_manage
-           | selectattr('type',
-                        'in',
-                        ['gitlab', 'github', 'http', 'https', 'jenkins'])
+           | selectattr("type",
+                        "in",
+                        ["gitlab", "github", "http", "https", "jenkins"])
            | list }}
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
+      no_log: "{{ artifact_item.no_log | default(true) }}"
 
     - name: Fail if artifacts checksums does not match
       fail:
         msg: downloaded artifact checksum does not match
       when:
-        - artifact_item.checksum | default('') | length > 0
+        - artifact_item.checksum | default("") | length > 0
         - artifact_item.checksum != artifact_checksums[artifact_item_index]
       loop: >-
         {{ artifact_to_manage
-           | selectattr('type',
-                        'in',
-                        ['gitlab', 'github', 'http', 'https', 'jenkins'])
+           | selectattr("type",
+                        "in",
+                        ["gitlab", "github", "http", "https", "jenkins"])
            | list }}
       loop_control:
         loop_var: artifact_item
         index_var: artifact_item_index
         label: "{{ artifact_item.id }}"
+      no_log: "{{ artifact_item.no_log | default(true) }}"
       vars:
         artifact_checksums: >-
-          {{ artifact_stat_result.results
+          {{ artifact_checksum_stat_result.results
              | map(attribute="stat.checksum")
              | list }}
   tags:

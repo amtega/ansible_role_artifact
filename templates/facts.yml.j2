@@ -1,4 +1,9 @@
 {% set ns = namespace(found=false) %}
+{% set unarchived =  artifact_unarchive_result.results | default([])
+                     | selectattr("artifact_item", "defined")
+                     | selectattr("artifact_item.id", "defined")
+                     | map(attribute="artifact_item.id")
+                     | list %}
 
 {%- macro fact(artifact, result={}) %}
 {% set ns.found = true %}
@@ -23,28 +28,32 @@
               or artifact_gitlab_checkout_result.results[loop.index0] is changed
               or artifact_gitlab_move_result.results[loop.index0] is changed
               or artifact_gitlab_cleanup_result.results[loop.index0] is changed
-              or artifact_gitlab_attributes_result.results[loop.index0] is changed }}
+              or artifact_gitlab_attributes_result.results[loop.index0] is changed
+              or artifact.id in unarchived }}
 {% endfor %}
 
 {% for artifact in artifact_to_manage
                    | selectattr('type', 'in', ['http', 'https'])
                    | list %}
 {{- fact(artifact) }}
-  changed: {{ artifact_http_result.results[loop.index0] is changed }}
+  changed: {{ artifact_http_result.results[loop.index0] is changed
+              or artifact.id in unarchived }}
 {% endfor %}
 
 {% for artifact in artifact_to_manage
                    | selectattr('type', 'in', ['maven'])
                    | list %}
 {{- fact(artifact, artifact_maven_result.results[loop.index0]) }}
-  changed: {{ artifact_maven_result.results[loop.index0] is changed }}
+  changed: {{ artifact_maven_result.results[loop.index0] is changed
+              or artifact.id in unarchived }}
 {% endfor %}
 
 {% for artifact in artifact_to_manage
                    | selectattr('type', 'in', ['jenkins'])
                    | list %}
 {{- fact(artifact) }}
-  changed: {{ artifact_jenkins_result.results[loop.index0] is changed }}
+  changed: {{ artifact_jenkins_result.results[loop.index0] is changed
+              or artifact.id in unarchived }}
 {% endfor %}
 
 {% if not ns.found %}

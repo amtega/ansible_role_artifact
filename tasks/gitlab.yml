@@ -134,7 +134,10 @@
 
         - name: Move artifact to destination
           shell: >-
-              mv {{ artifact_gitlab_file_path }} {{ artifact_item.dest }}
+              mv {{ artifact_gitlab_file_path }}
+              {{ artifact_item.dest
+                 + (artifact_item.dest_file | default("") | length > 0)
+                   | ternary("/" + artifact_item.dest_file | default(""), "") }}
           args:
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_move_result
@@ -183,7 +186,11 @@
 
     - name: Setup artifact attributes
       file:
-        path: "{{ artifact_item.dest | default('') }}/{{ artifact_item.file }}"
+        path: >-
+          {{ artifact_item.dest
+             + (artifact_item.dest_file | default("") | length > 0)
+               | ternary("/" + artifact_item.dest_file | default(""),
+                         "/" + artifact_item.file) }}
         attributes: "{{ artifact_item.attributes | default(omit) }}"
         group: "{{ artifact_item.group | default(omit) }}"
         mode: "{{ artifact_item.mode | default(omit) }}"

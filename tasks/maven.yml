@@ -6,7 +6,10 @@
     artifact_id: "{{ artifact_item.artifact_id | default(omit) }}"
     attributes: "{{ artifact_item.attributes | default(omit) }}"
     classifier: "{{ artifact_item.classifier | default(omit) }}"
-    dest: "{{ artifact_item.dest | default(omit) }}"
+    dest: >-
+      {{ artifact_item.dest
+         + (artifact_item.dest_file | default("") | length > 0)
+           | ternary("/" + artifact_item.dest_file | default(""), "") }}
     extension: "{{ artifact_item.extension | default(omit) }}"
     group: "{{ artifact_item.group | default(omit) }}"
     group_id: "{{ artifact_item.group_id | default(omit) }}"
