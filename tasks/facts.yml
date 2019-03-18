@@ -4,9 +4,21 @@
 - block:
     - name: Setup artifacts facts
       set_fact:
-        artifact_result: "{{ lookup('template', 'facts.yml.j2') | from_yaml }}"
-  vars:
-    distribution: "{{ ansible_facts.distribution | lower }}"
+        artifact_result: >-
+          {{ lookup("template", "facts.yml.j2") | from_yaml }}
+
+    - name: Create custom facts directory
+      file:
+        path: /etc/ansible/facts.d
+        state: directory
+
+    - name: Configure artifact facts
+      template:
+        src: facts.fact.j2
+        dest: "{{ artifact_facts_file_path }}"
+        owner: root
+        group: root
+        mode: 0640
   tags:
     - role::artifact
     - role::artifact::facts

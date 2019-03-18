@@ -1,0 +1,8 @@
+{
+{% for artifact_id in artifact_result.keys() | list %}
+  "{{ artifact_id }}": {
+    "download_path": {{ artifact_result[artifact_id].download_path | to_json }},
+    "unarchived_files": {{ artifact_result[artifact_id].unarchived_files | to_json }}
+  }{% if not loop.last %},{{ "\n" }}{% endif %}
+{% endfor %}{{ "\n" }}
+}

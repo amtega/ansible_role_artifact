@@ -15,7 +15,7 @@
         get_checksum: yes
       register: artifact_checksum_stat_result
       loop: >-
-        {{ artifact_to_manage
+        {{ artifact_to_manage_present
            | selectattr("type",
                         "in",
                         ["gitlab", "github", "http", "https", "jenkins"])
@@ -32,7 +32,7 @@
         - artifact_item.checksum | default("") | length > 0
         - artifact_item.checksum != artifact_checksums[artifact_item_index]
       loop: >-
-        {{ artifact_to_manage
+        {{ artifact_to_manage_present
            | selectattr("type",
                         "in",
                         ["gitlab", "github", "http", "https", "jenkins"])

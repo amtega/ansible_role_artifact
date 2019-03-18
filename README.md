@@ -12,6 +12,7 @@ The role setups a fact named `artifact_result` with the following dict structure
 artifact_result:
   <artifact1_id>:
     download_path: <path to the downloaded artifact>
+    unarchived_files: <list of files unarchived>
     changed: <true if artifact changed, false in other case>
   <artifact1_id>: ...
   <artifactN_id>: ...  

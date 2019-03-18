@@ -15,11 +15,18 @@
 #   host: <host>              # Host where the artifact resides
 #   path: <path>              # Path that contains the file. If
 #                             # not specified top level path is used
-#   dest: <dest>              # Directory where to save the artifact
+#   dest: <dir>               # Directory where to save the artifact
+#   dest_file <file>          # Filename where to save the artifact. If not
+#                             # not given will use same name as source
 #   download: <yes_no>        # Download or not the artifact. Default is yes
 #   retries: <n>              # Number of retries. Default is 3
 #   delay: <s>                # Seconds between retries. Default is 1
 #   no_log: <yes_no>          # Hide sensitive info. Default is yes
+#   unarchive: <yes_no>       # Unarchive the artifact after download using the
+#                             # ansible `unarchive` module
+#   unarchive_creates: <path> # If the path given exists, the file will not
+#                             # unarchived
+#   state: <state>            # Can be present or absent. Default is present
 #
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url/maven_artifact` modules:

@@ -44,7 +44,7 @@
   when: artifact_item.download | default(true)
   no_log: "{{ artifact_item.no_log | default(true) }}"
   loop: >-
-    {{ artifact_to_manage | selectattr('type', 'in', ['jenkins']) | list }}
+    {{ artifact_to_manage_present | selectattr('type', 'in', ['jenkins']) | list }}
   loop_control:
     loop_var: artifact_item
     label: "{{ artifact_item.id }}"

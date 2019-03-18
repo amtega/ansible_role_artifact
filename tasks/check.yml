@@ -4,9 +4,8 @@
 - name: Check artifacts config
   assert:
     that:
-      - artifact_to_manage | selectattr("id", "undefined") | list | length == 0
-  vars:
-    distribution: "{{ ansible_facts.distribution | lower }}"
+      - artifact_to_manage_present | selectattr("id", "undefined") | list | length == 0
+    fail_msg: artifact `id` attribute is required
   tags:
     - role::artifact
     - role::artifact::check

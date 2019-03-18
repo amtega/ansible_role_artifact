@@ -1,7 +1,9 @@
 {% set ns = namespace(found=false) %}
-{% set unarchived =  artifact_unarchive_result.results | default([])
+{% set unarchived =  artifact_unarchive_result.results
+                     | default([])
                      | selectattr("artifact_item", "defined")
                      | selectattr("artifact_item.id", "defined")
+                     | select("changed")
                      | map(attribute="artifact_item.id")
                      | list %}
 
@@ -10,17 +12,45 @@
 
 "{{ artifact.id }}":
 
-{% if artifact.type in ['gitlab', 'github', 'http', 'https'] %}
-  download_path: "{{ artifact.dest }}/{{ artifact.file }}"
+{% if artifact.type | lower in ["gitlab", "github", "http", "https", "jenkins"] %}
+  download_path: "{{ artifact.dest }}/{{ artifact.dest_file | default(artifact.file) }}"
+{% else %}
+  download_path: "{{ result.dest }}"
 {% endif %}
 
-{% if artifact.type in ['maven'] %}
-  download_path: "{{ result.dest }}"
+{% if artifact.unarchive | default(false) %}
+{% set unarchived_result = artifact_unarchive_result.results
+                           | default([])
+                           | selectattr("artifact_item", "defined")
+                           | selectattr("artifact_item.id", "defined")
+                           | selectattr("artifact_item.id", "equalto", artifact.id)
+                           | list
+                           | first %}
+
+{% if ansible_local.artifact is defined
+      and ansible_local.artifact[artifact.id] is defined
+      and ansible_local.artifact[artifact.id].unarchived_files is defined %}
+{% set saved_unarchived_files = ansible_local.artifact[artifact.id].unarchived_files %}
+{% else %}
+{% set unarchived_files_saved = [] %}
+{% endif %}
+
+{% if unarchived_result.files is defined %}
+  unarchived_files: {{ unarchived_result.files
+                       | map('regex_replace', '^', artifact.dest + '/')
+                       | list
+                       | to_json }}
+{% else %}
+  unarchived_files: {{ unarchived_files_saved | to_json }}
+{% endif %}
+
+{% else %}
+  unarchived_files: []
 {% endif %}
 {%- endmacro %}
 
-{% for artifact in artifact_to_manage
-                   | selectattr('type', 'in', ['gitlab', 'github'])
+{% for artifact in artifact_to_manage_present
+                   | selectattr("type", "in", ["gitlab", "github"])
                    | list %}
 {{- fact(artifact) }}
   changed: {{ artifact_gitlab_clone_result.results[loop.index0] is changed
@@ -32,24 +62,24 @@
               or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage
-                   | selectattr('type', 'in', ['http', 'https'])
+{% for artifact in artifact_to_manage_present
+                   | selectattr("type", "in", ["http", "https"])
                    | list %}
 {{- fact(artifact) }}
   changed: {{ artifact_http_result.results[loop.index0] is changed
               or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage
-                   | selectattr('type', 'in', ['maven'])
+{% for artifact in artifact_to_manage_present
+                   | selectattr("type", "in", ["maven"])
                    | list %}
 {{- fact(artifact, artifact_maven_result.results[loop.index0]) }}
   changed: {{ artifact_maven_result.results[loop.index0] is changed
               or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage
-                   | selectattr('type', 'in', ['jenkins'])
+{% for artifact in artifact_to_manage_present
+                   | selectattr("type", "in", ["jenkins"])
                    | list %}
 {{- fact(artifact) }}
   changed: {{ artifact_jenkins_result.results[loop.index0] is changed

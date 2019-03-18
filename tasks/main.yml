@@ -15,6 +15,10 @@
     - role::artifact
     - role::artifact::install
 
+- include_tasks: absent.yml
+  tags:
+    - role::artifact
+
 - include_tasks: http.yml
   tags:
     - role::artifact

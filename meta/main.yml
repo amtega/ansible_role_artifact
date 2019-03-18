@@ -91,7 +91,7 @@ dependencies:
           all:
             pexpect: latest
     when: >-
-      artifact_to_manage
+      artifact_to_manage_present
       | selectattr("type", "in", ["gitlab", "github"])
       | list
       | length > 0
@@ -105,7 +105,7 @@ dependencies:
           all:
             python-lxml: present
     when: >-
-      artifact_to_manage
+      artifact_to_manage_present
       | selectattr("type", "in", ["maven"])
       | list
       | length > 0
