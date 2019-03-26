@@ -1,11 +1,15 @@
 {% set ns = namespace(found=false) %}
-{% set unarchived =  artifact_unarchive_result.results
-                     | default([])
-                     | selectattr("artifact_item", "defined")
-                     | selectattr("artifact_item.id", "defined")
-                     | select("changed")
-                     | map(attribute="artifact_item.id")
-                     | list %}
+{% if artifact_unarchive_result.results is defined %}
+{% set unarchived = artifact_unarchive_result.results
+                    | default([])
+                    | selectattr("artifact_item", "defined")
+                    | selectattr("artifact_item.id", "defined")
+                    | select("changed")
+                    | map(attribute="artifact_item.id")
+                    | list %}
+{% else %}
+{% set unarchived = [] %}
+{% endif %}
 
 {%- macro fact(artifact, result={}) %}
 {% set ns.found = true %}
@@ -18,7 +22,8 @@
   download_path: "{{ result.dest }}"
 {% endif %}
 
-{% if artifact.unarchive | default(false) %}
+{% if artifact.unarchive | default(false)
+      and artifact_unarchive_result.results is defined %}
 {% set unarchived_result = artifact_unarchive_result.results
                            | default([])
                            | selectattr("artifact_item", "defined")
@@ -30,12 +35,13 @@
 {% if ansible_local.artifact is defined
       and ansible_local.artifact[artifact.id] is defined
       and ansible_local.artifact[artifact.id].unarchived_files is defined %}
-{% set saved_unarchived_files = ansible_local.artifact[artifact.id].unarchived_files %}
+{% set unarchived_files_saved = ansible_local.artifact[artifact.id].unarchived_files %}
 {% else %}
 {% set unarchived_files_saved = [] %}
 {% endif %}
 
-{% if unarchived_result.files is defined %}
+{% if unarchived_result is defined
+      and unarchived_result.files is defined %}
   unarchived_files: {{ unarchived_result.files
                        | map('regex_replace', '^', artifact.dest + '/')
                        | list
