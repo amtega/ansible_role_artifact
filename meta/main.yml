@@ -74,8 +74,6 @@ dependencies:
           all:
             git: present
             git-lfs: present
-            python2-lxml: present
-            python3-lxml: present
             python2-pexpect: present
             python3-pexpect: present
         rhel:
@@ -101,8 +99,18 @@ dependencies:
   - role: amtega.packages
     vars:
       packages_os:
-        all:
+        centos:
+          7:
+            python-lxml: present
+        debian:
           all:
+            python-lxml: present
+        fedora:
+          all:
+            python2-lxml: present
+            python3-lxml: present
+        rhel:
+          7:
             python-lxml: present
     when: >-
       artifact_to_manage_present

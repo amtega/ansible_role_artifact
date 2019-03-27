@@ -111,6 +111,7 @@
         host: https://archive.apache.org
         path: /dist/tomcat/tomcat-8/v8.5.9/bin
         file: apache-tomcat-8.5.9.tar.gz
+        dest_file: tomcat.tar.gz
         dest: /tmp
         validate_certs: false
         no_log: no
@@ -127,7 +128,7 @@
 
     - name: Check http/https artifact download
       stat:
-        path: /tmp/apache-tomcat-8.5.9.tar.gz
+        path: /tmp/tomcat.tar.gz
       register: check_http_result
 
     - name: Check http/https artifact unarchived content
@@ -206,6 +207,7 @@
         unarchive: yes
         unarchive_creates: /tmp/apache-tomcat-8.5.9
         validate_certs: false
+        state: absent
         no_log: no
   tasks:
     - name: Check http/https artifact download

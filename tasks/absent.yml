@@ -4,6 +4,7 @@
 - name: Remove artifacts
   file:
     path: "{{ artifact_item }}"
+    state: absent
   register: artifact_remove_result
   loop: "{{ lookup('template', 'absent.yml.j2') | from_yaml }}"
   loop_control:
