@@ -15,6 +15,7 @@
 {% set ns.found = true %}
 
 "{{ artifact.id }}":
+  version: "{{ artifact.version | default('') }}"
 
 {% if artifact.type | lower in ["gitlab", "github", "http", "https", "jenkins"] %}
   download_path: "{{ artifact.dest }}/{{ artifact.dest_file | default(artifact.file) }}"
@@ -42,10 +43,13 @@
 
 {% if unarchived_result is defined
       and unarchived_result.files is defined %}
-  unarchived_files: {{ unarchived_result.files
-                       | map('regex_replace', '^', artifact.dest + '/')
-                       | list
-                       | to_json }}
+
+{% set inner_ns = namespace(unarchived_files=[]) %}
+{% for file in unarchived_result.files %}
+{% set inner_ns.unarchived_files = inner_ns.unarchived_files
+                                   + [ file.split("/").0 | regex_replace("^", artifact.dest + "/") ] %}
+{% endfor %}
+  unarchived_files: {{ inner_ns.unarchived_files | unique | list | to_json }}
 {% else %}
   unarchived_files: {{ unarchived_files_saved | to_json }}
 {% endif %}

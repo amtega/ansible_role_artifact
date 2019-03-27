@@ -100,7 +100,7 @@ dependencies:
     vars:
       packages_os:
         centos:
-          7:
+          all:
             python-lxml: present
         debian:
           all:
@@ -110,7 +110,7 @@ dependencies:
             python2-lxml: present
             python3-lxml: present
         rhel:
-          7:
+          all:
             python-lxml: present
     when: >-
       artifact_to_manage_present

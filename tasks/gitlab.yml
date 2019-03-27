@@ -166,7 +166,10 @@
             loop_var: artifact_item
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
-      when: not artifact_download_exists or artifact_item.force | default(false)
+      when: >-
+        not artifact_download_exists
+        or artifact_item.force | default(false)
+        or artifact_item.version | default("") != artifact_previous_version
       vars:
         artifact_gitlab_check_results: >-
           {{ artifact_gitlab_check_result.results }}
@@ -183,6 +186,11 @@
                        + "/"
                        + artifact_item.file,
                        artifact_item.file) }}
+        artifact_previous_version: >-
+          ((ansible_local.artifact
+           | default({}))[artifact_item.id]
+           | default({}))[version]
+           | default("")
 
     - name: Setup artifact attributes
       file:

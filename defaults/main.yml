@@ -9,24 +9,29 @@
 # Attributes supported by all artifact types
 # ==============================================================================
 #
-#   id: <artifactid>          # For identification purposes. Same restrictions
-#                             # as ansible variable names
-#   type: <type>              # Can be http, https, maven, gitlab and github
-#   host: <host>              # Host where the artifact resides
-#   path: <path>              # Path that contains the file. If
-#                             # not specified top level path is used
-#   dest: <dir>               # Directory where to save the artifact
-#   dest_file <file>          # Filename where to save the artifact. If not
-#                             # not given will use same name as source
-#   download: <yes_no>        # Download or not the artifact. Default is yes
-#   retries: <n>              # Number of retries. Default is 3
-#   delay: <s>                # Seconds between retries. Default is 1
-#   no_log: <yes_no>          # Hide sensitive info. Default is yes
-#   unarchive: <yes_no>       # Unarchive the artifact after download using the
-#                             # ansible `unarchive` module
-#   unarchive_creates: <path> # If the path given exists, the file will not
-#                             # unarchived
-#   state: <state>            # Can be present or absent. Default is present
+#   id: <artifactid>           # For identification purposes. Same restrictions
+#                              # as ansible variable names
+#   type: <type>               # Can be http, https, maven, gitlab and github
+#   host: <host>               # Host where the artifact resides
+#   path: <path>               # Path that contains the file. If
+#                              # not specified top level path is used
+#   dest: <dir>                # Directory where to save the artifact
+#   dest_file <file>           # Filename where to save the artifact. If not
+#                              # not given will use same name as source
+#   download: <yes_no>         # Download or not the artifact. Default is yes
+#   retries: <n>               # Number of retries. Default is 3
+#   delay: <s>                 # Seconds between retries. Default is 1
+#   force: <yes_no>            # Force download
+#   unarchive: <yes_no>        # Unarchive the artifact after download using the
+#                              # ansible `unarchive` module
+#   unarchive_creates: <path>  # If the path given exists, the file will not
+#                              # unarchived
+#   unarchive_remove: <yes_no> # Remove source archive file after being
+#                              # unarchived
+#   version: <version>         # Version of the artifact. If not given will
+#                              # use empty string
+#   state: <state>             # Can be present or absent. Default is present
+#   no_log: <yes_no>           # Hide sensitive info. Default is yes
 #
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url/maven_artifact` modules:
@@ -54,7 +59,6 @@
 #   timeout: <seconds>        # Download timeout
 #   tmp_dest: <tmp_dest>      # Temporary directory for download operations
 #                             # (default is the same as dest)
-#   force: <yes_no>           # Force or not the download
 #   checksum_algorithm: <alg> # Algorithm to determine checksum of file. Can be
 #                             # md5, sha1, sha224, sha256, sha384, sha512.
 #                             # Default is sha256
@@ -86,7 +90,6 @@
 #                             # (default is the same as dest)
 #   unsafe_writes: <yes_no>
 #   use_proxy: <yes_no>
-#   force: <yes_no>           # Force or not the download
 #
 # ==============================================================================
 # Attributes supported by maven artifacts
@@ -106,7 +109,6 @@
 #   unsafe_writes: <unsafe_writes>
 #   username: <username>
 #   verify_checksum: <verify_checksum>
-#   version: <version>
 #
 # ==============================================================================
 # Attributes supported by jenkins artifacts
@@ -136,7 +138,6 @@
 #                             # (default is the same as dest)
 #   unsafe_writes: <yes_no>
 #   use_proxy: <yes_no>
-#   force: <yes_no>           # Force or not the download
 # }
 
 # artifact:

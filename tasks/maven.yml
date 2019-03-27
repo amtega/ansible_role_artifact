@@ -34,13 +34,22 @@
   retries: "{{ artifact_item.retries | default(artifact_retries) }}"
   delay: "{{ artifact_item.delay | default(artifact_delay) }}"
   until: artifact_maven_result is succeeded
-  when: artifact_item.download | default(true)
+  when: >-
+    artifact_item.download | default(true)
+    or artifact_item.force | default(false)
+    or artifact_item.version | default("") != artifact_previous_version
   no_log: "{{ artifact_item.no_log | default(true) }}"
   loop: "{{ artifact_to_manage_present | selectattr('type', 'in', ['maven']) | list }}"
   loop_control:
       loop_var: artifact_item
       label: "{{ artifact_item.id }}"
   environment: "{{ proxy_client_environment }}"
+  vars:
+    artifact_previous_version: >-
+      ((ansible_local.artifact
+       | default({}))[artifact_item.id]
+       | default({}))[version]
+       | default("")
   tags:
     - role::artifact
     - role::artifact::maven

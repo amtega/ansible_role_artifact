@@ -1,57 +1,77 @@
 ---
 # Unarchive tasks
 
-- name: Unarchive artifacts
-  unarchive:
-    src: >-
-      {{ artifact_item.dest | default("")
-         + "/"
-         + artifact_item.dest_file
-           | default(artifact_item.file) }}
-    remote_src: yes
-    dest: "{{ artifact_item.dest | default('') }}"
-    list_files: yes
-    group: "{{ artifact_item.group | default(omit) }}"
-    mode: "{{ artifact_item.mode | default(omit) }}"
-    others: "{{ artifact_item.others | default(omit) }}"
-    owner: "{{ artifact_item.owner | default(omit) }}"
-    selevel: "{{ artifact_item.selevel | default(omit) }}"
-    serole: "{{ artifact_item.serole | default(omit) }}"
-    setype: "{{ artifact_item.setype | default(omit) }}"
-    seuser: "{{ artifact_item.seuser | default(omit) }}"
-    creates: >-
-      {{ (artifact_item.unarchive_creates | default("") | length > 0
-          and not artifact_item_download_result is changed)
-          | ternary(artifact_item.dest | default("")
-                    + "/"
-                    + artifact_item.unarchive_creates | default(""),
-                    omit) }}
-  register: artifact_unarchive_result
-  loop: >-
-    {{ artifact_to_manage_present
-       | selectattr("unarchive", "defined")
-       | selectattr("unarchive", "equalto", True)
-       | list }}
-  loop_control:
-    loop_var: artifact_item
-    label: "{{ artifact_item.id }}"
-  no_log: "{{ artifact_item.no_log | default(true) }}"
-  vars:
-    artifact_item_download_result: >-
-      {{ (artifact_gitlab_clone_result.results | default([])
-          + artifact_gitlab_reset_result.results | default([])
-          + artifact_gitlab_checkout_result.results | default([])
-          + artifact_gitlab_move_result.results | default([])
-          + artifact_gitlab_cleanup_result.results | default([])
-          + artifact_gitlab_attributes_result.results | default([])
-          + artifact_http_result.results | default([])
-          + artifact_maven_result.results | default([])
-          + artifact_jenkins_result.results | default([]))
-         | selectattr("artifact_item", "defined")
-         | selectattr("artifact_item.id", "defined")
-         | selectattr("artifact_item.id", "equalto", artifact_item.id)
-         | list
-         | first }}
+- block:
+    - name: Unarchive artifacts
+      unarchive:
+        src: >-
+          {{ artifact_item.dest | default("")
+             + "/"
+             + artifact_item.dest_file
+               | default(artifact_item.file) }}
+        remote_src: yes
+        dest: "{{ artifact_item.dest | default('') }}"
+        list_files: yes
+        group: "{{ artifact_item.group | default(omit) }}"
+        mode: "{{ artifact_item.mode | default(omit) }}"
+        others: "{{ artifact_item.others | default(omit) }}"
+        owner: "{{ artifact_item.owner | default(omit) }}"
+        selevel: "{{ artifact_item.selevel | default(omit) }}"
+        serole: "{{ artifact_item.serole | default(omit) }}"
+        setype: "{{ artifact_item.setype | default(omit) }}"
+        seuser: "{{ artifact_item.seuser | default(omit) }}"
+        creates: >-
+          {{ (artifact_item.unarchive_creates | default("") | length > 0
+              and not artifact_item_download_result is changed)
+              | ternary(artifact_item.dest | default("")
+                        + "/"
+                        + artifact_item.unarchive_creates | default(""),
+                        omit) }}
+      register: artifact_unarchive_result
+      loop: >-
+        {{ artifact_to_manage_present
+           | selectattr("unarchive", "defined")
+           | selectattr("unarchive", "equalto", True)
+           | list }}
+      loop_control:
+        loop_var: artifact_item
+        label: "{{ artifact_item.id }}"
+      no_log: "{{ artifact_item.no_log | default(true) }}"
+      vars:
+        artifact_item_download_result: >-
+          {{ (artifact_gitlab_clone_result.results | default([])
+              + artifact_gitlab_reset_result.results | default([])
+              + artifact_gitlab_checkout_result.results | default([])
+              + artifact_gitlab_move_result.results | default([])
+              + artifact_gitlab_cleanup_result.results | default([])
+              + artifact_gitlab_attributes_result.results | default([])
+              + artifact_http_result.results | default([])
+              + artifact_maven_result.results | default([])
+              + artifact_jenkins_result.results | default([]))
+             | selectattr("artifact_item", "defined")
+             | selectattr("artifact_item.id", "defined")
+             | selectattr("artifact_item.id", "equalto", artifact_item.id)
+             | list
+             | first }}
+
+    - name: Remove archive files
+      file:
+        path: >-
+          {{ artifact_item.dest | default("")
+             + "/"
+             + artifact_item.dest_file
+               | default(artifact_item.file) }}
+        state: absent
+      loop: >-
+        {{ artifact_to_manage_present
+           | selectattr("unarchive", "defined")
+           | selectattr("unarchive", "equalto", True)
+           | selectattr("unarchive_remove", "defined")
+           | selectattr("unarchive_remove", "equalto", True)
+           | list }}
+      loop_control:
+        loop_var: artifact_item
+        label: "{{ artifact_item.id }}"
   tags:
     - role::artifact
     - role::artifact::unarchive
