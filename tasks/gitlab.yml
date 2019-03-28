@@ -187,10 +187,10 @@
                        + artifact_item.file,
                        artifact_item.file) }}
         artifact_previous_version: >-
-          ((ansible_local.artifact
-           | default({}))[artifact_item.id]
-           | default({}))[version]
-           | default("")
+          {{ ((ansible_local.artifact
+              | default({}))[artifact_item.id]
+              | default({}))["version"]
+              | default(artifact_undefined_place_holder) }}
 
     - name: Setup artifact attributes
       file:

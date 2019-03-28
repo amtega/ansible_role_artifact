@@ -1,11 +1,21 @@
 ---
 # Role check tasks
 
-- name: Check artifacts config
-  assert:
-    that:
-      - artifact_to_manage_present | selectattr("id", "undefined") | list | length == 0
-    fail_msg: artifact `id` attribute is required
+- block:
+    - name: Generate undefined value place holder
+      set_fact:
+        artifact_undefined_place_holder: >-
+          {{ "__check_platform_undefined_place_holder__"
+             + (99999999999999999999999999999999999999999999999999
+                | random
+                | to_uuid) }}
+
+    - name: Check artifacts config
+      assert:
+        that:
+          - artifact_to_manage_present | selectattr("id", "undefined") | list | length == 0
+        fail_msg: artifact `id` attribute is required
+      tags:
+        - role::artifact::check
   tags:
     - role::artifact
-    - role::artifact::check

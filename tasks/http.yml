@@ -38,8 +38,9 @@
   until: artifact_http_result is succeeded
   when: >-
     artifact_item.download | default(true)
-    or artifact_item.force | default(false)
-    or artifact_item.version | default("") != artifact_previous_version
+    and (artifact_item.force | default(false)
+         or artifact_previous_version is none
+         or artifact_item.version | default("") != artifact_previous_version)
   no_log: "{{ artifact_item.no_log | default(true) }}"
   loop: >-
     {{ artifact_to_manage_present | selectattr('type', 'in', ['http', 'https']) | list }}
@@ -49,10 +50,10 @@
   environment: "{{ proxy_client_environment }}"
   vars:
     artifact_previous_version: >-
-      ((ansible_local.artifact
-       | default({}))[artifact_item.id]
-       | default({}))[version]
-       | default("")
+      {{ ((ansible_local.artifact
+          | default({}))[artifact_item.id]
+          | default({}))["version"]
+          | default(artifact_undefined_place_holder) }}
   tags:
     - role::artifact
     - role::artifact::http

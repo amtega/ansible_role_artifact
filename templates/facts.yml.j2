@@ -20,7 +20,7 @@
 {% if artifact.type | lower in ["gitlab", "github", "http", "https", "jenkins"] %}
   download_path: "{{ artifact.dest }}/{{ artifact.dest_file | default(artifact.file) }}"
 {% else %}
-  download_path: "{{ result.dest }}"
+  download_path: "{{ result.dest | default(((ansible_local.artifact | default({}))[artifact.id] | default({}))['download_path'] | default('')) }}"
 {% endif %}
 
 {% if artifact.unarchive | default(false)

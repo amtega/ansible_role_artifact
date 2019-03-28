@@ -28,6 +28,7 @@
                         + artifact_item.unarchive_creates | default(""),
                         omit) }}
       register: artifact_unarchive_result
+      when: artifact_item_download_result is changed
       loop: >-
         {{ artifact_to_manage_present
            | selectattr("unarchive", "defined")

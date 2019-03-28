@@ -14,6 +14,11 @@
              | default(artifact_checksum_algorithm) }}
         get_checksum: yes
       register: artifact_checksum_stat_result
+      when: >-
+        artifact_item.download | default(true)
+        and (artifact_item.force | default(false)
+             or artifact_item.version | default("")
+                != artifact_previous_version)
       loop: >-
         {{ artifact_to_manage_present
            | selectattr("type",
@@ -24,11 +29,20 @@
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
       no_log: "{{ artifact_item.no_log | default(true) }}"
+      vars:
+        artifact_previous_version: >-
+          {{ ((ansible_local.artifact
+              | default({}))[artifact_item.id]
+              | default({}))["version"]
+              | default(artifact_undefined_place_holder) }}
 
     - name: Fail if artifacts checksums does not match
       fail:
         msg: downloaded artifact checksum does not match
       when:
+        - >-
+          artifact_checksum_stat_result.results[artifact_item_index]
+          is not skipped
         - artifact_item.checksum | default("") | length > 0
         - artifact_item.checksum != artifact_checksums[artifact_item_index]
       loop: >-
