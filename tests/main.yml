@@ -64,7 +64,7 @@
   tags:
     - idempotence
 
-- name: Test artifact role
+- name: Test artifact role present state
   hosts: docker_sandbox_containers
   roles:
     - amtega.artifact
@@ -79,16 +79,15 @@
         file: README.md
         dest: /tmp
         validate_certs: false
+        timeout: 180
         no_log: no
 
       - id: ansible
         type: github
         host: https://github.com
-        project: ansible/ansible
-        branch: devel
-        file: COPYING
-        checksum_algorithm: sha1
-        checksum: 338650eb7a42dd9bc1f1c6961420f2633b24932d
+        project: amtega/ansible_role_artifact
+        branch: master
+        file: README.md
         dest: /tmp
         validate_certs: false
         no_log: no
@@ -98,9 +97,13 @@
         host: https://archive.apache.org
         path: /dist/tomcat/tomcat-8/v8.5.9/bin
         file: apache-tomcat-8.5.9.tar.gz
+        dest_file: tomcat.tar.gz
         checksum_algorithm: sha1
         checksum: 3c800e7affdf93bf4dbcf44bd852904449b786f6
         dest: /tmp
+        unarchive: yes
+        unarchive_creates: /tmp/apache-tomcat-8.5.9
+        unarchive_remove: yes
         validate_certs: false
         no_log: no
 
@@ -109,6 +112,17 @@
         host: https://archive.apache.org
         path: /dist/tomcat/tomcat-8/v8.5.9/bin
         file: apache-tomcat-8.5.9.tar.gz
+        dest_file: tomcat2.tar.gz
+        dest: /tmp
+        validate_certs: false
+        no_log: no
+
+      - id: tomcat3
+        type: https
+        host: https://archive.apache.org
+        path: /dist/tomcat/tomcat-8/v8.5.9/bin
+        file: apache-tomcat-8.5.9.tar.gz
+        dest_file: tomcat2.tar.gz
         dest: /tmp
         validate_certs: false
         no_log: no
@@ -120,13 +134,23 @@
 
     - name: Check github artifact download
       stat:
-        path: /tmp/COPYING
+        path: /tmp/README.md
       register: check_github_result
+
+    - name: Check http/https unarchived artifact download
+      stat:
+        path: /tmp/tomcat.tar.gz
+      register: check_http_result
 
     - name: Check http/https artifact download
       stat:
-        path: /tmp/apache-tomcat-8.5.9.tar.gz
-      register: check_http_result
+        path: /tmp/tomcat2.tar.gz
+      register: check_http2_result
+
+    - name: Check http/https artifact unarchived content
+      stat:
+        path: /tmp/apache-tomcat-8.5.9
+      register: check_http_unarchive_result
 
     - name: Check jenkins artifact download
       stat:
@@ -157,13 +181,15 @@
         that:
           - check_gitlab_result.stat.exists
           - check_github_result.stat.exists
-          - check_http_result.stat.exists
+          - not check_http_result.stat.exists
+          - check_http2_result.stat.exists
+          - check_http_unarchive_result.stat.exists
           - check_maven_result.stat.exists
           - artifact_result.gitlab is defined
           - artifact_result.ansible is defined
           - artifact_result.tomcat1 is defined
           - artifact_result.maven is defined
-          - not artifact_result.tomcat2.changed
+          - not artifact_result.tomcat3.changed
 
     - name: Check that jenkins artifacts were downloaded correctly
       assert:
@@ -178,6 +204,44 @@
         - artifact_tests_jenkins_extension is defined
   tags:
     - idempotence
+
+- name: Test artifact role absent state
+  hosts: docker_sandbox_containers
+  roles:
+    - amtega.artifact
+  vars:
+    artifact_load_from_hostvars: yes
+    artifact_list:
+      - id: tomcat1
+        type: https
+        host: https://archive.apache.org
+        path: /dist/tomcat/tomcat-8/v8.5.9/bin
+        file: apache-tomcat-8.5.9.tar.gz
+        dest_file: tomcat.tar.gz
+        checksum_algorithm: sha1
+        checksum: 3c800e7affdf93bf4dbcf44bd852904449b786f6
+        dest: /tmp
+        unarchive: yes
+        unarchive_creates: /tmp/apache-tomcat-8.5.9
+        validate_certs: false
+        state: absent
+        no_log: no
+  tasks:
+    - name: Check http/https artifact download
+      stat:
+        path: /tmp/apache-tomcat-8.5.9.tar.gz
+      register: check_http_result
+
+    - name: Check http/https artifact unarchived content
+      stat:
+        path: /tmp/apache-tomcat-8.5.9
+      register: check_http_unarchive_result
+
+    - name: Check that artifacts were removed correctly
+      assert:
+        that:
+          - not check_http_result.stat.exists
+          - not check_http_unarchive_result.stat.exists
 
 - name: Cleanup docker sandbox
   hosts: localhost

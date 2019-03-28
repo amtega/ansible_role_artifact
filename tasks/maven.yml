@@ -6,7 +6,10 @@
     artifact_id: "{{ artifact_item.artifact_id | default(omit) }}"
     attributes: "{{ artifact_item.attributes | default(omit) }}"
     classifier: "{{ artifact_item.classifier | default(omit) }}"
-    dest: "{{ artifact_item.dest | default(omit) }}"
+    dest: >-
+      {{ artifact_item.dest
+         + (artifact_item.dest_file | default("") | length > 0)
+           | ternary("/" + artifact_item.dest_file | default(""), "") }}
     extension: "{{ artifact_item.extension | default(omit) }}"
     group: "{{ artifact_item.group | default(omit) }}"
     group_id: "{{ artifact_item.group_id | default(omit) }}"
@@ -31,13 +34,22 @@
   retries: "{{ artifact_item.retries | default(artifact_retries) }}"
   delay: "{{ artifact_item.delay | default(artifact_delay) }}"
   until: artifact_maven_result is succeeded
-  when: artifact_item.download | default(true)
+  when: >-
+    artifact_item.download | default(true)
+    and (artifact_item.force | default(false)
+         or artifact_item.version | default("") != artifact_previous_version)
   no_log: "{{ artifact_item.no_log | default(true) }}"
-  loop: "{{ artifact_to_manage | selectattr('type', 'in', ['maven']) | list }}"
+  loop: "{{ artifact_to_manage_present | selectattr('type', 'in', ['maven']) | list }}"
   loop_control:
       loop_var: artifact_item
       label: "{{ artifact_item.id }}"
   environment: "{{ proxy_client_environment }}"
+  vars:
+    artifact_previous_version: >-
+      {{ ((ansible_local.artifact
+          | default({}))[artifact_item.id]
+          | default({}))["version"]
+          | default(artifact_undefined_place_holder) }}
   tags:
     - role::artifact
     - role::artifact::maven

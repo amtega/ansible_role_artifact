@@ -7,7 +7,10 @@
     backup: "{{ artifact_item.backup | default(omit) }}"
     client_cert: "{{ artifact_item.client_cert | default(omit) }}"
     client_key: "{{ artifact_item.client_key | default(omit) }}"
-    dest: "{{ artifact_item.dest | default(omit) }}"
+    dest: >-
+      {{ artifact_item.dest
+         + (artifact_item.dest_file | default("") | length > 0)
+           | ternary("/" + artifact_item.dest_file | default(""), "") }}
     force: "{{ artifact_item.force | default(omit) }}"
     force_basic_auth: "{{ artifact_item.force_basic_auth | default(omit) }}"
     group: "{{ artifact_item.group | default(omit) }}"
@@ -33,14 +36,24 @@
   retries: "{{ artifact_item.retries | default(artifact_retries) }}"
   delay: "{{ artifact_item.delay | default(artifact_delay) }}"
   until: artifact_http_result is succeeded
-  when: artifact_item.download | default(true)
+  when: >-
+    artifact_item.download | default(true)
+    and (artifact_item.force | default(false)
+         or artifact_previous_version is none
+         or artifact_item.version | default("") != artifact_previous_version)
   no_log: "{{ artifact_item.no_log | default(true) }}"
   loop: >-
-    {{ artifact_to_manage | selectattr('type', 'in', ['http', 'https']) | list }}
+    {{ artifact_to_manage_present | selectattr('type', 'in', ['http', 'https']) | list }}
   loop_control:
     loop_var: artifact_item
     label: "{{ artifact_item.id }}"
   environment: "{{ proxy_client_environment }}"
+  vars:
+    artifact_previous_version: >-
+      {{ ((ansible_local.artifact
+          | default({}))[artifact_item.id]
+          | default({}))["version"]
+          | default(artifact_undefined_place_holder) }}
   tags:
     - role::artifact
     - role::artifact::http

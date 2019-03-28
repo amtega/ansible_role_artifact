@@ -8,7 +8,7 @@
       register: artifact_gitlab_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
       loop: >-
-        {{ artifact_to_manage
+        {{ artifact_to_manage_present
            | selectattr('type', 'in', ['gitlab', 'github'])
            | list }}
       loop_control:
@@ -23,7 +23,7 @@
           register: artifact_gitlab_tmp_result
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
-            {{ artifact_to_manage
+            {{ artifact_to_manage_present
                | selectattr('type', 'in', ['gitlab', 'github'])
                | list }}
           loop_control:
@@ -54,7 +54,7 @@
               failed_when: artifact_gitlab_clone_result.rc | default(0) != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
               loop: >-
-                {{ artifact_to_manage
+                {{ artifact_to_manage_present
                    | selectattr('type', 'in', ['gitlab', 'github'])
                    | list }}
               loop_control:
@@ -74,7 +74,7 @@
               failed_when: artifact_gitlab_reset_result.rc != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
               loop: >-
-                {{ artifact_to_manage
+                {{ artifact_to_manage_present
                    | selectattr('type', 'in', ['gitlab', 'github'])
                    | list }}
               loop_control:
@@ -101,7 +101,7 @@
               failed_when: artifact_gitlab_checkout_result.rc != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
               loop: >-
-                {{ artifact_to_manage
+                {{ artifact_to_manage_present
                    | selectattr('type', 'in', ['gitlab', 'github'])
                    | list }}
               loop_control:
@@ -134,14 +134,17 @@
 
         - name: Move artifact to destination
           shell: >-
-              mv {{ artifact_gitlab_file_path }} {{ artifact_item.dest }}
+              mv {{ artifact_gitlab_file_path }}
+              {{ artifact_item.dest
+                 + (artifact_item.dest_file | default("") | length > 0)
+                   | ternary("/" + artifact_item.dest_file | default(""), "") }}
           args:
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_move_result
           failed_when: artifact_gitlab_move_result.rc != 0
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
-            {{ artifact_to_manage
+            {{ artifact_to_manage_present
                | selectattr('type', 'in', ['gitlab', 'github'])
                | list }}
           loop_control:
@@ -156,14 +159,17 @@
           register: artifact_gitlab_cleanup_result
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: >-
-            {{ artifact_to_manage
+            {{ artifact_to_manage_present
                | selectattr('type', 'in', ['gitlab', 'github'])
                | list }}
           loop_control:
             loop_var: artifact_item
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
-      when: not artifact_download_exists or artifact_item.force | default(false)
+      when: >-
+        not artifact_download_exists
+        or artifact_item.force | default(false)
+        or artifact_item.version | default("") != artifact_previous_version
       vars:
         artifact_gitlab_check_results: >-
           {{ artifact_gitlab_check_result.results }}
@@ -180,10 +186,19 @@
                        + "/"
                        + artifact_item.file,
                        artifact_item.file) }}
+        artifact_previous_version: >-
+          {{ ((ansible_local.artifact
+              | default({}))[artifact_item.id]
+              | default({}))["version"]
+              | default(artifact_undefined_place_holder) }}
 
     - name: Setup artifact attributes
       file:
-        path: "{{ artifact_item.dest | default('') }}/{{ artifact_item.file }}"
+        path: >-
+          {{ artifact_item.dest
+             + (artifact_item.dest_file | default("") | length > 0)
+               | ternary("/" + artifact_item.dest_file | default(""),
+                         "/" + artifact_item.file) }}
         attributes: "{{ artifact_item.attributes | default(omit) }}"
         group: "{{ artifact_item.group | default(omit) }}"
         mode: "{{ artifact_item.mode | default(omit) }}"
@@ -195,7 +210,7 @@
       register: artifact_gitlab_attributes_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
       loop: >-
-        {{ artifact_to_manage
+        {{ artifact_to_manage_present
            | selectattr('type', 'in', ['gitlab', 'github'])
            | list }}
       loop_control:

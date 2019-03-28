@@ -1,21 +1,66 @@
 {% set ns = namespace(found=false) %}
+{% if artifact_unarchive_result.results is defined %}
+{% set unarchived = artifact_unarchive_result.results
+                    | default([])
+                    | selectattr("artifact_item", "defined")
+                    | selectattr("artifact_item.id", "defined")
+                    | select("changed")
+                    | map(attribute="artifact_item.id")
+                    | list %}
+{% else %}
+{% set unarchived = [] %}
+{% endif %}
 
 {%- macro fact(artifact, result={}) %}
 {% set ns.found = true %}
 
 "{{ artifact.id }}":
+  version: "{{ artifact.version | default('') }}"
 
-{% if artifact.type in ['gitlab', 'github', 'http', 'https'] %}
-  download_path: "{{ artifact.dest }}/{{ artifact.file }}"
+{% if artifact.type | lower in ["gitlab", "github", "http", "https", "jenkins"] %}
+  download_path: "{{ artifact.dest }}/{{ artifact.dest_file | default(artifact.file) }}"
+{% else %}
+  download_path: "{{ result.dest | default(((ansible_local.artifact | default({}))[artifact.id] | default({}))['download_path'] | default('')) }}"
 {% endif %}
 
-{% if artifact.type in ['maven'] %}
-  download_path: "{{ result.dest }}"
+{% if artifact.unarchive | default(false)
+      and artifact_unarchive_result.results is defined %}
+{% set unarchived_result = artifact_unarchive_result.results
+                           | default([])
+                           | selectattr("artifact_item", "defined")
+                           | selectattr("artifact_item.id", "defined")
+                           | selectattr("artifact_item.id", "equalto", artifact.id)
+                           | list
+                           | first %}
+
+{% if ansible_local.artifact is defined
+      and ansible_local.artifact[artifact.id] is defined
+      and ansible_local.artifact[artifact.id].unarchived_files is defined %}
+{% set unarchived_files_saved = ansible_local.artifact[artifact.id].unarchived_files %}
+{% else %}
+{% set unarchived_files_saved = [] %}
+{% endif %}
+
+{% if unarchived_result is defined
+      and unarchived_result.files is defined %}
+
+{% set inner_ns = namespace(unarchived_files=[]) %}
+{% for file in unarchived_result.files %}
+{% set inner_ns.unarchived_files = inner_ns.unarchived_files
+                                   + [ file.split("/").0 | regex_replace("^", artifact.dest + "/") ] %}
+{% endfor %}
+  unarchived_files: {{ inner_ns.unarchived_files | unique | list | to_json }}
+{% else %}
+  unarchived_files: {{ unarchived_files_saved | to_json }}
+{% endif %}
+
+{% else %}
+  unarchived_files: []
 {% endif %}
 {%- endmacro %}
 
-{% for artifact in artifact_to_manage
-                   | selectattr('type', 'in', ['gitlab', 'github'])
+{% for artifact in artifact_to_manage_present
+                   | selectattr("type", "in", ["gitlab", "github"])
                    | list %}
 {{- fact(artifact) }}
   changed: {{ artifact_gitlab_clone_result.results[loop.index0] is changed
@@ -23,28 +68,32 @@
               or artifact_gitlab_checkout_result.results[loop.index0] is changed
               or artifact_gitlab_move_result.results[loop.index0] is changed
               or artifact_gitlab_cleanup_result.results[loop.index0] is changed
-              or artifact_gitlab_attributes_result.results[loop.index0] is changed }}
+              or artifact_gitlab_attributes_result.results[loop.index0] is changed
+              or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage
-                   | selectattr('type', 'in', ['http', 'https'])
+{% for artifact in artifact_to_manage_present
+                   | selectattr("type", "in", ["http", "https"])
                    | list %}
 {{- fact(artifact) }}
-  changed: {{ artifact_http_result.results[loop.index0] is changed }}
+  changed: {{ artifact_http_result.results[loop.index0] is changed
+              or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage
-                   | selectattr('type', 'in', ['maven'])
+{% for artifact in artifact_to_manage_present
+                   | selectattr("type", "in", ["maven"])
                    | list %}
 {{- fact(artifact, artifact_maven_result.results[loop.index0]) }}
-  changed: {{ artifact_maven_result.results[loop.index0] is changed }}
+  changed: {{ artifact_maven_result.results[loop.index0] is changed
+              or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage
-                   | selectattr('type', 'in', ['jenkins'])
+{% for artifact in artifact_to_manage_present
+                   | selectattr("type", "in", ["jenkins"])
                    | list %}
 {{- fact(artifact) }}
-  changed: {{ artifact_jenkins_result.results[loop.index0] is changed }}
+  changed: {{ artifact_jenkins_result.results[loop.index0] is changed
+              or artifact.id in unarchived }}
 {% endfor %}
 
 {% if not ns.found %}

@@ -6,6 +6,10 @@
 artifact_retries: 3
 artifact_delay: 1
 
+# Path to facts file
+
+artifact_facts_file_path: /etc/ansible/facts.d/artifact.fact
+
 # Defaults for checksum
 
 artifact_checksum_algorithm: sha256
@@ -16,3 +20,21 @@ artifact_to_manage: >-
   {{ artifact_list
      + ((artifact_load_from_hostvars)
         | ternary(artifact_hostvars | default([]) | flatten, [])) }}
+
+artifact_to_manage_undefined: >-
+  {{ artifact_to_manage
+     | selectattr("state", "undefined")
+     | list }}
+
+artifact_to_manage_present: >-
+  {{ artifact_to_manage
+     | selectattr("state", "defined")
+     | selectattr("state", "equalto", "present")
+     | list
+     + artifact_to_manage_undefined }}
+
+artifact_to_manage_absent: >-
+  {{ artifact_to_manage
+     | selectattr("state", "defined")
+     | selectattr("state", "equalto", "absent")
+     | list }}

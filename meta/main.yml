@@ -74,8 +74,6 @@ dependencies:
           all:
             git: present
             git-lfs: present
-            python2-lxml: present
-            python3-lxml: present
             python2-pexpect: present
             python3-pexpect: present
         rhel:
@@ -91,7 +89,7 @@ dependencies:
           all:
             pexpect: latest
     when: >-
-      artifact_to_manage
+      artifact_to_manage_present
       | selectattr("type", "in", ["gitlab", "github"])
       | list
       | length > 0
@@ -101,11 +99,21 @@ dependencies:
   - role: amtega.packages
     vars:
       packages_os:
-        all:
+        centos:
+          all:
+            python-lxml: present
+        debian:
+          all:
+            python-lxml: present
+        fedora:
+          all:
+            python2-lxml: present
+            python3-lxml: present
+        rhel:
           all:
             python-lxml: present
     when: >-
-      artifact_to_manage
+      artifact_to_manage_present
       | selectattr("type", "in", ["maven"])
       | list
       | length > 0
