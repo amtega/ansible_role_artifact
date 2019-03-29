@@ -1,7 +1,7 @@
 ---
 # jenkins artifact download tasks
 
-- name: Download artifacts from jenkis server
+- name: Download artifacts from jenkins server
   get_url:
     attributes: "{{ artifact_item.attributes | default(omit) }}"
     backup: "{{ artifact_item.backup | default(omit) }}"
@@ -11,7 +11,12 @@
       {{ artifact_item.dest
          + (artifact_item.dest_file | default("") | length > 0)
            | ternary("/" + artifact_item.dest_file | default(""), "") }}
-    force: "{{ artifact_item.force | default(omit) }}"
+    force: >-
+      {{ artifact_item.force | default(false)
+         or artifact_item.version
+            | default("")
+            | string
+            != artifact_previous_version }}
     force_basic_auth: yes
     group: "{{ artifact_item.group | default(omit) }}"
     mode: "{{ artifact_item.mode | default(omit) }}"
@@ -38,13 +43,17 @@
     use_proxy: "{{ artifact_item.use_proxy | default(omit) }}"
     validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
   register: artifact_jenkins_result
+  failed_when: artifact_jenkins_result.status_code != 200
   retries: "{{ artifact_item.retries | default(artifact_retries) }}"
   delay: "{{ artifact_item.delay | default(artifact_delay) }}"
   until: artifact_jenkins_result is succeeded
   when: >-
     artifact_item.download | default(true)
     and (artifact_item.force | default(false)
-         or artifact_item.version | default("") != artifact_previous_version)
+         or artifact_item.version
+            | default("")
+            | string
+            != artifact_previous_version)
   no_log: "{{ artifact_item.no_log | default(true) }}"
   loop: >-
     {{ artifact_to_manage_present

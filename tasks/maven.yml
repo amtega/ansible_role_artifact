@@ -37,7 +37,10 @@
   when: >-
     artifact_item.download | default(true)
     and (artifact_item.force | default(false)
-         or artifact_item.version | default("") != artifact_previous_version)
+         or artifact_item.version
+            | default("")
+            | string
+            != artifact_previous_version)
   no_log: "{{ artifact_item.no_log | default(true) }}"
   loop: "{{ artifact_to_manage_present | selectattr('type', 'in', ['maven']) | list }}"
   loop_control:
