@@ -11,7 +11,12 @@
       {{ artifact_item.dest
          + (artifact_item.dest_file | default("") | length > 0)
            | ternary("/" + artifact_item.dest_file | default(""), "") }}
-    force: "{{ artifact_item.force | default(omit) }}"
+    force: >-
+      {{ artifact_item.force | default(false)
+         or artifact_item.version
+            | default("")
+            | string
+            != artifact_previous_version }}
     force_basic_auth: "{{ artifact_item.force_basic_auth | default(omit) }}"
     group: "{{ artifact_item.group | default(omit) }}"
     headers: "{{ artifact_item.headers | default(omit) }}"
@@ -40,7 +45,10 @@
     artifact_item.download | default(true)
     and (artifact_item.force | default(false)
          or artifact_previous_version is none
-         or artifact_item.version | default("") != artifact_previous_version)
+         or artifact_item.version
+            | default("")
+            | string
+            != artifact_previous_version)
   no_log: "{{ artifact_item.no_log | default(true) }}"
   loop: >-
     {{ artifact_to_manage_present | selectattr('type', 'in', ['http', 'https']) | list }}

@@ -17,7 +17,7 @@
       when: >-
         artifact_item.download | default(true)
         and (artifact_item.force | default(false)
-             or artifact_item.version | default("")
+             or artifact_item.version | default("") | string
                 != artifact_previous_version)
       loop: >-
         {{ artifact_to_manage_present
