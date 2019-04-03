@@ -12,6 +12,6 @@
        | subelements('files') }}
   loop_control:
     loop_var: artifact_item
-    label: "{{ artifact_item.0 }} {{ artifact_item.1 }}"
+    label: "{{ artifact_item.0.id }} {{ artifact_item.1 }}"
   tags:
     - role::artifact
