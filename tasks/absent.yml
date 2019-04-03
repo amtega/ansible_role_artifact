@@ -3,11 +3,15 @@
 
 - name: Remove artifacts
   file:
-    path: "{{ artifact_item }}"
+    path: "{{ artifact_item.1 }}"
     state: absent
   register: artifact_remove_result
-  loop: "{{ lookup('template', 'absent.yml.j2') | from_yaml }}"
+  loop: >-
+    {{ lookup('template', 'absent.yml.j2')
+       | from_yaml
+       | subelements('files') }}
   loop_control:
     loop_var: artifact_item
+    label: "{{ artifact_item.0.id }} {{ artifact_item.1 }}"
   tags:
     - role::artifact

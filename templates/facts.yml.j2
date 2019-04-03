@@ -96,6 +96,16 @@
               or artifact.id in unarchived }}
 {% endfor %}
 
+{% for artifact in artifact_to_manage_absent %}
+{% set ns.found = true %}
+"{{ artifact.id }}":
+  changed: {{ artifact_remove_result.results
+              | selectattr("artifact_item.0.id", "equalto", artifact.id)
+              | select("changed")
+              | list
+              | length > 0 }}
+{% endfor %}
+
 {% if not ns.found %}
 {}
 {% endif %}
