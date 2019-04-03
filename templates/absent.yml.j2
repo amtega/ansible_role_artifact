@@ -2,12 +2,15 @@
 
 {% if ansible_local.artifact is defined %}
 {% for artifact in artifact_to_manage_absent %}
+- id: "{{ artifact.id }}"
+  files: {% if ansible_local.artifact[artifact.id] is undefined
+            and ansible_local.artifact[artifact.id].unarchived_files | length == 0%}[]{% else %}{{ "\n" }}{% endif %}
 {% if ansible_local.artifact[artifact.id] is defined %}
 {% set ns.found = true %}
-- {{ ansible_local.artifact[artifact.id].download_path }}
+    - {{ ansible_local.artifact[artifact.id].download_path }}
 {% for file in ansible_local.artifact[artifact.id].unarchived_files %}
 {% set ns.found = true %}
-- {{ file }}
+    - {{ file }}
 {% endfor %}
 {% endif %}
 {% endfor %}
