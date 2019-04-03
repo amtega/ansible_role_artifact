@@ -15,7 +15,3 @@
     label: "{{ artifact_item.0 }} {{ artifact_item.1 }}"
   tags:
     - role::artifact
-
-- debug: var=artifact_remove_result
-  tags:
-    - role::artifact
