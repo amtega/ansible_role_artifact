@@ -1,23 +1,20 @@
 {% set ns = namespace(found=false) %}
 
-{% if ansible_local.artifact is defined %}
 {% for artifact in artifact_to_manage_absent %}
 - id: "{{ artifact.id }}"
-{% if ansible_local.artifact is undefined
-      or ansible_local.artifact[artifact.id] is undefined %}
+{% if ansible_local["artifact_" + artifact.id] is undefined %}
 {% set ns.found = true %}
   files: []
 {% else %}
 {% set ns.found = true %}
   files:
-    - {{ ansible_local.artifact[artifact.id].download_path }}
-{% for file in ansible_local.artifact[artifact.id].unarchived_files | default([]) %}
+    - {{ ansible_local["artifact_" + artifact.id].download_path }}
+{% for file in ansible_local["artifact_" + artifact.id].unarchived_files | default([]) %}
 {% set ns.found = true %}
     - {{ file }}
 {% endfor %}
 {% endif %}
 {% endfor %}
-{% endif %}
 
 {% if not ns.found %}
 []

@@ -58,8 +58,7 @@
   environment: "{{ proxy_client_environment }}"
   vars:
     artifact_previous_version: >-
-      {{ ((ansible_local.artifact
-          | default({}))[artifact_item.id]
+      {{ (ansible_local["artifact_" + artifact_item.id]
           | default({}))["version"]
           | default(artifact_undefined_place_holder) }}
   tags:

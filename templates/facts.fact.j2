@@ -1,11 +1,5 @@
 {
-{% for artifact_id in artifact_result.keys()
-   | list
-   | difference(artifact_to_manage_absent| map(attribute="id") | list) %}
-  "{{ artifact_id }}": {
-    "version": {{ artifact_result[artifact_id].version | to_json }},
-    "download_path": {{ artifact_result[artifact_id].download_path | to_json }},
-    "unarchived_files": {{ artifact_result[artifact_id].unarchived_files | to_json }}
-  }{% if not loop.last %},{{ "\n" }}{% endif %}
-{% endfor %}{{ "\n" }}
+  "version": {{ artifact_result[artifact_id].version | to_json }},
+  "download_path": {{ artifact_result[artifact_id].download_path | to_json }},
+  "unarchived_files": {{ artifact_result[artifact_id].unarchived_files | to_json }}
 }
