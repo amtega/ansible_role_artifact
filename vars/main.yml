@@ -6,10 +6,6 @@
 artifact_retries: 3
 artifact_delay: 1
 
-# Path to facts file
-
-artifact_facts_file_path: /etc/ansible/facts.d/artifact.fact
-
 # Defaults for checksum
 
 artifact_checksum_algorithm: sha256

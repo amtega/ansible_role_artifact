@@ -31,8 +31,7 @@
       no_log: "{{ artifact_item.no_log | default(true) }}"
       vars:
         artifact_previous_version: >-
-          {{ ((ansible_local.artifact
-              | default({}))[artifact_item.id]
+          {{ (ansible_local["artifact_" + artifact_item.id]
               | default({}))["version"]
               | default(artifact_undefined_place_holder) }}
 

@@ -243,7 +243,7 @@
           - not check_http_result.stat.exists
           - not check_http_unarchive_result.stat.exists
           - artifact_result.tomcat1 is defined
-          - artifact_result.tomcat1.changed 
+          - artifact_result.tomcat1.changed
 
 - name: Cleanup docker sandbox
   hosts: localhost

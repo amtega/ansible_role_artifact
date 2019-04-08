@@ -15,10 +15,23 @@
     - name: Configure artifact facts
       template:
         src: facts.fact.j2
-        dest: "{{ artifact_facts_file_path }}"
+        dest: >-
+          /etc/ansible/facts.d/artifact_{{ artifact_id }}.fact
         owner: root
         group: root
         mode: 0640
+      loop: >-
+        {{ artifact_result.keys()
+           | list
+           | difference(artifact_to_manage_absent
+                        | map(attribute="id") | list) }}
+      loop_control:
+        loop_var: artifact_id
+
+    - name: Remove obsolete artifact facts file
+      file:
+        path: /etc/ansible/facts.d/artifact.fact
+        state: absent
   tags:
     - role::artifact
     - role::artifact::facts
