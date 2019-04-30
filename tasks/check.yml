@@ -13,7 +13,11 @@
     - name: Check artifacts config
       assert:
         that:
-          - artifact_to_manage_present | selectattr("id", "undefined") | list | length == 0
+          - >-
+            artifact_to_manage_present
+            | selectattr("id", "undefined")
+            | list
+            | length == 0
         fail_msg: artifact `id` attribute is required
       tags:
         - role::artifact::check
