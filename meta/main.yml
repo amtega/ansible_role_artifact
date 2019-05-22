@@ -119,3 +119,18 @@ dependencies:
       | length > 0
     tags:
       - role::artifact
+
+  - role: amtega.packages
+    vars:
+      packages_os:
+        all:
+          all:
+            tar: present
+            unzip: present
+    when: >-
+      artifact_to_manage_present
+      | selectattr("unarchive", "defined")
+      | list
+      | length > 0
+    tags:
+      - role::artifact
