@@ -218,7 +218,7 @@
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
-  when: artifact_item.download | default(true)
+  when: artifact_item.download | default(true) | bool
   environment: "{{ proxy_client_environment }}"
   tags:
     - role::artifact

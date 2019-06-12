@@ -14,7 +14,7 @@ artifact_checksum_algorithm: sha256
 
 artifact_to_manage: >-
   {{ artifact_list
-     + ((artifact_load_from_hostvars)
+     + ((artifact_load_from_hostvars | bool)
         | ternary(artifact_hostvars | default([]) | flatten, [])) }}
 
 artifact_to_manage_undefined: >-
