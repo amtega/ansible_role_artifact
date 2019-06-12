@@ -48,8 +48,8 @@
   delay: "{{ artifact_item.delay | default(artifact_delay) }}"
   until: artifact_jenkins_result is succeeded
   when: >-
-    artifact_item.download | default(true)
-    and (artifact_item.force | default(false)
+    artifact_item.download | default(true) | bool
+    and (artifact_item.force | default(false) | bool
          or artifact_item.version
             | default("")
             | string

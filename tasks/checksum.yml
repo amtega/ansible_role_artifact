@@ -15,8 +15,8 @@
         get_checksum: yes
       register: artifact_checksum_stat_result
       when: >-
-        artifact_item.download | default(true)
-        and (artifact_item.force | default(false)
+        artifact_item.download | default(true) | bool
+        and (artifact_item.force | default(false) | bool
              or artifact_item.version | default("") | string
                 != artifact_previous_version)
       loop: >-

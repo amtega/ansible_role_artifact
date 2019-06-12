@@ -48,7 +48,7 @@ dependencies:
           - id
         fact_name: artifact_hostvars
         output_type: list
-    when: artifact_load_from_hostvars
+    when: artifact_load_from_hostvars | bool
     tags:
       - role::artifact
 
