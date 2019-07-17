@@ -4,9 +4,19 @@
 - block:
     - block:
         - name: Install ius community repository
-          yum:
-            name: https://rhel6.iuscommunity.org/ius-release.rpm
-            state: present
+          command: >-
+            yum install -y https://rhel6.iuscommunity.org/ius-release.rpm
+          args:
+            warn: no
+          register: artifact_install_ius_result
+          changed_when: >-
+            artifact_install_ius_result.stdout is search("Complete!")
+          failed_when: >-
+            not artifact_install_ius_result.stdout is search("Complete!")
+            and not artifact_install_ius_result.stderr
+                    is search("Nothing to do")
+          environment:
+            LANGUAGE: en_US
 
         - name: Install git2u package
           yum:
