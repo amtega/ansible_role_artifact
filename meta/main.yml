@@ -15,8 +15,8 @@ galaxy_info:
         - 7
     - name: Fedora
       versions:
-        - 27
-        - 28
+        - 29
+        - 30
     - name: Debian
       versions:
         - stretch
@@ -34,7 +34,7 @@ dependencies:
       check_platform_distributions:
         centos: 6
         debian: 9
-        fedora: 27
+        fedora: 29
         rhel: 6
     tags:
       - role::artifact
