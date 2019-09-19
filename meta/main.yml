@@ -17,9 +17,6 @@ galaxy_info:
       versions:
         - 29
         - 30
-    - name: Debian
-      versions:
-        - stretch
   galaxy_tags:
     - download
     - artifact
@@ -33,7 +30,6 @@ dependencies:
     vars:
       check_platform_distributions:
         centos: 6
-        debian: 9
         fedora: 29
         rhel: 6
     tags:
@@ -65,11 +61,6 @@ dependencies:
           7:
             git: present
             git-lfs: present
-        debian:
-          all:
-            curl: present
-            git: present
-            python-pexpect: present
         fedora:
           all:
             git: present
@@ -100,9 +91,6 @@ dependencies:
     vars:
       packages_os:
         centos:
-          all:
-            python-lxml: present
-        debian:
           all:
             python-lxml: present
         fedora:

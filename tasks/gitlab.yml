@@ -2,18 +2,24 @@
 # GitLab/GitHub artifact download tasks
 
 - block:
-    - name: Check gitlab/github artifact download
+    - name: Check gitlab artifact download
       stat:
-        path: "{{ artifact_item.dest }}/{{ artifact_item.file }}"
+        path: "{{ artifact_gitlab_check_path }}"
       register: artifact_gitlab_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
       loop: >-
         {{ artifact_to_manage_present
-           | selectattr('type', 'in', ['gitlab', 'github'])
+           | selectattr("type", "in", ["gitlab", "github"])
            | list }}
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
+      vars:
+        artifact_gitlab_check_path: >-
+          {{ (artifact_item.unarchive | default(false)
+              and artifact_item.unarchive_creates is defined)
+             | ternary(artifact_item.unarchive_creates | default(""),
+                       artifact_gitlab_dest) }}
 
     - block:
         - name: Create temporary directory for gitlab/github project clone
@@ -128,16 +134,13 @@
                   | default('')
                   | length > 0)
                  | ternary('-c "https.proxy='
-                           + proxy_client_environment.https_proxy | default('')                           | default('')
+                           + proxy_client_environment.https_proxy | default('')
                            + '"',
                            '' ) }}
 
         - name: Move artifact to destination
           shell: >-
-              mv {{ artifact_gitlab_file_path }}
-              {{ artifact_item.dest
-                 + (artifact_item.dest_file | default("") | length > 0)
-                   | ternary("/" + artifact_item.dest_file | default(""), "") }}
+              mv {{ artifact_gitlab_file_path }} {{ artifact_gitlab_dest }}
           args:
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_move_result
@@ -196,11 +199,7 @@
 
     - name: Setup artifact attributes
       file:
-        path: >-
-          {{ artifact_item.dest
-             + (artifact_item.dest_file | default("") | length > 0)
-               | ternary("/" + artifact_item.dest_file | default(""),
-                         "/" + artifact_item.file) }}
+        path: "{{ artifact_gitlab_dest }}"
         attributes: "{{ artifact_item.attributes | default(omit) }}"
         group: "{{ artifact_item.group | default(omit) }}"
         mode: "{{ artifact_item.mode | default(omit) }}"
@@ -220,6 +219,12 @@
         label: "{{ artifact_item.id }}"
   when: artifact_item.download | default(true) | bool
   environment: "{{ proxy_client_environment }}"
+  vars:
+    artifact_gitlab_dest: >-
+      {{ artifact_item.dest
+         + (artifact_item.dest_file | default("") | length > 0)
+           | ternary("/" + artifact_item.dest_file | default(""),
+                     "/" + artifact_item.file) }}
   tags:
     - role::artifact
     - role::artifact::gitlab
