@@ -1,72 +1,100 @@
 ---
 # jenkins artifact download tasks
 
-- name: Download artifacts from jenkins server
-  get_url:
-    attributes: "{{ artifact_item.attributes | default(omit) }}"
-    backup: "{{ artifact_item.backup | default(omit) }}"
-    client_cert: "{{ artifact_item.client_cert | default(omit) }}"
-    client_key: "{{ artifact_item.client_key | default(omit) }}"
-    dest: >-
+- block:
+    - name: Check jenkins artifact download
+      stat:
+        path: "{{ artifact_jenkins_check_path }}"
+      register: artifact_jenkins_check_result
+      no_log: "{{ artifact_item.no_log | default(true) }}"
+      loop: >-
+        {{ artifact_to_manage_present
+           | selectattr("type", "in", ["jenkins"])
+           | list }}
+      loop_control:
+        loop_var: artifact_item
+        label: "{{ artifact_item.id }}"
+      vars:
+        artifact_jenkins_check_path: >-
+          {{ (artifact_item.unarchive | default(false)
+              and artifact_item.unarchive_creates is defined)
+             | ternary(artifact_item.unarchive_creates | default(""),
+                       artifact_jenkins_dest) }}
+
+    - name: Download artifacts from jenkins server
+      get_url:
+        attributes: "{{ artifact_item.attributes | default(omit) }}"
+        backup: "{{ artifact_item.backup | default(omit) }}"
+        client_cert: "{{ artifact_item.client_cert | default(omit) }}"
+        client_key: "{{ artifact_item.client_key | default(omit) }}"
+        dest: "{{ artifact_jenkins_dest }}"
+        force: >-
+          {{ artifact_item.force | default(false)
+             or artifact_item.version
+                | default("")
+                | string
+                != artifact_previous_version }}
+        force_basic_auth: yes
+        group: "{{ artifact_item.group | default(omit) }}"
+        mode: "{{ artifact_item.mode | default(omit) }}"
+        others: "{{ artifact_item.others | default(omit) }}"
+        owner: "{{ artifact_item.owner | default(omit) }}"
+        selevel: "{{ artifact_item.selevel | default(omit) }}"
+        serole: "{{ artifact_item.serole | default(omit) }}"
+        setype: "{{ artifact_item.setype | default(omit) }}"
+        seuser: "{{ artifact_item.seuser | default(omit) }}"
+        timeout: "{{ artifact_item.timeout | default(omit) }}"
+        tmp_dest:  "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
+        unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
+        url: >-
+          {{ artifact_item.host
+             + artifact_item.jenkins_path | default('/')
+             + "/job/"
+             + artifact_item.job_name
+             + "/ws/"
+             + artifact_item.path | default('/')
+             + "/"
+             + artifact_item.file }}
+        url_password:  "{{ artifact_item.password | default(omit) }}"
+        url_username: "{{ artifact_item.username | default(omit) }}"
+        use_proxy: "{{ artifact_item.use_proxy | default(omit) }}"
+        validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
+      register: artifact_jenkins_result
+      failed_when: artifact_jenkins_result.status_code != 200
+      retries: "{{ artifact_item.retries | default(artifact_retries) }}"
+      delay: "{{ artifact_item.delay | default(artifact_delay) }}"
+      until: artifact_jenkins_result is succeeded
+      when: >-
+        not not artifact_download_exists
+        or (artifact_item.download | default(true) | bool
+            and (artifact_item.force | default(false) | bool
+                 or artifact_item.version
+                    | default("")
+                    | string
+                    != artifact_previous_version))
+      no_log: "{{ artifact_item.no_log | default(true) }}"
+      loop: >-
+        {{ artifact_to_manage_present
+          | selectattr('type', 'in', ['jenkins']) | list }}
+      loop_control:
+        loop_var: artifact_item
+        index_var: artifact_item_index
+        label: "{{ artifact_item.id }}"
+      environment: "{{ proxy_client_environment }}"
+      vars:
+        artifact_previous_version: >-
+          {{ (ansible_local["artifact_" + artifact_item.id]
+              | default({}))["version"]
+              | default(artifact_undefined_place_holder) }}
+        artifact_jenkins_check_results: >-
+          {{ artifact_jenkins_check_result.results }}
+        artifact_download_exists: >-
+          {{ artifact_jenkins_check_results[artifact_item_index].stat.exists }}
+  vars:
+    artifact_jenkins_dest: >-
       {{ artifact_item.dest
          + (artifact_item.dest_file | default("") | length > 0)
            | ternary("/" + artifact_item.dest_file | default(""), "") }}
-    force: >-
-      {{ artifact_item.force | default(false)
-         or artifact_item.version
-            | default("")
-            | string
-            != artifact_previous_version }}
-    force_basic_auth: yes
-    group: "{{ artifact_item.group | default(omit) }}"
-    mode: "{{ artifact_item.mode | default(omit) }}"
-    others: "{{ artifact_item.others | default(omit) }}"
-    owner: "{{ artifact_item.owner | default(omit) }}"
-    selevel: "{{ artifact_item.selevel | default(omit) }}"
-    serole: "{{ artifact_item.serole | default(omit) }}"
-    setype: "{{ artifact_item.setype | default(omit) }}"
-    seuser: "{{ artifact_item.seuser | default(omit) }}"
-    timeout: "{{ artifact_item.timeout | default(omit) }}"
-    tmp_dest:  "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
-    unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
-    url: >-
-      {{ artifact_item.host
-         + artifact_item.jenkins_path | default('/')
-         + "/job/"
-         + artifact_item.job_name
-         + "/ws/"
-         + artifact_item.path | default('/')
-         + "/"
-         + artifact_item.file }}
-    url_password:  "{{ artifact_item.password | default(omit) }}"
-    url_username: "{{ artifact_item.username | default(omit) }}"
-    use_proxy: "{{ artifact_item.use_proxy | default(omit) }}"
-    validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
-  register: artifact_jenkins_result
-  failed_when: artifact_jenkins_result.status_code != 200
-  retries: "{{ artifact_item.retries | default(artifact_retries) }}"
-  delay: "{{ artifact_item.delay | default(artifact_delay) }}"
-  until: artifact_jenkins_result is succeeded
-  when: >-
-    artifact_item.download | default(true) | bool
-    and (artifact_item.force | default(false) | bool
-         or artifact_item.version
-            | default("")
-            | string
-            != artifact_previous_version)
-  no_log: "{{ artifact_item.no_log | default(true) }}"
-  loop: >-
-    {{ artifact_to_manage_present
-      | selectattr('type', 'in', ['jenkins']) | list }}
-  loop_control:
-    loop_var: artifact_item
-    label: "{{ artifact_item.id }}"
-  environment: "{{ proxy_client_environment }}"
-  vars:
-    artifact_previous_version: >-
-      {{ (ansible_local["artifact_" + artifact_item.id]
-          | default({}))["version"]
-          | default(artifact_undefined_place_holder) }}
   tags:
     - role::artifact
     - role::artifact::jenkins
