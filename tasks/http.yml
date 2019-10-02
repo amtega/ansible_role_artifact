@@ -18,7 +18,9 @@
         artifact_http_check_path: >-
           {{ (artifact_item.unarchive | default(false)
               and artifact_item.unarchive_creates is defined)
-             | ternary(artifact_item.unarchive_creates | default(""),
+             | ternary(artifact_item.dest | default("")
+                       + "/"
+                       + artifact_item.unarchive_creates | default(""),
                        artifact_http_dest) }}
 
     - name: Download artifacts from http/https server
