@@ -7,7 +7,7 @@
     check_platform_distributions:
       centos: 6
       fedora: 29
-      rhel: 6
+      redhat: 6
 
 - include_role:
     name: amtega.select_hostvars
@@ -40,7 +40,7 @@
           git-lfs: present
           python2-pexpect: present
           python3-pexpect: present
-      rhel:
+      redhat:
         7:
           git: present
           git-lfs: present
@@ -49,7 +49,7 @@
       centos:
         all:
           pexpect: latest
-      rhel:
+      redhat:
         all:
           pexpect: latest
   when: >-
@@ -69,7 +69,7 @@
         all:
           python2-lxml: present
           python3-lxml: present
-      rhel:
+      redhat:
         all:
           python-lxml: present
   when: >-
@@ -99,7 +99,7 @@
 
 - include_tasks: install.yml
   when: >-
-    (ansible_facts.distribution | lower in ["centos", "rhel"]
+    (ansible_facts.distribution | lower in ["centos", "redhat"]
      and ansible_facts.distribution_version is version("7", "<"))
     or ansible_facts.distribution | lower == "debian"
   tags:
