@@ -27,17 +27,86 @@ galaxy_info:
 
 dependencies:
   - role: amtega.check_platform
-    tags:
-      - never
+    vars:
+      check_platform_distributions:
+        centos: 6
+        fedora: 29
+        redhat: 6
 
   - role: amtega.select_hostvars
-    tags:
-      - never
+    vars:
+      select_hostvars_query:
+        pattern: "^artifact_.*"
+        exclude_pattern: "^artifact_list$"
+        attributes:
+          - id
+        fact_name: artifact_hostvars
+        output_type: list
+    when: artifact_load_from_hostvars | bool
 
   - role: amtega.proxy_client
-    tags:
-      - never
+    vars:
+      proxy_client_permanent: no
 
   - role: amtega.packages
-    tags:
-      - never
+    vars:
+      packages_os:
+        centos:
+          7:
+            git: present
+            git-lfs: present
+        fedora:
+          all:
+            git: present
+            git-lfs: present
+            python2-pexpect: present
+            python3-pexpect: present
+        redhat:
+          7:
+            git: present
+            git-lfs: present
+
+      packages_python:
+        centos:
+          all:
+            pexpect: latest
+        redhat:
+          all:
+            pexpect: latest
+    when: >-
+      artifact_to_manage_present
+      | selectattr("type", "in", ["gitlab", "github"])
+      | list
+      | length > 0
+
+  - role: amtega.packages
+    vars:
+      packages_os:
+        centos:
+          all:
+            python-lxml: present
+        fedora:
+          all:
+            python2-lxml: present
+            python3-lxml: present
+        redhat:
+          all:
+            python-lxml: present
+    when: >-
+      artifact_to_manage_present
+      | selectattr("type", "in", ["maven"])
+      | list
+      | length > 0
+
+  - role: amtega.packages
+    vars:
+      packages_os:
+        all:
+          all:
+            tar: present
+            unzip: present
+    when: >-
+      artifact_to_manage_present
+      | selectattr("unarchive", "defined")
+      | list
+      | length > 0
