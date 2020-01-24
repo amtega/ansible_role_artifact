@@ -31,7 +31,7 @@
           type: maven
           artifact_id: spring-jdbc
           group_id: org.springframework
-          host: http://central.maven.org
+          host: https://repo1.maven.org
           path: /maven2
           version: 5.1.5.RELEASE
           dest: /tmp
