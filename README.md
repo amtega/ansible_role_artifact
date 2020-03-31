@@ -24,7 +24,7 @@ This is an example playbook:
 
 ``` yaml
 ---
-- name: artifact role sample
+- name: Artifact role sample
   hosts: localhost
   roles:  
     - amtega.artifact
