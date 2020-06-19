@@ -42,28 +42,27 @@ This is an example playbook:
 
 ## Testing
 
-Tests are based on docker containers. You can setup docker engine quickly using the playbook `files/setup.yml` available in the role [amtega.docker_engine](https://galaxy.ansible.com/amtega/docker_engine).
-
-Once you have docker, you can run the tests with the following commands:
+Tests are based on [molecule with docker containers](https://molecule.readthedocs.io/en/latest/installation.html).
 
 ```shell
-$ cd amtega.artifact/tests
-$ ansible-playbook main.yml
+cd amtega.artifact
+
+molecule test --all
 ```
 
-To enable jenkins artefact type testing you need to pass the following extra vars, or define them for the group `docker_sandbox_containers` in the inventory:
+To enable jenkins artefact type testing you need to pass the following extra environment variables to molecule:
 
-- `artifact_tests_jenkins_host`: jenkins host
-- `artifact_tests_jenkins_jenkins_path`: URL path where jenkins resides. Default is `/`
-- `artifact_tests_jenkins_job_name`: jenkins job name
-- `artifact_tests_jenkins_path`: jenkins artifact path within workspace. Default is `/`
-- `artifact_tests_jenkins_file`: jenkins artifact file name
-- `artifact_tests_jenkins_username`: jenkins username (optional)
-- `artifact_tests_jenkins_password`: jenkins password (optional)
+- `ARTIFACT_TESTS_JENKINS_HOST`: jenkins host
+- `ARTIFACT_TESTS_JENKINS_JENKINS_PATH`: URL path where jenkins resides. Default is `/`
+- `ARTIFACT_TESTS_JENKINS_JOB_NAME`: jenkins job name
+- `ARTIFACT_TESTS_JENKINS_PATH`: jenkins artifact path within workspace. Default is `/`
+- `ARTIFACT_TESTS_JENKINS_FILE`: jenkins artifact file name
+- `ARTIFACT_TESTS_JENKINS_USERNAME`: jenkins username (optional)
+- `ARTIFACT_TESTS_JENKINS_PASSWORD`: jenkins password (optional)
 
 ## License
 
-Copyright (C) 2019 AMTEGA - Xunta de Galicia
+Copyright (C) 2020 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify it under the terms of:
 

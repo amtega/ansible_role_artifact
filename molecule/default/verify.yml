@@ -1,0 +1,74 @@
+---
+
+- name: Verify
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Check gitlab artifact download
+      stat:
+        path: /tmp/README.md
+      register: check_gitlab_result
+
+    - name: Check github artifact download
+      stat:
+        path: /tmp/README.md
+      register: check_github_result
+
+    - name: Check http/https unarchived artifact download
+      stat:
+        path: /tmp/tomcat.tar.gz
+      register: check_http_result
+
+    - name: Check http/https artifact download
+      stat:
+        path: /tmp/tomcat2.tar.gz
+      register: check_http2_result
+
+    - name: Check http/https artifact unarchived content
+      stat:
+        path: /tmp/apache-tomcat-8.5.9
+      register: check_http_unarchive_result
+
+    - name: Check jenkins artifact download
+      stat:
+        path: >-
+          {{ "/tmp/"
+             + artifact.artifact_id
+             + "-"
+             + artifact.version
+             + "."
+             + artifact.extension }}
+      register: check_jenkins_result
+      vars:
+        artifact: "{{ artifact_jenkins.0 }}"
+      when:
+        - artifact_tests_jenkins_host | length > 0
+        - artifact_tests_jenkins_job_name | length > 0
+        - artifact_tests_jenkins_artifact_| length > 0
+        - artifact_tests_jenkins_version | length > 0
+        - artifact_tests_jenkins_extension | length > 0
+
+    - name: Check maven artifact download
+      stat:
+        path: /tmp/spring-jdbc-5.1.5.RELEASE.jar
+      register: check_maven_result
+
+    - name: Check that artifacts were downloaded correctly
+      assert:
+        that:
+          - check_gitlab_result.stat.exists
+          - check_github_result.stat.exists
+          - not check_http_result.stat.exists
+          - check_http2_result.stat.exists
+          - check_http_unarchive_result.stat.exists
+          - check_maven_result.stat.exists
+
+    - name: Check that jenkins artifacts were downloaded correctly
+      assert:
+        that: check_jenkins_result.stat.exists
+      when:
+        - artifact_tests_jenkins_host | length > 0
+        - artifact_tests_jenkins_job_name | length > 0
+        - artifact_tests_jenkins_artifact_id | length > 0
+        - artifact_tests_jenkins_version | length > 0
+        - artifact_tests_jenkins_extension | length > 0

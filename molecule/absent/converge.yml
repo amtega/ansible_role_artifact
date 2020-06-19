@@ -1,0 +1,13 @@
+---
+
+- name: Converge
+  hosts: molecule_hosts
+  gather_facts: no
+  roles:
+    - amtega.artifact
+  tasks:
+    - name: Check artifact facts
+      assert:
+        that:
+          - artifact_result.tomcat1 is defined
+          - artifact_result.tomcat1.changed

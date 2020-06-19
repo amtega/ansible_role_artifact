@@ -1,0 +1,15 @@
+---
+
+- name: Verify
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Check http/https artifact download
+      stat:
+        path: /tmp/apache-tomcat-8.5.9.tar.gz
+      register: check_http_result
+
+    - name: Check http/https artifact unarchived content
+      stat:
+        path: /tmp/apache-tomcat-8.5.9
+      register: check_http_unarchive_result
