@@ -8,6 +8,10 @@
   tasks:
     - name: Check artifact facts
       assert:
-        that:
-          - artifact_result.tomcat1 is defined
-          - artifact_result.tomcat1.changed
+        that: artifact_result.tomcat1 is defined
+
+    - name: Check artifact was removed
+      assert:
+        that: artifact_result.tomcat1.changed
+      tags:
+        - molecule-idempotence-notest

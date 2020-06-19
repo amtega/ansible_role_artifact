@@ -61,22 +61,20 @@ provisioner:
     hosts:
       molecule_hosts:
         vars:
-          # FIXME:
-          epel_url: http://fedora.mirror.serversaustralia.com.au/epel
           artifact_tests_jenkins_host: >-
-            ${ARTIFACT_TESTS_JENKINS_HOST:-""}
+            ${ARTIFACT_TESTS_JENKINS_HOST}
           artifact_tests_jenkins_jenkins_path: >-
             ${ARTIFACT_TESTS_JENKINS_JENKINS_PATH:-/}
           artifact_tests_jenkins_job_name: >-
-            ${ARTIFACT_TESTS_JENKINS_JOB_NAME:-""}
+            ${ARTIFACT_TESTS_JENKINS_JOB_NAME}
           artifact_tests_jenkins_path: >-
             ${ARTIFACT_TESTS_JENKINS_PATH:-/}
           artifact_tests_jenkins_file: >-
-            ${ARTIFACT_TESTS_JENKINS_FILE:-""}
+            ${ARTIFACT_TESTS_JENKINS_FILE}
           artifact_tests_jenkins_username: >-
-            ${ARTIFACT_TESTS_JENKINS_USERNAME:-""}
+            ${ARTIFACT_TESTS_JENKINS_USERNAME}
           artifact_tests_jenkins_password: >-
-            ${ARTIFACT_TESTS_JENKINS_PASSWORD:-""}
+            ${ARTIFACT_TESTS_JENKINS_PASSWORD}
 
           artifact_maven:
             id: maven
@@ -124,7 +122,7 @@ provisioner:
               checksum: 3c800e7affdf93bf4dbcf44bd852904449b786f6
               dest: /tmp
               unarchive: yes
-              unarchive_creates: /tmp/apache-tomcat-8.5.9
+              unarchive_creates: apache-tomcat-8.5.9
               unarchive_remove: yes
               validate_certs: false
               no_log: no

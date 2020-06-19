@@ -61,8 +61,6 @@ provisioner:
     hosts:
       molecule_hosts:
         vars:
-          # FIXME:
-          epel_url: http://fedora.mirror.serversaustralia.com.au/epel
           artifact_list:
             - id: tomcat1
               type: https
