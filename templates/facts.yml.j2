@@ -99,7 +99,7 @@
 {% set ns.found = true %}
 "{{ artifact.id }}":
   changed: {{ artifact_remove_result.results
-              | selectattr("artifact_item.0.id", "equalto", artifact.id)
+              | selectattr("artifact_item_to_remove.0.id", "equalto", artifact.id)
               | select("changed")
               | list
               | length > 0 }}

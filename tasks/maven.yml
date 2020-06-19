@@ -23,54 +23,73 @@
                        + artifact_item.unarchive_creates | default(""),
                        artifact_maven_dest) }}
 
-    - name: Download artifacts from maven repository
-      maven_artifact:
-        artifact_id: "{{ artifact_item.artifact_id | default(omit) }}"
-        attributes: "{{ artifact_item.attributes | default(omit) }}"
-        classifier: "{{ artifact_item.classifier | default(omit) }}"
-        dest: "{{ artifact_maven_dest }}"
-        extension: "{{ artifact_item.extension | default(omit) }}"
-        group: "{{ artifact_item.group | default(omit) }}"
-        group_id: "{{ artifact_item.group_id | default(omit) }}"
-        keep_name: "{{ artifact_item.keep_name | default(omit) }}"
-        mode: "{{ artifact_item.mode | default(omit) }}"
-        owner: "{{ artifact_item.owner | default(omit) }}"
-        password: "{{ artifact_item.password | default(omit) }}"
-        repository_url: >-
-          {{ artifact_item.host }}{{ artifact_item.path | default('/') }}
-        selevel: "{{ artifact_item.selevel | default(omit) }}"
-        serole: "{{ artifact_item.serole | default(omit) }}"
-        setype: "{{ artifact_item.setype | default(omit) }}"
-        seuser: "{{ artifact_item.seuser | default(omit) }}"
-        state: present
-        timeout: "{{ artifact_item.timeout | default(omit) }}"
-        unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
-        username: "{{ artifact_item.username | default(omit) }}"
-        validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
-        verify_checksum: "{{ artifact_item.verify_checksum | default(omit) }}"
-        version: "{{ artifact_item.version | default(omit) }}"
-      register: artifact_maven_result
-      retries: "{{ artifact_item.retries | default(artifact_retries) }}"
-      delay: "{{ artifact_item.delay | default(artifact_delay) }}"
-      until: artifact_maven_result is succeeded
-      when: >-
-        not artifact_download_exists
-        or (artifact_item.download | default(true) | bool
-            and (artifact_item.force | default(false) | bool
-                 or artifact_item.version
-                    | default("")
-                    | string
-                    != artifact_previous_version))
-      no_log: "{{ artifact_item.no_log | default(true) }}"
-      loop: >-
-        {{ artifact_to_manage_present
-           | selectattr('type', 'in', ['maven'])
-           | list }}
-      loop_control:
-          loop_var: artifact_item
-          index_var: artifact_item_index
-          label: "{{ artifact_item.id }}"
-      environment: "{{ proxy_client_environment }}"
+    - block:
+        - name: Remove previous maven artifact download
+          include_tasks: absent.yml
+          when:
+            - artifact_download_exists
+            - artifact_item.download | default(true) | bool
+            - artifact_item.force | default(false) | bool
+          loop: >-
+            {{ artifact_to_manage_present
+               | selectattr('type', 'in', ['maven'])
+               | list }}
+          loop_control:
+              loop_var: artifact_item
+              index_var: artifact_item_index
+              label: "{{ artifact_item.id }}"
+          vars:
+            artifact_to_manage_absent:
+              - "{{ artifact_item }}"
+
+        - name: Download artifacts from maven repository
+          maven_artifact:
+            artifact_id: "{{ artifact_item.artifact_id | default(omit) }}"
+            attributes: "{{ artifact_item.attributes | default(omit) }}"
+            classifier: "{{ artifact_item.classifier | default(omit) }}"
+            dest: "{{ artifact_maven_dest }}"
+            extension: "{{ artifact_item.extension | default(omit) }}"
+            group: "{{ artifact_item.group | default(omit) }}"
+            group_id: "{{ artifact_item.group_id | default(omit) }}"
+            keep_name: "{{ artifact_item.keep_name | default(omit) }}"
+            mode: "{{ artifact_item.mode | default(omit) }}"
+            owner: "{{ artifact_item.owner | default(omit) }}"
+            password: "{{ artifact_item.password | default(omit) }}"
+            repository_url: >-
+              {{ artifact_item.host }}{{ artifact_item.path | default('/') }}
+            selevel: "{{ artifact_item.selevel | default(omit) }}"
+            serole: "{{ artifact_item.serole | default(omit) }}"
+            setype: "{{ artifact_item.setype | default(omit) }}"
+            seuser: "{{ artifact_item.seuser | default(omit) }}"
+            state: present
+            timeout: "{{ artifact_item.timeout | default(omit) }}"
+            unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
+            username: "{{ artifact_item.username | default(omit) }}"
+            validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
+            verify_checksum: "{{ artifact_item.verify_checksum | default(omit) }}"
+            version: "{{ artifact_item.version | default(omit) }}"
+          register: artifact_maven_result
+          retries: "{{ artifact_item.retries | default(artifact_retries) }}"
+          delay: "{{ artifact_item.delay | default(artifact_delay) }}"
+          until: artifact_maven_result is succeeded
+          when: >-
+            not artifact_download_exists
+            or (artifact_item.download | default(true) | bool
+                and (artifact_item.force | default(false) | bool
+                     or artifact_item.version
+                        | default("")
+                        | string
+                        != artifact_previous_version))
+          no_log: "{{ artifact_item.no_log | default(true) }}"
+          loop: >-
+            {{ artifact_to_manage_present
+               | selectattr('type', 'in', ['maven'])
+               | list }}
+          loop_control:
+              loop_var: artifact_item
+              index_var: artifact_item_index
+              label: "{{ artifact_item.id }}"
+          environment: "{{ proxy_client_environment }}"
       vars:
         artifact_previous_version: >-
           {{ (ansible_local["artifact_" + artifact_item.id]

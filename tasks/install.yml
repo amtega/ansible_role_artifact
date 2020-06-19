@@ -5,7 +5,7 @@
     - block:
         - name: Install ius community repository
           command: >-
-            yum install -y https://rhel6.iuscommunity.org/ius-release.rpm
+            yum install -y https://repo.ius.io/ius-release-el6.rpm
           args:
             warn: no
           register: artifact_install_ius_result
@@ -22,6 +22,7 @@
           yum:
             name: git2u
             state: present
+            enablerepo: ius-archive
       when:
         - ansible_facts.distribution | lower in ['centos', 'redhat']
         - ansible_facts.distribution_version is version("7", "<")
