@@ -6,6 +6,9 @@
     path: "{{ artifact_item_to_remove.1 }}"
     state: absent
   register: artifact_remove_result
+  failed_when: >-
+    artifact_remove_result.msg is defined
+    and artifact_remove_result.msg is not search("No such file or directory")
   loop: >-
     {{ lookup('template', 'absent.yml.j2')
        | from_yaml
@@ -13,5 +16,7 @@
   loop_control:
     loop_var: artifact_item_to_remove
     label: "{{ artifact_item_to_remove.0.id }} {{ artifact_item_to_remove.1 }}"
+  environment:
+    LANGUAGE: en_US
   tags:
     - role::artifact
