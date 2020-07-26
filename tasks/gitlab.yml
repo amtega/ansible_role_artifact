@@ -220,6 +220,7 @@
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
   when: artifact_item.download | default(true) | bool
+  run_once: "{{ artifact_item.run_once | default(false) | bool }}"
   environment: "{{ proxy_client_environment }}"
   vars:
     artifact_gitlab_dest: >-

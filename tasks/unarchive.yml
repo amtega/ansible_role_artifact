@@ -73,6 +73,8 @@
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
+
+  run_once: "{{ artifact_item.run_once | default(false) | bool }}"
   tags:
     - role::artifact
     - role::artifact::unarchive
