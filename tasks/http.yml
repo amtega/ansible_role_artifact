@@ -86,6 +86,7 @@
           {{ artifact_http_check_result.results }}
         artifact_download_exists: >-
           {{ artifact_http_check_results[artifact_item_index].stat.exists }}
+  run_once: "{{ artifact_item.run_once | default(false) | bool }}"
   vars:
     artifact_http_dest: >-
       {{ artifact_item.dest

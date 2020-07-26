@@ -92,6 +92,7 @@
           {{ artifact_jenkins_check_result.results }}
         artifact_download_exists: >-
           {{ artifact_jenkins_check_results[artifact_item_index].stat.exists }}
+  run_once: "{{ artifact_item.run_once | default(false) | bool }}"
   vars:
     artifact_jenkins_dest: >-
       {{ artifact_item.dest

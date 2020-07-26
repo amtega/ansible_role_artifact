@@ -31,6 +31,8 @@
 #   version: <version>         # Version of the artifact. If not given will
 #                              # use empty string
 #   state: <state>             # Can be present or absent. Default is present
+#   run_once: <yes_no>         # Deploy the artifact only in one host of the
+#                              # ansible batch. Default is no
 #   no_log: <yes_no>           # Hide sensitive info. Default is yes
 #
 # Additionally the following list of attributes are also supported, with the
