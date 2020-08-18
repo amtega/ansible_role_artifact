@@ -45,8 +45,11 @@
 
 {% set inner_ns = namespace(unarchived_files=[]) %}
 {% for file in unarchived_result.files %}
-{% set inner_ns.unarchived_files = inner_ns.unarchived_files
-                                   + [ file.split("/").0 | regex_replace("^", artifact.dest + "/") ] %}
+{% set inner_ns.unarchived_files =
+         inner_ns.unarchived_files
+         + [ file
+             | regex_replace("^./", "")
+             | regex_replace("^", artifact.dest + "/") ] %}
 {% endfor %}
   unarchived_files: {{ inner_ns.unarchived_files | unique | list | to_json }}
 {% else %}

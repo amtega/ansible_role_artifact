@@ -66,7 +66,8 @@
             unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
             username: "{{ artifact_item.username | default(omit) }}"
             validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
-            verify_checksum: "{{ artifact_item.verify_checksum | default(omit) }}"
+            verify_checksum: >-
+              {{ artifact_item.verify_checksum | default(omit) }}
             version: "{{ artifact_item.version | default(omit) }}"
           register: artifact_maven_result
           retries: "{{ artifact_item.retries | default(artifact_retries) }}"
