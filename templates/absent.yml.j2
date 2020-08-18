@@ -18,10 +18,18 @@
 {% else %}
   files:
 {% if download_path is not none %}
-    - {{ download_path}}
+    - {{ download_path }}
 {% endif %}
 {% for file in unarchived_files %}
+{% if file | dirname in ["", "/", artifact.dest ]%}
     - {{ file }}
+{% else %}
+{% set subpath = file
+                 | dirname
+                 | regex_replace("^" + artifact.dest + "/(.*)$", "\\1") %}
+{% set topdir = subpath.split("/") | first %}
+    - {{ artifact.dest }}/{{ topdir }}
+{% endif %}
 {% endfor %}
 {% endif %}
 {% endfor %}

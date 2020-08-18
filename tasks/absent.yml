@@ -12,7 +12,8 @@
   loop: >-
     {{ lookup('template', 'absent.yml.j2')
        | from_yaml
-       | subelements('files') }}
+       | subelements('files')
+       | unique }}
   loop_control:
     loop_var: artifact_item_to_remove
     label: "{{ artifact_item_to_remove.0.id }} {{ artifact_item_to_remove.1 }}"
