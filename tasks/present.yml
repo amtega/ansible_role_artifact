@@ -1,0 +1,11 @@
+---
+# Artifacts present state tasks
+
+- include_tasks: "{{ artifact_type }}.yml"
+  loop: "{{ artifact_types_supported }}"
+  loop_control:
+    loop_var: artifact_type
+
+- include_tasks: unarchive.yml
+- include_tasks: checksum.yml
+- include_tasks: facts.yml

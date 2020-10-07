@@ -7,6 +7,10 @@
         artifact_result: >-
           {{ lookup("template", "facts.yml.j2") | from_yaml }}
 
+    - debug: var=artifact_result
+
+    - fail:
+
     - name: Create custom facts directory
       file:
         path: /etc/ansible/facts.d

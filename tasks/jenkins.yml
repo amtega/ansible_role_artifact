@@ -7,10 +7,7 @@
         path: "{{ artifact_jenkins_check_path }}"
       register: artifact_jenkins_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
-      loop: >-
-        {{ artifact_to_manage_present
-           | selectattr("type", "in", ["jenkins"])
-           | list }}
+      loop: "{{ artifact_to_manage_present_type }}"
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
@@ -75,9 +72,7 @@
                     | string
                     != artifact_previous_version))
       no_log: "{{ artifact_item.no_log | default(true) }}"
-      loop: >-
-        {{ artifact_to_manage_present
-          | selectattr('type', 'in', ['jenkins']) | list }}
+      loop: "{{ artifact_to_manage_present_type }}"
       loop_control:
         loop_var: artifact_item
         index_var: artifact_item_index
@@ -92,7 +87,7 @@
           {{ artifact_jenkins_check_result.results }}
         artifact_download_exists: >-
           {{ artifact_jenkins_check_results[artifact_item_index].stat.exists }}
-  run_once: "{{ artifact_item.run_once | default(false) | bool }}"
+  run_once: "{{ artifact_run_once | bool }}"
   vars:
     artifact_jenkins_dest: >-
       {{ artifact_item.dest

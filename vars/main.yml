@@ -1,6 +1,14 @@
 ---
 # Role variables
 
+# Artifact types supported
+
+artifact_types_supported:
+  - gitlab
+  - http
+  - jenkins
+  - maven
+
 # Defaults for error handling
 
 artifact_retries: 3
@@ -34,3 +42,43 @@ artifact_to_manage_absent: >-
      | selectattr("state", "defined")
      | selectattr("state", "equalto", "absent")
      | list }}
+
+# Specific types artifact list to manage
+
+artifact_to_manage_present_gitlab: >-
+  {{ artifact_to_manage_present
+     | selectattr("type", "in", ["gitlab", "github"])
+     | list }}
+
+artifact_to_manage_present_http: >-
+  {{ artifact_to_manage_present
+     | selectattr('type', "in", ["http", "https"])
+     | list }}
+
+artifact_to_manage_present_jenkins: >-
+  {{ artifact_to_manage_present
+     | selectattr("type", "in", ["jenkins"])
+     | list }}
+
+artifact_to_manage_present_maven: >-
+  {{ artifact_to_manage_present
+     | selectattr("type", "in", ["maven"])
+     | list }}
+
+# Unarchive artifacts
+
+artifact_to_manage_present_unarchive_all: >-
+  {{ artifact_to_manage_present
+     | selectattr("unarchive", "defined")
+     | selectattr("unarchive", "equalto", True)
+     | list }}
+
+artifact_to_manage_present_unarchive_run_once: >-
+  {{ artifact_to_manage_present_unarchive_all
+     | selectattr("run_once", "defined")
+     | selectattr("run_once", "equalto", True)
+     | list }}
+
+artifact_to_manage_present_unarchive_run_n: >-
+  {{ artifact_to_manage_present_unarchive_all
+     | difference(artifact_to_manage_present_unarchive_run_once) }}

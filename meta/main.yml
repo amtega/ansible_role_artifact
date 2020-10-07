@@ -47,68 +47,64 @@ dependencies:
   - role: amtega.proxy_client
     vars:
       proxy_client_permanent: no
-
-  - role: amtega.epel
-
-  - role: amtega.packages
-    vars:
-      packages_os:
-        centos:
-          7:
-            git: present
-            git-lfs: present
-        fedora:
-          all:
-            git: present
-            git-lfs: present
-            python2-pexpect: present
-            python3-pexpect: present
-        redhat:
-          7:
-            git: present
-            git-lfs: present
-
-      packages_python:
-        centos:
-          all:
-            pexpect: latest
-        redhat:
-          all:
-            pexpect: latest
-    when: >-
-      artifact_to_manage_present
-      | selectattr("type", "in", ["gitlab", "github"])
-      | list
-      | length > 0
-
-  - role: amtega.packages
-    vars:
-      packages_os:
-        centos:
-          all:
-            python-lxml: present
-        fedora:
-          all:
-            python2-lxml: present
-            python3-lxml: present
-        redhat:
-          all:
-            python-lxml: present
-    when: >-
-      artifact_to_manage_present
-      | selectattr("type", "in", ["maven"])
-      | list
-      | length > 0
-
-  - role: amtega.packages
-    vars:
-      packages_os:
-        all:
-          all:
-            tar: present
-            unzip: present
-    when: >-
-      artifact_to_manage_present
-      | selectattr("unarchive", "defined")
-      | list
-      | length > 0
+  #
+  # - role: amtega.epel
+  #
+  # - role: amtega.packages
+  #   vars:
+  #     packages_os:
+  #       centos:
+  #         7:
+  #           git: present
+  #           git-lfs: present
+  #       fedora:
+  #         all:
+  #           git: present
+  #           git-lfs: present
+  #           python2-pexpect: present
+  #           python3-pexpect: present
+  #       redhat:
+  #         7:
+  #           git: present
+  #           git-lfs: present
+  #
+  #     packages_python:
+  #       centos:
+  #         all:
+  #           pexpect: latest
+  #       redhat:
+  #         all:
+  #           pexpect: latest
+  #   when: >-
+  #     artifact_to_manage_present
+  #     | selectattr("type", "in", ["gitlab", "github"])
+  #     | list
+  #     | length > 0
+  #
+  # - role: amtega.packages
+  #   vars:
+  #     packages_os:
+  #       centos:
+  #         all:
+  #           python-lxml: present
+  #       fedora:
+  #         all:
+  #           python2-lxml: present
+  #           python3-lxml: present
+  #       redhat:
+  #         all:
+  #           python-lxml: present
+  #   when: artifact_to_manage_present_maven | length > 0
+  #
+  # - role: amtega.packages
+  #   vars:
+  #     packages_os:
+  #       all:
+  #         all:
+  #           tar: present
+  #           unzip: present
+  #   when: >-
+  #     artifact_to_manage_present
+  #     | selectattr("unarchive", "defined")
+  #     | list
+  #     | length > 0
