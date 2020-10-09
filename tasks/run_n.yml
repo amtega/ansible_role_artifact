@@ -1,0 +1,11 @@
+---
+# Manage artifacts that runs on all hosts
+
+- block:
+    - include_tasks: absent.yml
+    - include_tasks: present.yml
+    - include_tasks: facts.yml
+  vars:
+    artifact_run_once: no
+  tags:
+    - role::artifact

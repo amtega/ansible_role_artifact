@@ -1,11 +1,40 @@
 ---
 # Artifacts present state tasks
 
+
 - include_tasks: "{{ artifact_type }}.yml"
   loop: "{{ artifact_types_supported }}"
   loop_control:
     loop_var: artifact_type
+  vars:
+    artifact_type_state_present_run_all: >-
+      {{ lookup("vars", "artifact_type_" + artifact_type + "_state_present") }}
+
+    artifact_type_state_present_run_once: >-
+      {{ artifact_type_state_present_run_all
+         | selectattr("run_once", "defined")
+         | selectattr("run_once", "equalto", True)
+         | list }}
+
+    artifact_type_state_present_run_n: >-
+      {{ artifact_type_state_present_run_all
+         | difference(artifact_type_state_present_run_once) }}
+
+    artifact_type_state_present: >-
+      {{ (artifact_run_once | bool)
+         | ternary(artifact_type_state_present_run_once,
+                   artifact_type_state_present_run_n) }}
+
+- include_tasks: checksum.yml
+  vars:
+    artifact_present_checksum: >-
+      {{ (artifact_run_once | bool)
+         | ternary(artifact_state_present_run_once,
+                   artifact_state_present_run_n) }}
 
 - include_tasks: unarchive.yml
-- include_tasks: checksum.yml
-- include_tasks: facts.yml
+  vars:
+    artifact_present_unarchive: >-
+      {{ (artifact_run_once | bool)
+         | ternary(artifact_present_unarchive_run_once,
+                   artifact_present_unarchive_run_n) }}

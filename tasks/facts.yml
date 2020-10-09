@@ -5,18 +5,16 @@
     - name: Setup artifacts facts
       set_fact:
         artifact_result: >-
-          {{ lookup("template", "facts.yml.j2") | from_yaml }}
-
-    - debug: var=artifact_result
-
-    - fail:
+          {{ artifact_result
+             | default({})
+             | combine(lookup("template", "facts.yml.j2") | from_yaml) }}
 
     - name: Create custom facts directory
       file:
         path: /etc/ansible/facts.d
         state: directory
 
-    - name: Setup artifact facts
+    - name: Setup artifact local facts
       template:
         src: facts.fact.j2
         dest: >-
@@ -24,19 +22,16 @@
         owner: root
         group: root
         mode: 0640
-      loop: >-
-        {{ artifact_result.keys()
-           | list
-           | difference(artifact_to_manage_absent
-                        | map(attribute="id") | list) }}
+      when: artifact_result[artifact_id].state == "present"
+      loop: "{{ artifact_result.keys() | list }}"
       loop_control:
         loop_var: artifact_id
 
-    - name: Remove artifact facts
+    - name: Remove artifact local facts
       file:
         path: /etc/ansible/facts.d/artifact_{{ artifact_id }}.fact
         state: absent
-      loop: "{{ artifact_to_manage_absent | map(attribute='id') | list }}"
+      loop: "{{ artifact_absent_facts | map(attribute='id') | list }}"
       loop_control:
         loop_var: artifact_id
 
@@ -44,6 +39,16 @@
       file:
         path: /etc/ansible/facts.d/artifact.fact
         state: absent
+  vars:
+    artifact_present_facts: >-
+      {{ (artifact_run_once | bool)
+         | ternary(artifact_state_present_run_once,
+                   artifact_state_present_run_n) }}
+
+    artifact_absent_facts: >-
+      {{ (artifact_run_once | bool)
+         | ternary(artifact_state_absent_run_once,
+                   artifact_state_absent_run_n) }}
   tags:
     - role::artifact
     - role::artifact::facts

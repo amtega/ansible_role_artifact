@@ -15,6 +15,7 @@
 {% set ns.found = true %}
 
 "{{ artifact.id }}":
+  state: present
   version: "{{ artifact.version | default('') }}"
 
 {% if artifact.type | lower in ["gitlab", "github", "http", "https", "jenkins"] %}
@@ -61,7 +62,7 @@
 {% endif %}
 {%- endmacro %}
 
-{% for artifact in artifact_to_manage_present
+{% for artifact in artifact_present_facts
                    | selectattr("type", "in", ["gitlab", "github"])
                    | list %}
 {{- fact(artifact) }}
@@ -74,7 +75,7 @@
               or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage_present
+{% for artifact in artifact_present_facts
                    | selectattr("type", "in", ["http", "https"])
                    | list %}
 {{- fact(artifact) }}
@@ -82,7 +83,7 @@
               or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage_present
+{% for artifact in artifact_present_facts
                    | selectattr("type", "in", ["maven"])
                    | list %}
 {{- fact(artifact, artifact_maven_result.results[loop.index0]) }}
@@ -90,7 +91,7 @@
               or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage_present
+{% for artifact in artifact_present_facts
                    | selectattr("type", "in", ["jenkins"])
                    | list %}
 {{- fact(artifact) }}
@@ -98,9 +99,11 @@
               or artifact.id in unarchived }}
 {% endfor %}
 
-{% for artifact in artifact_to_manage_absent %}
+{% for artifact in artifact_absent_facts %}
 {% set ns.found = true %}
 "{{ artifact.id }}":
+  state: absent
+  version: "{{ artifact.version | default('') }}"
   changed: {{ artifact_remove_result.results
               | selectattr("artifact_item_to_remove.0.id", "equalto", artifact.id)
               | select("changed")

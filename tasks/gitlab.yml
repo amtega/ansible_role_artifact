@@ -7,7 +7,7 @@
         path: "{{ artifact_gitlab_check_path }}"
       register: artifact_gitlab_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
-      loop: "{{ artifact_to_manage_present_type }}"
+      loop: "{{ artifact_type_state_present }}"
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
@@ -27,7 +27,7 @@
             state: directory
           register: artifact_gitlab_tmp_result
           no_log: "{{ artifact_item.no_log | default(true) }}"
-          loop: "{{ artifact_to_manage_present_type }}"
+          loop: "{{ artifact_type_state_present }}"
           loop_control:
             loop_var: artifact_item
             index_var: artifact_item_index
@@ -55,7 +55,7 @@
               register: artifact_gitlab_clone_result
               failed_when: artifact_gitlab_clone_result.rc | default(0) != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
-              loop: "{{ artifact_to_manage_present_type }}"
+              loop: "{{ artifact_type_state_present }}"
               loop_control:
                 loop_var: artifact_item
                 index_var: artifact_item_index
@@ -72,7 +72,7 @@
               register: artifact_gitlab_reset_result
               failed_when: artifact_gitlab_reset_result.rc != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
-              loop: "{{ artifact_to_manage_present_type }}"
+              loop: "{{ artifact_type_state_present }}"
               loop_control:
                 loop_var: artifact_item
                 index_var: artifact_item_index
@@ -96,7 +96,7 @@
               register: artifact_gitlab_checkout_result
               failed_when: artifact_gitlab_checkout_result.rc != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
-              loop: "{{ artifact_to_manage_present_type }}"
+              loop: "{{ artifact_type_state_present }}"
               loop_control:
                 loop_var: artifact_item
                 index_var: artifact_item_index
@@ -133,7 +133,7 @@
           register: artifact_gitlab_move_result
           failed_when: artifact_gitlab_move_result.rc != 0
           no_log: "{{ artifact_item.no_log | default(true) }}"
-          loop: "{{ artifact_to_manage_present_type }}"
+          loop: "{{ artifact_type_state_present }}"
           loop_control:
             loop_var: artifact_item
             index_var: artifact_item_index
@@ -145,7 +145,7 @@
             state: absent
           register: artifact_gitlab_cleanup_result
           no_log: "{{ artifact_item.no_log | default(true) }}"
-          loop: "{{ artifact_to_manage_present_type }}"
+          loop: "{{ artifact_type_state_present }}"
           loop_control:
             loop_var: artifact_item
             index_var: artifact_item_index
@@ -191,7 +191,7 @@
         seuser: "{{ artifact_item.seuser | default(omit) }}"
       register: artifact_gitlab_attributes_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
-      loop: "{{ artifact_to_manage_present_type }}"
+      loop: "{{ artifact_type_state_present }}"
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"

@@ -1,6 +1,8 @@
 {% set ns = namespace(found=false) %}
 
-{% for artifact in artifact_to_manage_absent %}
+{% for artifact in (artifact_run_once | bool)
+                   | ternary(artifact_state_absent_run_once,
+                             artifact_state_absent_run_n) %}
 
 {% set download_path = ansible_local["artifact_" + artifact.id].download_path
                        | default(artifact_result[artifact.id].download_path)

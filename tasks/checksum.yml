@@ -20,7 +20,7 @@
              or artifact_item.version | default("") | string
                 != artifact_previous_version)
       loop: >-
-        {{ artifact_to_manage_present
+        {{ artifact_present_checksum
            | selectattr("type",
                         "in",
                         ["gitlab", "github", "http", "https", "jenkins"])
@@ -28,6 +28,7 @@
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
+      run_once: "{{ artifact_run_once | bool }}"
       no_log: "{{ artifact_item.no_log | default(true) }}"
       vars:
         artifact_previous_version: >-
@@ -45,7 +46,7 @@
         - artifact_item.checksum | default("") | length > 0
         - artifact_item.checksum != artifact_checksums[artifact_item_index]
       loop: >-
-        {{ artifact_to_manage_present
+        {{ artifact_present_checksum
            | selectattr("type",
                         "in",
                         ["gitlab", "github", "http", "https", "jenkins"])

@@ -7,7 +7,7 @@
         path: "{{ artifact_maven_check_path }}"
       register: artifact_maven_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
-      loop: "{{ artifact_to_manage_present_type }}"
+      loop: "{{ artifact_type_state_present }}"
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
@@ -27,13 +27,13 @@
             - artifact_download_exists
             - artifact_item.download | default(true) | bool
             - artifact_item.force | default(false) | bool
-          loop: "{{ artifact_to_manage_present_type }}"
+          loop: "{{ artifact_type_state_present }}"
           loop_control:
               loop_var: artifact_item
               index_var: artifact_item_index
               label: "{{ artifact_item.id }}"
           vars:
-            artifact_to_manage_absent:
+            artifact_state_absent:
               - "{{ artifact_item }}"
 
         - name: Download artifacts from maven repository
@@ -76,7 +76,7 @@
                         | string
                         != artifact_previous_version))
           no_log: "{{ artifact_item.no_log | default(true) }}"
-          loop: "{{ artifact_to_manage_present_type }}"
+          loop: "{{ artifact_type_state_present }}"
           loop_control:
               loop_var: artifact_item
               index_var: artifact_item_index

@@ -29,7 +29,7 @@
                         omit) }}
       register: artifact_unarchive_result
       when: artifact_item_download_result is changed
-      loop: "{{ artifact_to_manage_present_unarchive }}"
+      loop: "{{ artifact_present_unarchive }}"
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
@@ -60,7 +60,7 @@
                | default(artifact_item.file) }}
         state: absent
       loop: >-
-        {{ artifact_to_manage_present_unarchive
+        {{ artifact_present_unarchive
            | selectattr("unarchive_remove", "defined")
            | selectattr("unarchive_remove", "equalto", True)
            | list }}

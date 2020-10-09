@@ -1,52 +1,27 @@
 ---
 # Role tasks
 
-- include_tasks: check.yml
-  tags:
-    - role::artifact
-    - role::artifact::check
-#
-# - include_tasks: install.yml
-#   when: >-
-#     (ansible_facts.distribution | lower in ["centos", "redhat"]
-#      and ansible_facts.distribution_version is version("7", "<"))
-#     or ansible_facts.distribution | lower == "debian"
-#   tags:
-#     - role::artifact
-#     - role::artifact::install
-
-- include_tasks: absent.yml
-  tags:
-    - role::artifact
-
 - block:
-    - include_tasks: present.yml
-      vars:
-        artifact_run_once: yes
-        artifact_to_manage_present_type: >-
-          {{ artifact_to_manage_present_run_once }}
-        artifact_to_manage_present_unarchive: >-
-          {{ artifact_to_manage_present_unarchive_run_once }}
+    - include_tasks: check.yml
+      tags:
+        - role::artifact::check
 
-    - include_tasks: present.yml
-      vars:
-        artifact_run_once: no
-        artifact_to_manage_present_type: >-
-          {{ artifact_to_manage_present_run_n }}
-        artifact_to_manage_present_unarchive: >-
-          {{ artifact_to_manage_present_unarchive_run_n }}
-  vars:
-    artifact_to_manage_present_type_all: >-
-      {{ lookup("vars", "artifact_to_manage_present_" + artifact_type) }}
+    - include_tasks: install.yml
+      when: >-
+        (ansible_facts.distribution | lower in ["centos", "redhat"]
+         and ansible_facts.distribution_version is version("7", "<"))
+        or ansible_facts.distribution | lower == "debian"
+      tags:
+        - role::artifact::install
 
-    artifact_to_manage_present_run_once: >-
-      {{ artifact_to_manage_present_type_all
-         | selectattr("run_once", "defined")
-         | selectattr("run_once", "equalto", True)
-         | list }}
+    - include_tasks: run_once.yml
+      when: >-
+        artifact_state_present_run_once | length > 0
+        or artifact_state_absent_run_once | length > 0
 
-    artifact_to_manage_present_run_n: >-
-      {{ artifact_to_manage_present_type_all
-         | difference(artifact_to_manage_present_run_once) }}
+    - include_tasks: run_n.yml
+      when: >-
+        artifact_state_present_run_n | length > 0
+        or artifact_state_absent_run_n | length > 0
   tags:
     - role::artifact
