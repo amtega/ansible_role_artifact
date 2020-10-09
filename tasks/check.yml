@@ -14,7 +14,7 @@
       assert:
         that:
           - >-
-            artifact_to_manage_present
+            artifact_state_present
             | selectattr("id", "undefined")
             | list
             | length == 0

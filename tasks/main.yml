@@ -1,55 +1,27 @@
 ---
 # Role tasks
 
-- include_tasks: check.yml
-  tags:
-    - role::artifact
-    - role::artifact::check
+- block:
+    - include_tasks: check.yml
+      tags:
+        - role::artifact::check
 
-- include_tasks: install.yml
-  when: >-
-    (ansible_facts.distribution | lower in ["centos", "redhat"]
-     and ansible_facts.distribution_version is version("7", "<"))
-    or ansible_facts.distribution | lower == "debian"
-  tags:
-    - role::artifact
-    - role::artifact::install
+    - include_tasks: install.yml
+      when: >-
+        (ansible_facts.distribution | lower in ["centos", "redhat"]
+         and ansible_facts.distribution_version is version("7", "<"))
+        or ansible_facts.distribution | lower == "debian"
+      tags:
+        - role::artifact::install
 
-- include_tasks: absent.yml
-  tags:
-    - role::artifact
+    - include_tasks: run_once.yml
+      when: >-
+        artifact_state_present_run_once | length > 0
+        or artifact_state_absent_run_once | length > 0
 
-- include_tasks: http.yml
+    - include_tasks: run_n.yml
+      when: >-
+        artifact_state_present_run_n | length > 0
+        or artifact_state_absent_run_n | length > 0
   tags:
     - role::artifact
-    - role::artifact::http
-
-- include_tasks: gitlab.yml
-  tags:
-    - role::artifact
-    - role::artifact::gitab
-
-- include_tasks: maven.yml
-  tags:
-    - role::artifact
-    - role::artifact::maven
-
-- include_tasks: jenkins.yml
-  tags:
-    - role::artifact
-    - role::artifact::jenkins
-
-- include_tasks: checksum.yml
-  tags:
-    - role::artifact
-    - role::artifact::checksum
-
-- include_tasks: unarchive.yml
-  tags:
-    - role::artifact
-    - role::artifact::checksum
-
-- include_tasks: facts.yml
-  tags:
-    - role::artifact
-    - role::artifact::facts

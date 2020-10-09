@@ -1,6 +1,14 @@
 ---
 # Role variables
 
+# Artifact types supported
+
+artifact_types_supported:
+  - gitlab
+  - http
+  - jenkins
+  - maven
+
 # Defaults for error handling
 
 artifact_retries: 3
@@ -17,20 +25,84 @@ artifact_to_manage: >-
      + ((artifact_load_from_hostvars | bool)
         | ternary(artifact_hostvars | default([]) | flatten, [])) }}
 
-artifact_to_manage_undefined: >-
+# Artifact list to manage organized by state
+
+artifact_state_undefined: >-
   {{ artifact_to_manage
      | selectattr("state", "undefined")
      | list }}
 
-artifact_to_manage_present: >-
+artifact_state_present: >-
   {{ artifact_to_manage
      | selectattr("state", "defined")
      | selectattr("state", "equalto", "present")
      | list
-     + artifact_to_manage_undefined }}
+     + artifact_state_undefined }}
 
-artifact_to_manage_absent: >-
+artifact_state_absent: >-
   {{ artifact_to_manage
      | selectattr("state", "defined")
      | selectattr("state", "equalto", "absent")
      | list }}
+
+# Artifact list organized by state and type of run
+
+artifact_state_present_run_once: >-
+  {{ artifact_state_present
+     | selectattr("run_once", "defined")
+     | selectattr("run_once", "equalto", True)
+     | list }}
+
+artifact_state_present_run_n: >-
+  {{ artifact_state_present
+     | difference(artifact_state_present_run_once) }}
+
+artifact_state_absent_run_once: >-
+  {{ artifact_state_absent
+     | selectattr("run_once", "defined")
+     | selectattr("run_once", "equalto", True)
+     | list }}
+
+artifact_state_absent_run_n: >-
+  {{ artifact_state_absent
+     | difference(artifact_state_present_run_once) }}
+
+# Artifact present list organized by type
+
+artifact_type_gitlab_state_present: >-
+  {{ artifact_state_present
+     | selectattr("type", "in", ["gitlab", "github"])
+     | list }}
+
+artifact_type_http_state_present: >-
+  {{ artifact_state_present
+     | selectattr('type', "in", ["http", "https"])
+     | list }}
+
+artifact_type_jenkins_state_present: >-
+  {{ artifact_state_present
+     | selectattr("type", "in", ["jenkins"])
+     | list }}
+
+artifact_type_maven_state_present: >-
+  {{ artifact_state_present
+     | selectattr("type", "in", ["maven"])
+     | list }}
+
+# Artifact list organized by unarchive attribute
+
+artifact_present_unarchive_run_all: >-
+  {{ artifact_state_present
+     | selectattr("unarchive", "defined")
+     | selectattr("unarchive", "equalto", True)
+     | list }}
+
+artifact_present_unarchive_run_once: >-
+  {{ artifact_present_unarchive_run_all
+     | selectattr("run_once", "defined")
+     | selectattr("run_once", "equalto", True)
+     | list }}
+
+artifact_present_unarchive_run_n: >-
+  {{ artifact_present_unarchive_run_all
+     | difference(artifact_present_unarchive_run_once) }}

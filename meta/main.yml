@@ -76,7 +76,7 @@ dependencies:
           all:
             pexpect: latest
     when: >-
-      artifact_to_manage_present
+      artifact_state_present
       | selectattr("type", "in", ["gitlab", "github"])
       | list
       | length > 0
@@ -94,11 +94,7 @@ dependencies:
         redhat:
           all:
             python-lxml: present
-    when: >-
-      artifact_to_manage_present
-      | selectattr("type", "in", ["maven"])
-      | list
-      | length > 0
+    when: artifact_type_maven_state_present | length > 0
 
   - role: amtega.packages
     vars:
@@ -108,7 +104,7 @@ dependencies:
             tar: present
             unzip: present
     when: >-
-      artifact_to_manage_present
+      artifact_state_present
       | selectattr("unarchive", "defined")
       | list
       | length > 0
