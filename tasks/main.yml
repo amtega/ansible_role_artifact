@@ -7,10 +7,11 @@
         - role::artifact::check
 
     - include_tasks: install.yml
-      when: >-
-        (ansible_facts.distribution | lower in ["centos", "redhat"]
-         and ansible_facts.distribution_version is version("7", "<"))
-        or ansible_facts.distribution | lower == "debian"
+      when:
+        - artifact_support_el_6 | bool
+        - (ansible_facts.distribution | lower in ["centos", "redhat"]
+           and ansible_facts.distribution_version is version("7", "<"))
+          or ansible_facts.distribution | lower == "debian"
       tags:
         - role::artifact::install
 
