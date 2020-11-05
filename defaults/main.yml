@@ -151,6 +151,17 @@
 
 artifact_list: "{{ (artifact is defined) | ternary([artifact], []) }}"
 
+# Indicate if artifact local facts should be saved. Usually is better to save
+# local artifacts because it improves role management and efficiency.
+
+artifact_local_facts: yes
+
+# Indicate if the role must support Enterprise Linux (RHEL/CentOS) 6. You can
+# set this value to `no` if you don't use these versions and you want to speed
+# up the role
+
+artifact_support_el_6: yes
+
 # Indicate `artifact_list` must be loaded also from host variables. Any host
 # variable that begins with "artifact_*" and contains the necessary attributes
 # will be loaded as an item to manage by the role. The variables must follow the
