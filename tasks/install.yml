@@ -27,30 +27,6 @@
         - ansible_facts.distribution | lower in ['centos', 'redhat']
         - ansible_facts.distribution_version is version("7", "<")
 
-    - block:
-        - name: Enable backports repository
-          apt_repository:
-            repo: deb http://http.debian.net/debian stretch-backports main
-            state: present
-            update_cache: yes
-          register: artifact_enable_backports_result
-
-        - name: Prepare git-lfs repository
-          shell: "curl -s {{ script_url }} | sudo bash"
-          when: artifact_enable_backports_result is changed
-          args:
-            warn: false
-          vars:
-            script_url: >-
-              {{ "https://packagecloud.io/"
-                 + "install/repositories/github/git-lfs/script.deb.sh" }}
-
-        - name: Install git-lfs package
-          package:
-            name: git-lfs
-            state: present
-      when: ansible_facts.distribution | lower == "debian"
-
   environment: "{{ proxy_client_environment }}"
   tags:
     - role::artifact
