@@ -6,6 +6,7 @@
 
 {% set download_path = ansible_local["artifact_" + artifact.id].download_path
                        | default(artifact_result[artifact.id].download_path)
+                       | default(artifact.dest + "/" + artifact.dest_file | default(artifact.file))
                        | default(none)%}
 
 {% set unarchived_files = ansible_local["artifact_" + artifact.id].unarchived_files
