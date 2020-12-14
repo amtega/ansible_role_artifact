@@ -1,7 +1,6 @@
 ---
 # Artifacts present state tasks
 
-
 - include_tasks: "{{ artifact_type }}.yml"
   loop: "{{ artifact_types_supported }}"
   loop_control:
