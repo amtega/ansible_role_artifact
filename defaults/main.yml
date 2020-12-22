@@ -36,6 +36,8 @@
 #                              # set to yes will be deployed first.
 #                              # Default is no
 #   no_log: <yes_no>           # Hide sensitive info. Default is yes
+#   absent_local_facts: <dict> # Dict with the facts to leave on the host when
+#                              # the fact state is absent
 #
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url/maven_artifact` modules:

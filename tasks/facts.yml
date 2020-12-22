@@ -18,26 +18,53 @@
 
         - name: Setup artifact local facts
           template:
-            src: facts.fact.j2
+            src: >-
+              facts_{{ artifact_result[artifact_id].state | lower }}.fact.j2
             dest: >-
               /etc/ansible/facts.d/artifact_{{ artifact_id }}.fact
             owner: root
             group: root
             mode: 0640
-          when: artifact_result[artifact_id].state == "present"
-          loop: "{{ artifact_result.keys() | list }}"
+          when: >-
+            (artifact_result[artifact_id].state == "present"
+             and artifact_result[artifact_id].changed)
+            or (artifact_result[artifact_id].state == "absent"
+                and artifact_item.absent_local_facts is defined)
+          loop: >-
+            {{ artifact_result.keys()
+               | select("in", (artifact_present_facts
+                               + artifact_absent_facts)
+                              | map(attribute="id")
+                              | list)
+               | list }}
           loop_control:
             loop_var: artifact_id
+          vars:
+            artifact_item: >-
+              {{ (artifact_present_facts
+                  + artifact_absent_facts)
+                 | selectattr("id", "equalto", artifact_id)
+                 | list
+                 | first }}
 
     - name: Remove artifact local facts
       file:
         path: /etc/ansible/facts.d/artifact_{{ artifact_id }}.fact
         state: absent
       loop: >-
-        {{ artifact_absent_facts | map(attribute='id') | list
-           + (not artifact_local_facts | bool)
-             | ternary(artifact_present_facts | map(attribute='id') | list,
-                       []) }}
+        {{ (artifact_absent_facts
+            | map(attribute='id')
+            | list
+            + (not artifact_local_facts | bool)
+              | ternary(artifact_present_facts
+                        | map(attribute='id')
+                        | list,
+                        []))
+           | difference((artifact_local_facts | bool)
+                        | ternary(artifact_absent_local_facts
+                                  | map(attribute='id')
+                                  | list,
+                                  [])) }}
       loop_control:
         loop_var: artifact_id
 
@@ -56,6 +83,12 @@
       {{ (artifact_run_once | bool)
          | ternary(artifact_state_absent_run_once,
                    artifact_state_absent_run_n) }}
+
+    artifact_absent_local_facts: >-
+      {{ artifact_absent_facts
+         | selectattr("absent_local_facts", "defined")
+         | list }}
+
   tags:
     - role::artifact
     - role::artifact::facts
