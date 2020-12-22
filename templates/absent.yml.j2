@@ -15,16 +15,16 @@
 
 - id: "{{ artifact.id }}"
 {% set ns.found = true %}
-{% if download_path is none
+{% if download_path | length == 0
       and unarchived_files | length == 0 %}
   files: []
 {% else %}
   files:
-{% if download_path is not none %}
+{% if download_path | length > 0 %}
     - {{ download_path }}
 {% endif %}
 {% for file in unarchived_files %}
-{% if file | dirname in ["", "/", artifact.dest ]%}
+{% if file | dirname in ["", "/", artifact.dest] %}
     - {{ file }}
 {% else %}
 {% set subpath = file

@@ -75,6 +75,22 @@ provisioner:
               unarchive_creates: /tmp/apache-tomcat-8.5.9
               validate_certs: false
               state: absent
+              my_local_fact: value
+              no_log: no
+
+            - id: tomcat2
+              type: https
+              host: https://archive.apache.org
+              path: /dist/tomcat/tomcat-8/v8.5.9/bin
+              file: apache-tomcat-8.5.9.tar.gz
+              dest_file: tomcat2.tar.gz
+              checksum_algorithm: sha1
+              checksum: 3c800e7affdf93bf4dbcf44bd852904449b786f6
+              dest: /tmp
+              validate_certs: false
+              state: absent
+              absent_local_facts:
+                my_local_fact: value
               no_log: no
 verifier:
   name: ansible
