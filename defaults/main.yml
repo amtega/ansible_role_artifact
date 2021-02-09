@@ -38,6 +38,7 @@
 #   no_log: <yes_no>           # Hide sensitive info. Default is yes
 #   absent_local_facts: <dict> # Dict with the facts to leave on the host when
 #                              # the fact state is absent
+#   notify: <handlers>         # List of handlers to trigger in changed state
 #
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url/maven_artifact` modules:
@@ -157,12 +158,6 @@ artifact_list: "{{ (artifact is defined) | ternary([artifact], []) }}"
 # local artifacts because it improves role management and efficiency.
 
 artifact_local_facts: yes
-
-# Indicate if the role must support Enterprise Linux (RHEL/CentOS) 6. You can
-# set this value to `no` if you don't use these versions and you want to speed
-# up the role
-
-artifact_support_el_6: yes
 
 # Indicate `artifact_list` must be loaded also from host variables. Any host
 # variable that begins with "artifact_*" and contains the necessary attributes

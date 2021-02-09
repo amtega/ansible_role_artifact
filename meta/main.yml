@@ -11,12 +11,12 @@ galaxy_info:
   platforms:
     - name: EL
       versions:
-        - 6
         - 7
+        - 8
     - name: Fedora
       versions:
-        - 29
-        - 30
+        - 32
+        - 33
   galaxy_tags:
     - download
     - artifact
@@ -29,9 +29,9 @@ dependencies:
   - role: amtega.check_platform
     vars:
       check_platform_distributions:
-        centos: 6
-        fedora: 29
-        redhat: 6
+        centos: 7
+        fedora: 32
+        redhat: 7
 
   - role: amtega.select_hostvars
     vars:
@@ -57,14 +57,19 @@ dependencies:
           7:
             git: present
             git-lfs: present
+          8:
+            git: present
+            git-lfs: present
         fedora:
           all:
             git: present
             git-lfs: present
-            python2-pexpect: present
             python3-pexpect: present
         redhat:
           7:
+            git: present
+            git-lfs: present
+          8:
             git: present
             git-lfs: present
 
@@ -84,16 +89,26 @@ dependencies:
   - role: amtega.packages
     vars:
       packages_os:
-        centos:
+        all:
           all:
+            git: present
+        centos:
+          6:
             python-lxml: present
+          7:
+            python-lxml: present
+          8:
+            python3-lxml: present
         fedora:
           all:
-            python2-lxml: present
             python3-lxml: present
         redhat:
-          all:
+          6:
             python-lxml: present
+          7:
+            python-lxml: present
+          8:
+            python3-lxml: present
     when: artifact_type_maven_state_present | length > 0
 
   - role: amtega.packages

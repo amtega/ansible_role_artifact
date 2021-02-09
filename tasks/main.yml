@@ -6,15 +6,6 @@
       tags:
         - role::artifact::check
 
-    - include_tasks: install.yml
-      when:
-        - artifact_support_el_6 | bool
-        - (ansible_facts.distribution | lower in ["centos", "redhat"]
-           and ansible_facts.distribution_version is version("7", "<"))
-          or ansible_facts.distribution | lower == "debian"
-      tags:
-        - role::artifact::install
-
     - include_tasks: run_once.yml
       when: >-
         artifact_state_present_run_once | length > 0
@@ -24,5 +15,9 @@
       when: >-
         artifact_state_present_run_n | length > 0
         or artifact_state_absent_run_n | length > 0
+
+    - include_tasks: notify.yml
+      tags:
+        - role::artifact::notify
   tags:
     - role::artifact
