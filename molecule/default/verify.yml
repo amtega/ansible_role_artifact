@@ -50,7 +50,7 @@
 
     - name: Check maven artifact download
       stat:
-        path: /tmp/spring-jdbc-5.1.5.RELEASE.jar
+        path: /tmp/spring-jdbc.jar
       register: check_maven_result
 
     - name: Check that artifacts were downloaded correctly

@@ -47,26 +47,26 @@
                  | list
                  | first }}
 
-    - name: Remove artifact local facts
-      file:
-        path: /etc/ansible/facts.d/artifact_{{ artifact_id }}.fact
-        state: absent
-      loop: >-
-        {{ (artifact_absent_facts
-            | map(attribute='id')
-            | list
-            + (not artifact_local_facts | bool)
-              | ternary(artifact_present_facts
-                        | map(attribute='id')
-                        | list,
-                        []))
-           | difference((artifact_local_facts | bool)
-                        | ternary(artifact_absent_local_facts
-                                  | map(attribute='id')
-                                  | list,
-                                  [])) }}
-      loop_control:
-        loop_var: artifact_id
+        - name: Remove artifact local facts
+          file:
+            path: /etc/ansible/facts.d/artifact_{{ artifact_id }}.fact
+            state: absent
+          loop: >-
+            {{ (artifact_absent_facts
+                | map(attribute='id')
+                | list
+                + (not artifact_local_facts | bool)
+                  | ternary(artifact_present_facts
+                            | map(attribute='id')
+                            | list,
+                            []))
+               | difference((artifact_local_facts | bool)
+                            | ternary(artifact_absent_local_facts
+                                      | map(attribute='id')
+                                      | list,
+                                      [])) }}
+          loop_control:
+            loop_var: artifact_id
 
     - name: Remove obsolete artifact facts file
       file:
