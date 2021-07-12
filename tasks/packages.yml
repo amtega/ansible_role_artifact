@@ -1,0 +1,30 @@
+---
+# Package setup tasks
+
+- block:
+    - include_role:
+        name: amtega.epel
+
+    - include_role:
+        name: amtega.packages
+      vars:
+        packages_os: >-
+          {{ {}
+             | combine((artifact_gitlab_github_exist)
+                       | ternary(artifact_gitlab_github_packages_os, {}))
+             | combine((artifact_maven_exist)
+                       | ternary(artifact_maven_packages_os, {}))
+             | combine((artifact_unarchive_exist)
+                       | ternary(artifact_unarchive_packages_os, {})) }}
+
+        packages_python: >-
+          {{ {}
+             | combine((artifact_gitlab_github_exist)
+                       | ternary(artifact_gitlab_github_packages_python, {}))
+             | combine((artifact_maven_exist)
+                       | ternary(artifact_maven_packages_python, {}))
+             | combine((artifact_unarchive_exist)
+                       | ternary(artifact_unarchive_packages_python, {})) }}
+
+  tags:
+    - role::artifact

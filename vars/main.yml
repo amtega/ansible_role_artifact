@@ -106,3 +106,83 @@ artifact_present_unarchive_run_once: >-
 artifact_present_unarchive_run_n: >-
   {{ artifact_present_unarchive_run_all
      | difference(artifact_present_unarchive_run_once) }}
+
+# Artifacts flags
+
+artifact_gitlab_github_exist: >-
+  {{ artifact_state_present
+     | selectattr("type", "in", ["gitlab", "github"])
+     | list
+     | length > 0 }}
+
+artifact_maven_exist: >-
+  {{ artifact_type_maven_state_present | length > 0 }}
+
+artifact_unarchive_exist: >-
+  {{ artifact_state_present
+       | selectattr("unarchive", "defined")
+       | list
+       | length > 0  }}
+
+# Required packages
+
+artifact_gitlab_github_packages_os:
+  centos:
+    7:
+      git: present
+      git-lfs: present
+    8:
+      git: present
+      git-lfs: present
+  fedora:
+    all:
+      git: present
+      git-lfs: present
+      python3-pexpect: present
+  redhat:
+    7:
+      git: present
+      git-lfs: present
+    8:
+      git: present
+      git-lfs: present
+
+artifact_gitlab_github_packages_python:
+  centos:
+    all:
+      pexpect: latest
+  redhat:
+    all:
+      pexpect: latest
+
+artifact_maven_packages_os:
+  all:
+    all:
+      git: present
+  centos:
+    6:
+      python-lxml: present
+    7:
+      python-lxml: present
+    8:
+      python3-lxml: present
+  fedora:
+    all:
+      python3-lxml: present
+  redhat:
+    6:
+      python-lxml: present
+    7:
+      python-lxml: present
+    8:
+      python3-lxml: present
+
+artifact_maven_packages_python: {}
+
+artifact_unarchive_packages_os:
+  all:
+    all:
+      tar: present
+      unzip: present
+
+artifact_unarchive_packages_python: {}
