@@ -15,8 +15,8 @@
         artifact_jenkins_check_path: >-
           {{ (artifact_item.unarchive | default(false)
               and artifact_item.unarchive_creates is defined)
-             | ternary(artifact_item.dest | default("")
-                       + "/"
+             | ternary((artifact_item.unarchive_creates.0 | default("") != "/")
+                       | ternary(artifact_item.dest | default("") + "/", "")
                        + artifact_item.unarchive_creates | default(""),
                        artifact_jenkins_dest) }}
 
