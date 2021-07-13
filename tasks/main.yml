@@ -6,6 +6,8 @@
       tags:
         - role::artifact::check
 
+    - include_tasks: packages.yml
+
     - include_tasks: run_once.yml
       when: >-
         artifact_state_present_run_once | length > 0

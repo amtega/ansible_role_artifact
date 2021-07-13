@@ -3,11 +3,12 @@
 
 galaxy_info:
   role_name: artifact
+  namespace: amtega
   author: Juan Antonio Valiño García
   description: Download several kinds or artifacts
   company: AMTEGA - Xunta de Galicia
   license: GPLv3 or EUPL
-  min_ansible_version: 2.9
+  min_ansible_version: 2.10
   platforms:
     - name: EL
       versions:
@@ -15,8 +16,8 @@ galaxy_info:
         - 8
     - name: Fedora
       versions:
-        - 32
         - 33
+        - 34
   galaxy_tags:
     - download
     - artifact
@@ -30,7 +31,7 @@ dependencies:
     vars:
       check_platform_distributions:
         centos: 7
-        fedora: 32
+        fedora: 33
         redhat: 7
 
   - role: amtega.select_hostvars
@@ -49,77 +50,9 @@ dependencies:
       proxy_client_permanent: no
 
   - role: amtega.epel
+    tags:
+      - never
 
   - role: amtega.packages
-    vars:
-      packages_os:
-        centos:
-          7:
-            git: present
-            git-lfs: present
-          8:
-            git: present
-            git-lfs: present
-        fedora:
-          all:
-            git: present
-            git-lfs: present
-            python3-pexpect: present
-        redhat:
-          7:
-            git: present
-            git-lfs: present
-          8:
-            git: present
-            git-lfs: present
-
-      packages_python:
-        centos:
-          all:
-            pexpect: latest
-        redhat:
-          all:
-            pexpect: latest
-    when: >-
-      artifact_state_present
-      | selectattr("type", "in", ["gitlab", "github"])
-      | list
-      | length > 0
-
-  - role: amtega.packages
-    vars:
-      packages_os:
-        all:
-          all:
-            git: present
-        centos:
-          6:
-            python-lxml: present
-          7:
-            python-lxml: present
-          8:
-            python3-lxml: present
-        fedora:
-          all:
-            python3-lxml: present
-        redhat:
-          6:
-            python-lxml: present
-          7:
-            python-lxml: present
-          8:
-            python3-lxml: present
-    when: artifact_type_maven_state_present | length > 0
-
-  - role: amtega.packages
-    vars:
-      packages_os:
-        all:
-          all:
-            tar: present
-            unzip: present
-    when: >-
-      artifact_state_present
-      | selectattr("unarchive", "defined")
-      | list
-      | length > 0
+    tags:
+      - never

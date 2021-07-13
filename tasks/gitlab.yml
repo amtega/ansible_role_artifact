@@ -65,8 +65,7 @@
               delay: "{{ artifact_item.delay | default(artifact_delay) }}"
 
             - name: Reset gitlab/github project clone to head
-              shell: >-
-                  git reset HEAD .
+              command: /usr/bin/git reset HEAD .
               args:
                 chdir: "{{ artifact_gitlab_tmp }}"
               register: artifact_gitlab_reset_result
