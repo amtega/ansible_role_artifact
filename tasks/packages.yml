@@ -2,29 +2,43 @@
 # Package setup tasks
 
 - block:
-    - include_role:
+    - name: Setup EPEL
+      include_role:
         name: amtega.epel
 
-    - include_role:
+    - name: Setup packages
+      include_role:
         name: amtega.packages
       vars:
         packages_os: >-
           {{ {}
              | combine((artifact_gitlab_github_exist)
-                       | ternary(artifact_gitlab_github_packages_os, {}))
+                       | ternary(artifact_gitlab_github_packages_os, {}),
+                       recursive=true,
+                       list_merge="append")
              | combine((artifact_maven_exist)
-                       | ternary(artifact_maven_packages_os, {}))
+                       | ternary(artifact_maven_packages_os, {}),
+                       recursive=true,
+                       list_merge="append")
              | combine((artifact_unarchive_exist)
-                       | ternary(artifact_unarchive_packages_os, {})) }}
+                       | ternary(artifact_unarchive_packages_os, {}),
+                       recursive=true,
+                       list_merge="append") }}
 
         packages_python: >-
           {{ {}
              | combine((artifact_gitlab_github_exist)
-                       | ternary(artifact_gitlab_github_packages_python, {}))
+                       | ternary(artifact_gitlab_github_packages_python, {}),
+                       recursive=true,
+                       list_merge="append")
              | combine((artifact_maven_exist)
-                       | ternary(artifact_maven_packages_python, {}))
+                       | ternary(artifact_maven_packages_python, {}),
+                       recursive=true,
+                       list_merge="append")
              | combine((artifact_unarchive_exist)
-                       | ternary(artifact_unarchive_packages_python, {})) }}
+                       | ternary(artifact_unarchive_packages_python, {}),
+                       recursive=true,
+                       list_merge="append") }}
 
   tags:
     - role::artifact

@@ -27,7 +27,8 @@
         - artifact_tests_jenkins_path | length > 0
         - artifact_tests_jenkins_file | length > 0
 
-    - include_role:
+    - name: Setup artifact
+      include_role:
         name: amtega.artifact
 
     - name: Check artifact facts

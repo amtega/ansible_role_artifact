@@ -150,18 +150,16 @@ artifact_gitlab_github_packages_os:
 artifact_gitlab_github_packages_python:
   centos:
     all:
-      pexpect: latest
+      pexpect: present
   redhat:
     all:
-      pexpect: latest
+      pexpect: present
 
 artifact_maven_packages_os:
   all:
     all:
       git: present
   centos:
-    6:
-      python-lxml: present
     7:
       python-lxml: present
     8:
@@ -170,8 +168,6 @@ artifact_maven_packages_os:
     all:
       python3-lxml: present
   redhat:
-    6:
-      python-lxml: present
     7:
       python-lxml: present
     8:
