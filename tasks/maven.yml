@@ -78,10 +78,31 @@
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: "{{ artifact_type_state_present }}"
           loop_control:
-              loop_var: artifact_item
-              index_var: artifact_item_index
-              label: "{{ artifact_item.id }}"
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
+          ignore_errors: yes
           environment: "{{ proxy_client_environment }}"
+
+        - name: Check maven artifacts
+          assert:
+            that: >-
+                artifact_maven_result.results[artifact_item_index]
+                is success
+            quiet: yes
+            fail_msg: >-
+              {{ artifact_maven_result.results[artifact_item_index].msg
+                 | default("") }}
+            success_msg: Artifact downloaded successful
+          loop: >-
+            {{ artifact_type_state_present
+               | map("artifact_hide_sensitive_info")
+               | list }}
+          loop_control:
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
+
       vars:
         artifact_previous_version: >-
           {{ (ansible_local["artifact_" + artifact_item.id]
