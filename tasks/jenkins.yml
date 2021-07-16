@@ -77,6 +77,7 @@
         loop_var: artifact_item
         index_var: artifact_item_index
         label: "{{ artifact_item.id }}"
+      ignore_errors: yes
       environment: "{{ proxy_client_environment }}"
       vars:
         artifact_previous_version: >-
@@ -87,6 +88,26 @@
           {{ artifact_jenkins_check_result.results }}
         artifact_download_exists: >-
           {{ artifact_jenkins_check_results[artifact_item_index].stat.exists }}
+
+    - name: Check jenkins artifacts
+      assert:
+        that: >-
+            artifact_jenkins_result.results[artifact_item_index]
+            is success
+        quiet: yes
+        fail_msg: >-
+          {{ artifact_jenkins_result.results[artifact_item_index].msg
+             | default("") }}
+        success_msg: Artifact downloaded successful
+      loop: >-
+        {{ artifact_type_state_present
+           | map("artifact_hide_sensitive_info")
+           | list }}
+      loop_control:
+        loop_var: artifact_item
+        index_var: artifact_item_index
+        label: "{{ artifact_item.id }}"
+
   run_once: "{{ artifact_run_once | bool }}"
   vars:
     artifact_jenkins_dest: >-
