@@ -165,3 +165,8 @@ artifact_local_facts: yes
 # structure detailed before for `artifact`
 
 artifact_load_from_hostvars: no
+
+# Indicate if the role must skip operating system packages related tasks,
+# something that can be useful if you want to speed up things
+
+artifact_skip_packages: no

@@ -10,6 +10,7 @@
       include_role:
         name: amtega.packages
       vars:
+        packages_load_from_hostvars: no
         packages_os: >-
           {{ {}
              | combine((artifact_gitlab_github_exist)
