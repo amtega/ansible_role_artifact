@@ -127,51 +127,21 @@ artifact_unarchive_exist: >-
 # Required packages
 
 artifact_gitlab_github_packages_os:
-  centos:
-    7:
-      git: present
-      git-lfs: present
-    8:
-      git: present
-      git-lfs: present
-  fedora:
+  all:
     all:
-      git: present
-      git-lfs: present
-      python3-pexpect: present
-  redhat:
-    7:
-      git: present
-      git-lfs: present
-    8:
       git: present
       git-lfs: present
 
 artifact_gitlab_github_packages_python:
-  centos:
+  all:
     all:
-      pexpect: present
-  redhat:
-    all:
+      lxml: present
       pexpect: present
 
 artifact_maven_packages_os:
   all:
     all:
       git: present
-  centos:
-    7:
-      python-lxml: present
-    8:
-      python3-lxml: present
-  fedora:
-    all:
-      python3-lxml: present
-  redhat:
-    7:
-      python-lxml: present
-    8:
-      python3-lxml: present
 
 artifact_maven_packages_python: {}
 

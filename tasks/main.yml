@@ -7,7 +7,7 @@
         - role::artifact::check
 
     - include_tasks: packages.yml
-      when: not artifact_skip_packages | bool 
+      when: not artifact_skip_packages | bool
 
     - include_tasks: run_once.yml
       when: >-
