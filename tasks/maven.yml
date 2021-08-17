@@ -29,9 +29,9 @@
             - artifact_item.force | default(false) | bool
           loop: "{{ artifact_type_state_present }}"
           loop_control:
-              loop_var: artifact_item
-              index_var: artifact_item_index
-              label: "{{ artifact_item.id }}"
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
           vars:
             artifact_state_absent:
               - "{{ artifact_item }}"
