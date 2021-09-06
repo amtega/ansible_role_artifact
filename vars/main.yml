@@ -143,7 +143,11 @@ artifact_maven_packages_os:
     all:
       git: present
 
-artifact_maven_packages_python: {}
+artifact_maven_packages_python:
+    all:
+      all:
+        lxml: present
+        pexpect: present
 
 artifact_unarchive_packages_os:
   all:
