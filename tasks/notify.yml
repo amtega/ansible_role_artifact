@@ -9,6 +9,7 @@
   loop_control:
     loop_var: artifact_item
     label: "{{ artifact_item.id }}"
+  notify: "{{ artifact_item.notify }}"
   tags:
     - role::artifact
     - role::artifact::notify
