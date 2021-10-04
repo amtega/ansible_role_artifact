@@ -13,11 +13,8 @@
         label: "{{ artifact_item.id }}"
       vars:
         artifact_gitlab_check_path: >-
-          {{ (artifact_item.unarchive | default(false)
-              and artifact_item.unarchive_creates is defined)
-             | ternary(artifact_item.dest | default("")
-                       + "/"
-                       + artifact_item.unarchive_creates | default(""),
+          {{ (artifact_item_unarchive_creates)
+             | ternary(artifact_item_unarchive_creates_dest,
                        artifact_gitlab_dest) }}
 
     - block:
@@ -200,6 +197,25 @@
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
 
+        - name: Setup artifact attributes
+          file:
+            path: "{{ artifact_gitlab_dest }}"
+            attributes: "{{ artifact_item.attributes | default(omit) }}"
+            group: "{{ artifact_item.group | default(omit) }}"
+            mode: "{{ artifact_item.mode | default(omit) }}"
+            owner: "{{ artifact_item.owner | default(omit) }}"
+            selevel: "{{ artifact_item.selevel | default(omit) }}"
+            serole: "{{ artifact_item.serole | default(omit) }}"
+            setype: "{{ artifact_item.setype | default(omit) }}"
+            seuser: "{{ artifact_item.seuser | default(omit) }}"
+          register: artifact_gitlab_attributes_result
+          no_log: "{{ artifact_item.no_log | default(true) }}"
+          loop: "{{ artifact_type_state_present }}"
+          loop_control:
+            loop_var: artifact_item
+            index_var: artifact_item_index
+            label: "{{ artifact_item.id }}"
+
         - name: Cleanup temporary directory with gitlab/github project clone
           file:
             path: "{{ artifact_gitlab_tmp }}"
@@ -238,24 +254,6 @@
           {{ (ansible_local["artifact_" + artifact_item.id]
               | default({}))["version"]
               | default(artifact_undefined_place_holder) }}
-
-    - name: Setup artifact attributes
-      file:
-        path: "{{ artifact_gitlab_dest }}"
-        attributes: "{{ artifact_item.attributes | default(omit) }}"
-        group: "{{ artifact_item.group | default(omit) }}"
-        mode: "{{ artifact_item.mode | default(omit) }}"
-        owner: "{{ artifact_item.owner | default(omit) }}"
-        selevel: "{{ artifact_item.selevel | default(omit) }}"
-        serole: "{{ artifact_item.serole | default(omit) }}"
-        setype: "{{ artifact_item.setype | default(omit) }}"
-        seuser: "{{ artifact_item.seuser | default(omit) }}"
-      register: artifact_gitlab_attributes_result
-      no_log: "{{ artifact_item.no_log | default(true) }}"
-      loop: "{{ artifact_type_state_present }}"
-      loop_control:
-        loop_var: artifact_item
-        label: "{{ artifact_item.id }}"
   when: artifact_item.download | default(true) | bool
   run_once: "{{ artifact_run_once | bool }}"
   environment: "{{ proxy_client_environment }}"

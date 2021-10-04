@@ -156,3 +156,14 @@ artifact_unarchive_packages_os:
       unzip: present
 
 artifact_unarchive_packages_python: {}
+
+# Artficat item vars
+
+artifact_item_unarchive_creates: >-
+  {{ artifact_item.unarchive | default(false)
+     and artifact_item.unarchive_creates is defined }}
+
+artifact_item_unarchive_creates_dest: >-
+  {{ (artifact_item.unarchive_creates.0 | default("") != "/")
+     | ternary(artifact_item.dest | default("") + "/", "")
+     + artifact_item.unarchive_creates | default("") }}

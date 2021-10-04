@@ -13,11 +13,8 @@
         label: "{{ artifact_item.id }}"
       vars:
         artifact_maven_check_path: >-
-          {{ (artifact_item.unarchive | default(false)
-              and artifact_item.unarchive_creates is defined)
-             | ternary((artifact_item.unarchive_creates.0 | default("") != "/")
-                       | ternary(artifact_item.dest | default("") + "/", "")
-                       + artifact_item.unarchive_creates | default(""),
+          {{ (artifact_item_unarchive_creates)
+             | ternary(artifact_item_unarchive_creates_dest,
                        artifact_maven_dest) }}
 
     - block:
