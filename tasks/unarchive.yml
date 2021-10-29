@@ -2,15 +2,69 @@
 # Unarchive tasks
 
 - block:
+    - name: Check artifact archive estructure
+      shell: "set -o pipefail ; {{ artficat_archive_check_command }}"
+      args:
+        warn: no
+      loop: "{{ artifact_present_unarchive_force_root }}"
+      loop_control:
+        loop_var: artifact_item
+        label: "{{ artifact_item.id }}"
+      register: artifact_check_archive_structure_result
+      when: artifact_item_download_result is changed
+      failed_when: artifact_check_archive_structure_result.stderr | length > 0
+      changed_when: no
+      vars:
+        artifact_archive_check_zip_command: >-
+          /usr/bin/unzip -l {{ artifact_item_src }}
+          | tail -n +4
+          | head -n -2
+          | /usr/bin/awk 'BEGIN { lastprefix = "" }
+            {if (match($4, /[^/]+/)) { prefix=substr($4, RSTART, RLENGTH);
+             if (lastprefix != "" && prefix != lastprefix) { exit 1 };
+             lastprefix=prefix }}'
+
+        artifact_archive_check_gtar_command: >-
+          /usr/bin/gtar -tf {{ artifact_item_src }}
+          | /usr/bin/awk 'BEGIN { lastprefix = "" }
+            {if (match($1, /[^/]+/)) { prefix=substr($1, RSTART, RLENGTH);
+             if (lastprefix != "" && prefix != lastprefix) { exit 1 };
+             lastprefix=prefix }}'
+
+        artficat_archive_check_command: >-
+          {{ ((artifact_item.dest_file
+               | default(artifact_item.file) | splitext).1 | lower in [".zip"])
+             | ternary(artifact_archive_check_zip_command,
+                       artifact_archive_check_gtar_command) }}
+
+    - name: Setup unarchive root directory
+      file:
+        path: "{{ artifact_item_forced_root_dest }}"
+        mode: "{{ artifact_item.mode | default(omit) }}"
+        others: "{{ artifact_item.others | default(omit) }}"
+        owner: "{{ artifact_item.owner | default(omit) }}"
+        selevel: "{{ artifact_item.selevel | default(omit) }}"
+        serole: "{{ artifact_item.serole | default(omit) }}"
+        setype: "{{ artifact_item.setype | default(omit) }}"
+        seuser: "{{ artifact_item.seuser | default(omit) }}"
+        state: directory
+      register: artifact_setup_archive_root_result
+      loop: >-
+        {{ artifact_check_archive_structure_result.results
+           | default([])
+           | selectattr("rc", "defined")
+           | selectattr("rc", "equalto", 1)
+           | map(attribute="artifact_item")
+           | list }}
+      loop_control:
+        loop_var: artifact_item
+        label: "{{ artifact_item.id }}"
+
     - name: Unarchive artifacts
       unarchive:
-        src: >-
-          {{ artifact_item.dest | default("")
-             + "/"
-             + artifact_item.dest_file
-               | default(artifact_item.file) }}
+        src: "{{ artifact_item_src }}"
         remote_src: yes
-        dest: "{{ artifact_item.dest | default('') }}"
+        dest: "{{ artifact_item_dest }}"
         list_files: yes
         group: "{{ artifact_item.group | default(omit) }}"
         mode: "{{ artifact_item.mode | default(omit) }}"
@@ -35,21 +89,16 @@
         label: "{{ artifact_item.id }}"
       no_log: "{{ artifact_item.no_log | default(true) }}"
       vars:
-        artifact_item_download_result: >-
-          {{ (artifact_gitlab_clone_result.results | default([])
-              + artifact_gitlab_reset_result.results | default([])
-              + artifact_gitlab_checkout_result.results | default([])
-              + artifact_gitlab_move_result.results | default([])
-              + artifact_gitlab_cleanup_result.results | default([])
-              + artifact_gitlab_attributes_result.results | default([])
-              + artifact_http_result.results | default([])
-              + artifact_maven_result.results | default([])
-              + artifact_jenkins_result.results | default([]))
-             | selectattr("artifact_item", "defined")
-             | selectattr("artifact_item.id", "defined")
-             | selectattr("artifact_item.id", "equalto", artifact_item.id)
-             | list
-             | first }}
+        artifact_structure_check_result: >-
+          {{ (artifact_check_archive_structure_result.results
+              | selectattr("artifact_item", "equalto", artifact_item)
+              | list).0 | default({"rc": 0}) }}
+
+        artifact_item_dest: >-
+          {{ (artifact_item.unarchive_force_root is defined
+              and artifact_structure_check_result.rc == 1)
+             | ternary(artifact_item_forced_root_dest,
+                       artifact_item.dest | default("")) }}
 
     - name: Remove archive files
       file:
@@ -67,6 +116,33 @@
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
+
+  vars:
+    artifact_item_download_result: >-
+      {{ ((artifact_gitlab_clone_result.results | default([])
+           + artifact_gitlab_reset_result.results | default([])
+           + artifact_gitlab_checkout_result.results | default([])
+           + artifact_gitlab_move_result.results | default([])
+           + artifact_gitlab_cleanup_result.results | default([])
+           + artifact_gitlab_attributes_result.results | default([])
+           + artifact_http_result.results | default([])
+           + artifact_maven_result.results | default([])
+           + artifact_jenkins_result.results | default([]))
+          | selectattr("artifact_item", "defined")
+          | selectattr("artifact_item.id", "defined")
+          | selectattr("artifact_item.id", "equalto", artifact_item.id)
+          | list).0 | default({}) }}
+
+    artifact_item_src: >-
+      {{ artifact_item.dest | default("")
+         + "/"
+         + artifact_item.dest_file
+           | default(artifact_item.file) }}
+
+    artifact_item_forced_root_dest: >-
+      {{ artifact_item.dest | default("")
+         + "/"
+         + artifact_item.unarchive_force_root | default("") }}
 
   run_once: "{{ artifact_run_once | bool }}"
   tags:

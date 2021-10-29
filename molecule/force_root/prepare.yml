@@ -1,0 +1,49 @@
+---
+
+- name: Prepare
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Setup directories for zip structures
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0755
+      loop:
+        - /tmp/noroot
+        - /tmp/noroot/level1
+        - /tmp/noroot/level1/level2
+        - /tmp/root
+        - /tmp/root/level1
+        - /tmp/root/level1/level2
+
+    - name: Create testing files
+      copy:
+        content: This is a test
+        dest: "{{ item }}"
+        mode: 0755
+      loop:
+        - /tmp/noroot/myfile
+        - /tmp/noroot/level1/level2/myfile
+        - /tmp/root/level1/myfile
+        - /tmp/root/level1/level2/myfile
+
+    - name: Create zip files
+      archive:
+        path: "{{ item.path }}"
+        dest: "{{ item.dest }}"
+        format: zip
+        mode: 0755
+      loop:
+        - path: /tmp/noroot/*
+          dest: /tmp/noroot.zip
+        - path: /tmp/root
+          dest: /tmp/root.zip
+
+    - name: Remove directoroes for zip structures
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/noroot
+        - /tmp/root

@@ -107,6 +107,11 @@ artifact_present_unarchive_run_n: >-
   {{ artifact_present_unarchive_run_all
      | difference(artifact_present_unarchive_run_once) }}
 
+artifact_present_unarchive_force_root: >-
+  {{ artifact_state_present
+     | selectattr("unarchive_force_root", "defined")     
+     | list }}
+
 # Artifacts flags
 
 artifact_gitlab_github_exist: >-

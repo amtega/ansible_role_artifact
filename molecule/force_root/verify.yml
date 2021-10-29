@@ -1,0 +1,26 @@
+---
+
+- name: Verify
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Check artifact download
+      stat:
+        path: "{{ item }}"
+      register: check_result
+      loop:
+        - /var/tmp/noroot/level1
+        - /var/tmp/root/level1
+
+    - name: Ensure artifact was downloaded
+      assert:
+        that: >-
+          check_result.results
+          | selectattr("stat.isdir", "equalto", true)
+          | list
+          | length
+          + check_result.results
+            | selectattr("stat.exists", "equalto", true)
+            | list
+            | length
+          == 2 * check_result.results | length
