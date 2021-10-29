@@ -1,0 +1,31 @@
+---
+
+- name: Prepare
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Setup directory for zip content
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /tmp/level1
+        - /tmp/level1/level2
+
+    - name: Create testing file
+      copy:
+        content: This is a test
+        dest: /tmp/level1/level2/myfile
+        mode: 0755
+
+    - name: Create zip file
+      archive:
+        path: /tmp/level1
+        dest: /tmp/test.zip
+        format: zip
+        mode: 0755
+
+    - name: Remove directory for zip content
+      file:
+        path: /tmp/level1
+        state: absent

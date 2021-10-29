@@ -1,0 +1,14 @@
+---
+
+- name: Verify
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Check artifact download
+      stat:
+        path: /var/tmp/level2/file
+      register: check_result
+
+    - name: Ensure artifact was downloaded
+      assert:
+        that: check_result.stat.exists
