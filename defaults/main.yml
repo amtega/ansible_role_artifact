@@ -28,6 +28,9 @@
 #                              # unarchived
 #   unarchive_remove: <yes_no> # Remove source archive file after being
 #                              # unarchived
+#   unarchive_force_root: <d>  # Ensure unarchive process creates the indicated
+#                              # root directory if the artifact package does not
+#                              # contain it
 #   version: <version>         # Version of the artifact. If not given will
 #                              # use empty string
 #   state: <state>             # Can be present or absent. Default is present

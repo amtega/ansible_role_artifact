@@ -46,11 +46,21 @@
 
 {% set inner_ns = namespace(unarchived_files=[]) %}
 {% for file in unarchived_result.files %}
+{% if artifact not in artifact_setup_archive_root_result.results
+                      | default([])
+                      | map(attribute="artifact_item")
+                      | list %}
+{% set path_replacement = artifact.dest %}
+{% else %}
+{% set path_replacement = artifact.dest
+                          + "/"
+                          + artifact.unarchive_force_root %}
+{% endif %}
 {% set inner_ns.unarchived_files =
          inner_ns.unarchived_files
          + [ file
              | regex_replace("^./", "")
-             | regex_replace("^", artifact.dest + "/") ] %}
+             | regex_replace("^", path_replacement + "/") ] %}
 {% endfor %}
   unarchived_files: {{ inner_ns.unarchived_files | unique | list | to_json }}
 {% else %}

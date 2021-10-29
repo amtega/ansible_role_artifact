@@ -52,16 +52,29 @@ provisioner:
       molecule_hosts:
         vars:
           artifact_list:
-            - id: strip
+            - id: noroot
               type: http
               host: file://
               path: /tmp
-              file: test.zip
+              file: noroot.zip
               dest: /var/tmp
               unarchive: yes
-              unarchive_creates: /var/tmp/test/level2
+              unarchive_creates: /var/tmp/noroot/level1
               unarchive_remove: yes
-              unarchive_strip_components: 1
+              unarchive_force_root: noroot
+              validate_certs: false
+              no_log: no
+
+            - id: root
+              type: http
+              host: file://
+              path: /tmp
+              file: root.zip
+              dest: /var/tmp
+              unarchive: yes
+              unarchive_creates: /var/tmp/root/level1
+              unarchive_remove: yes
+              unarchive_force_root: root
               validate_certs: false
               no_log: no
 verifier:
