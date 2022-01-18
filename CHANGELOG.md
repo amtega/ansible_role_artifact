@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### [1.22.0] - 2021-10-29
+## [1.23.0] - 2022-01-18
+### Changed
+- Supported distros.
+
+### Fixed
+- Coding standards.
+
+## [1.22.0] - 2021-10-29
 ### Added
 - Added suport for unarchive root dir management (variable `unarchive_force_root`). Related to ansible/playbooks/tomcat#102
