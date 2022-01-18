@@ -37,7 +37,7 @@ This is an example playbook:
       branch: master
       file: README.rst
       dest: /tmp
-      validate_certs: false
+      validate_certs: no
 ```
 
 ## Testing
@@ -62,7 +62,7 @@ To enable jenkins artefact type testing you need to pass the following extra env
 
 ## License
 
-Copyright (C) 2020 AMTEGA - Xunta de Galicia
+Copyright (C) 2022 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify it under the terms of:
 

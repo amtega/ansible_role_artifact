@@ -26,18 +26,18 @@ platforms:
       - molecule_hosts
       - molecule_hosts_centos
       - molecule_hosts_centos_8
-  - name: "fedora33-${INSTANCE_UUID:-1}"
-    image: fedora:33
-    groups:
-      - molecule_hosts
-      - molecule_hosts_fedora
-      - molecule_hosts_fedora_33
   - name: "fedora34-${INSTANCE_UUID:-1}"
     image: fedora:34
     groups:
       - molecule_hosts
       - molecule_hosts_fedora
       - molecule_hosts_fedora_34
+  - name: "fedora35-${INSTANCE_UUID:-1}"
+    image: fedora:35
+    groups:
+      - molecule_hosts
+      - molecule_hosts_fedora
+      - molecule_hosts_fedora_35
 provisioner:
   name: ansible
   playbooks:
@@ -45,7 +45,7 @@ provisioner:
     side_effect: ../resources/side_effect.yml
   config_options:
     defaults:
-      callback_enabled: profile_tasks
+      callbacks_enabled: profile_tasks
       action_plugins: $PWD/action_plugins
   inventory:
     hosts:
@@ -63,7 +63,7 @@ provisioner:
               dest: /tmp
               unarchive: yes
               unarchive_creates: /tmp/apache-tomcat-8.5.9
-              validate_certs: false
+              validate_certs: no
               state: absent
               my_local_fact: value
               no_log: no
@@ -77,7 +77,7 @@ provisioner:
               checksum_algorithm: sha1
               checksum: 3c800e7affdf93bf4dbcf44bd852904449b786f6
               dest: /tmp
-              validate_certs: false
+              validate_certs: no
               state: absent
               absent_local_facts:
                 my_local_fact: value

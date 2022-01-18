@@ -18,7 +18,7 @@
             username: "{{ artifact_tests_jenkins_username | default(omit) }}"
             password: "{{ artifact_tests_jenkins_password | default(omit) }}"
             dest: /tmp
-            validate_certs: false
+            validate_certs: no
             no_log: no
       when:
         - artifact_tests_jenkins_host | length > 0
