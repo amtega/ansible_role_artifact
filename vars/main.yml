@@ -21,9 +21,10 @@ artifact_checksum_algorithm: sha256
 # Artifact list to manage (included the items loaded from hostvars)
 
 artifact_to_manage: >-
-  {{ artifact_list
-     + ((artifact_load_from_hostvars | bool)
-        | ternary(artifact_hostvars | default([]) | flatten, [])) }}
+  {{ (artifact_list
+      + ((artifact_load_from_hostvars | bool)
+         | ternary(artifact_hostvars | default([]) | flatten, [])))
+     | map("artifact_reverse_combine", artifact_defaults) }}
 
 # Artifact list to manage organized by state
 
@@ -109,7 +110,7 @@ artifact_present_unarchive_run_n: >-
 
 artifact_present_unarchive_force_root: >-
   {{ artifact_state_present
-     | selectattr("unarchive_force_root", "defined")     
+     | selectattr("unarchive_force_root", "defined")
      | list }}
 
 # Artifacts flags

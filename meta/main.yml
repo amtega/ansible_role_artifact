@@ -38,7 +38,7 @@ dependencies:
     vars:
       select_hostvars_query:
         pattern: "^artifact_.*"
-        exclude_pattern: "^artifact_list$"
+        exclude_pattern: "^artifact_list|artifact_defaults$"
         attributes:
           - id
         fact_name: artifact_hostvars

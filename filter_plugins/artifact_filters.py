@@ -2,6 +2,8 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+from ansible.plugins.filter.core import combine
+
 
 def artifact_hide_sensitive_info(artifact):
     """Hide sensitive info in artifact config
@@ -24,10 +26,24 @@ def artifact_hide_sensitive_info(artifact):
     return result
 
 
+def artifact_reverse_combine(a, b):
+    """Apply ansible combine in a reverse way
+
+    Args:
+        a (dict): the dict with the values to merge
+        b (dict): the dict to merge in
+
+    Returns:
+        dict: dict b with the values of dict a merged
+    """
+    return combine(b, a, recursive=True)
+
+
 class FilterModule(object):
     """Ansible filters."""
 
     def filters(self):
         return {
-            "artifact_hide_sensitive_info": artifact_hide_sensitive_info
+            "artifact_hide_sensitive_info": artifact_hide_sensitive_info,
+            "artifact_reverse_combine": artifact_reverse_combine
         }
