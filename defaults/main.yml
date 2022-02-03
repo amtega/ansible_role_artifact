@@ -157,6 +157,12 @@
 
 artifact_list: "{{ (artifact is defined) | ternary([artifact], []) }}"
 
+# Dictionary with the default options to use if no other ones are specified in
+# the artifact. The members of the dict are the same attributes that the ones
+# expected for an artifact.
+
+artifact_defaults: {}
+
 # Indicate if artifact local facts should be saved. Usually is better to save
 # local artifacts because it improves role management and efficiency.
 

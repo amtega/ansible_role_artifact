@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.24.0] - 2022-02-03
+### Added
+- Added variable `artifact_defaults`.
+
 ## [1.23.0] - 2022-01-18
 ### Changed
 - Supported distros.
