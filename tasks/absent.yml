@@ -17,7 +17,6 @@
   loop_control:
     loop_var: artifact_item_to_remove
     label: "{{ artifact_item_to_remove.0.id }} {{ artifact_item_to_remove.1 }}"
-  run_once: "{{ artifact_run_once | bool }}"
   environment:
     LANGUAGE: en_US
   tags:

@@ -9,12 +9,23 @@
     - include_tasks: packages.yml
       when: not artifact_skip_packages | bool
 
-    - include_tasks: run_once.yml
+    - block:
+        - include_tasks: absent.yml
+        - include_tasks: present.yml
+        - include_tasks: facts.yml
+      run_once: yes
+      vars:
+        artifact_run_once: yes
       when: >-
         artifact_state_present_run_once | length > 0
         or artifact_state_absent_run_once | length > 0
 
-    - include_tasks: run_n.yml
+    - block:
+        - include_tasks: absent.yml
+        - include_tasks: present.yml
+        - include_tasks: facts.yml
+      vars:
+        artifact_run_once: no
       when: >-
         artifact_state_present_run_n | length > 0
         or artifact_state_absent_run_n | length > 0

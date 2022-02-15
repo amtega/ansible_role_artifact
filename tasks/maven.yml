@@ -109,7 +109,6 @@
           {{ artifact_maven_check_result.results }}
         artifact_download_exists: >-
           {{ artifact_maven_check_results[artifact_item_index].stat.exists }}
-  run_once: "{{ artifact_run_once | bool }}"
   vars:
     artifact_maven_dest: >-
       {{ artifact_item.dest
