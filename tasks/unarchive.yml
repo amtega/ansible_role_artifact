@@ -143,8 +143,6 @@
       {{ artifact_item.dest | default("")
          + "/"
          + artifact_item.unarchive_force_root | default("") }}
-
-  run_once: "{{ artifact_run_once | bool }}"
   tags:
     - role::artifact
     - role::artifact::unarchive

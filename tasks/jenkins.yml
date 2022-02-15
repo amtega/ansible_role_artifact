@@ -104,8 +104,6 @@
         loop_var: artifact_item
         index_var: artifact_item_index
         label: "{{ artifact_item.id }}"
-
-  run_once: "{{ artifact_run_once | bool }}"
   vars:
     artifact_jenkins_dest: >-
       {{ artifact_item.dest

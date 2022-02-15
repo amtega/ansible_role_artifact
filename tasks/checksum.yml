@@ -28,7 +28,6 @@
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
-      run_once: "{{ artifact_run_once | bool }}"
       no_log: "{{ artifact_item.no_log | default(true) }}"
       vars:
         artifact_previous_version: >-

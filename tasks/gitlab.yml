@@ -255,7 +255,6 @@
               | default({}))["version"]
               | default(artifact_undefined_place_holder) }}
   when: artifact_item.download | default(true) | bool
-  run_once: "{{ artifact_run_once | bool }}"
   environment: "{{ proxy_client_environment }}"
   vars:
     artifact_gitlab_dest: >-
