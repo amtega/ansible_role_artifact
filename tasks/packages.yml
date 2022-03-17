@@ -13,33 +13,32 @@
         packages_load_from_hostvars: no
         packages_os: >-
           {{ {}
-             | combine((artifact_gitlab_github_exist)
+             | combine((_artifact_gitlab_gitlab_exist)
                        | ternary(artifact_gitlab_github_packages_os, {}),
                        recursive=true,
                        list_merge="append")
-             | combine((artifact_maven_exist)
+             | combine((_artifact_maven_exist)
                        | ternary(artifact_maven_packages_os, {}),
                        recursive=true,
                        list_merge="append")
-             | combine((artifact_unarchive_exist)
+             | combine((_artifact_unarchive_exist)
                        | ternary(artifact_unarchive_packages_os, {}),
                        recursive=true,
                        list_merge="append") }}
 
         packages_python: >-
           {{ {}
-             | combine((artifact_gitlab_github_exist)
+             | combine((_artifact_gitlab_gitlab_exist)
                        | ternary(artifact_gitlab_github_packages_python, {}),
                        recursive=true,
                        list_merge="append")
-             | combine((artifact_maven_exist)
+             | combine((_artifact_maven_exist)
                        | ternary(artifact_maven_packages_python, {}),
                        recursive=true,
                        list_merge="append")
-             | combine((artifact_unarchive_exist)
+             | combine((_artifact_unarchive_exist)
                        | ternary(artifact_unarchive_packages_python, {}),
                        recursive=true,
                        list_merge="append") }}
-
   tags:
     - role::artifact

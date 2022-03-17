@@ -76,13 +76,13 @@
   vars:
     artifact_present_facts: >-
       {{ (artifact_run_once | bool)
-         | ternary(artifact_state_present_run_once,
-                   artifact_state_present_run_n) }}
+         | ternary(_artifact_state_present_run_once,
+                   _artifact_state_present_run_n) }}
 
     artifact_absent_facts: >-
       {{ (artifact_run_once | bool)
-         | ternary(artifact_state_absent_run_once,
-                   artifact_state_absent_run_n) }}
+         | ternary(_artifact_state_absent_run_once,
+                   _artifact_state_absent_run_n) }}
 
     artifact_absent_local_facts: >-
       {{ artifact_absent_facts

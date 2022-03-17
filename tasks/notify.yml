@@ -5,7 +5,7 @@
   command: /bin/true
   changed_when: artifact_result[artifact_item.id].changed | bool
   when: artifact_item.notify | default([]) | length > 0
-  loop: "{{ artifact_to_manage }}"
+  loop: "{{ _artifact_to_manage }}"
   loop_control:
     loop_var: artifact_item
     label: "{{ artifact_item.id }}"

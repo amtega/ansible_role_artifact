@@ -17,8 +17,8 @@
       vars:
         artifact_run_once: yes
       when: >-
-        artifact_state_present_run_once | length > 0
-        or artifact_state_absent_run_once | length > 0
+        _artifact_state_present_run_once | length > 0
+        or _artifact_state_absent_run_once | length > 0
 
     - block:
         - include_tasks: absent.yml
@@ -27,8 +27,8 @@
       vars:
         artifact_run_once: no
       when: >-
-        artifact_state_present_run_n | length > 0
-        or artifact_state_absent_run_n | length > 0
+        _artifact_state_present_run_n | length > 0
+        or _artifact_state_absent_run_n | length > 0
 
     - include_tasks: notify.yml
       tags:
