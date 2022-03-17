@@ -7,7 +7,7 @@
         path: "{{ artifact_jenkins_check_path }}"
       register: artifact_jenkins_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
-      loop: "{{ artifact_type_state_present }}"
+      loop: "{{ _artifact_type_state_present }}"
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
@@ -69,7 +69,7 @@
                     | string
                     != artifact_previous_version))
       no_log: "{{ artifact_item.no_log | default(true) }}"
-      loop: "{{ artifact_type_state_present }}"
+      loop: "{{ _artifact_type_state_present }}"
       loop_control:
         loop_var: artifact_item
         index_var: artifact_item_index
@@ -97,7 +97,7 @@
              | default("") }}
         success_msg: Artifact downloaded successful
       loop: >-
-        {{ artifact_type_state_present
+        {{ _artifact_type_state_present
            | map("artifact_hide_sensitive_info")
            | list }}
       loop_control:

@@ -6,7 +6,7 @@
       shell: "set -o pipefail ; {{ artficat_archive_check_command }}"
       args:
         warn: no
-      loop: "{{ artifact_present_unarchive_force_root }}"
+      loop: "{{ _artifact_present_unarchive_force_root }}"
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
