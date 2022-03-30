@@ -30,7 +30,7 @@
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
           vars:
-            _artifact_state_absent:
+            artifact_state_absent_transient:
               - "{{ artifact_item }}"
 
         - name: Download artifacts from maven repository
