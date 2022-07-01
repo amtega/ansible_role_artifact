@@ -5,7 +5,7 @@
   gather_facts: no
   tasks:
     - name: Setup directories for zip structures
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         mode: 0755
@@ -18,7 +18,7 @@
         - /tmp/root/level1/level2
 
     - name: Create testing files
-      copy:
+      ansible.builtin.copy:
         content: This is a test
         dest: "{{ item }}"
         mode: 0755
@@ -41,7 +41,7 @@
           dest: /tmp/root.zip
 
     - name: Remove directoroes for zip structures
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: absent
       loop:

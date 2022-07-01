@@ -1,9 +1,9 @@
 ---
-# Maven artifact download tasks
 
-- block:
+- name: Download maven artifacts
+  block:
     - name: Check maven artifact download
-      stat:
+      ansible.builtin.stat:
         path: "{{ artifact_maven_check_path }}"
       register: artifact_maven_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
@@ -17,9 +17,10 @@
              | ternary(artifact_item_unarchive_creates_dest,
                        artifact_maven_dest) }}
 
-    - block:
+    - name: Perform maven artifacts download
+      block:
         - name: Remove previous maven artifact download
-          include_tasks: absent.yml
+          ansible.builtin.include_tasks: absent.yml
           when:
             - artifact_download_exists
             - artifact_item.download | default(true) | bool
@@ -34,7 +35,7 @@
               - "{{ artifact_item }}"
 
         - name: Download artifacts from maven repository
-          maven_artifact:
+          community.general.maven_artifact:
             artifact_id: "{{ artifact_item.artifact_id | default(omit) }}"
             attributes: "{{ artifact_item.attributes | default(omit) }}"
             classifier: "{{ artifact_item.classifier | default(omit) }}"
@@ -68,10 +69,10 @@
             not artifact_download_exists
             or (artifact_item.download | default(true) | bool
                 and (artifact_item.force | default(false) | bool
-                     or artifact_item.version
-                        | default("")
-                        | string
-                        != artifact_previous_version))
+                    or artifact_previous_version is none
+                    or (artifact_item.version is defined
+                        and artifact_item.version | string
+                        != artifact_previous_version)))
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: "{{ _artifact_type_state_present }}"
           loop_control:
@@ -82,7 +83,7 @@
           environment: "{{ proxy_client_environment }}"
 
         - name: Check maven artifacts
-          assert:
+          ansible.builtin.assert:
             that: >-
                 artifact_maven_result.results[artifact_item_index]
                 is success

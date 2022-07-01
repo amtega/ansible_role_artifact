@@ -5,32 +5,32 @@
   gather_facts: no
   tasks:
     - name: Check gitlab artifact download
-      stat:
+      ansible.builtin.stat:
         path: /tmp/README.md
       register: check_gitlab_result
 
     - name: Check github artifact download
-      stat:
+      ansible.builtin.stat:
         path: /tmp/README.md
       register: check_github_result
 
     - name: Check http/https unarchived artifact download
-      stat:
+      ansible.builtin.stat:
         path: /tmp/tomcat.tar.gz
       register: check_http_result
 
     - name: Check http/https artifact download
-      stat:
+      ansible.builtin.stat:
         path: /tmp/tomcat2.tar.gz
       register: check_http2_result
 
     - name: Check http/https artifact unarchived content
-      stat:
+      ansible.builtin.stat:
         path: /tmp/apache-tomcat-8.5.9
       register: check_http_unarchive_result
 
     - name: Check jenkins artifact download
-      stat:
+      ansible.builtin.stat:
         path: >-
           {{ "/tmp/"
              + artifact.artifact_id
@@ -49,12 +49,12 @@
         - artifact_tests_jenkins_extension | length > 0
 
     - name: Check maven artifact download
-      stat:
+      ansible.builtin.stat:
         path: /tmp/spring-jdbc.jar
       register: check_maven_result
 
     - name: Check that artifacts were downloaded correctly
-      assert:
+      ansible.builtin.assert:
         that:
           - check_gitlab_result.stat.exists
           - check_github_result.stat.exists
@@ -64,7 +64,7 @@
           - check_maven_result.stat.exists
 
     - name: Check that jenkins artifacts were downloaded correctly
-      assert:
+      ansible.builtin.assert:
         that: check_jenkins_result.stat.exists
       when:
         - artifact_tests_jenkins_host | length > 0

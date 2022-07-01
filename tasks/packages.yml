@@ -1,13 +1,13 @@
 ---
-# Package setup tasks
 
-- block:
+- name: Setup required packages for artifacts management
+  block:
     - name: Setup EPEL
-      include_role:
+      ansible.builtin.include_role:
         name: amtega.epel
 
     - name: Setup packages
-      include_role:
+      ansible.builtin.include_role:
         name: amtega.packages
       vars:
         packages_load_from_hostvars: no

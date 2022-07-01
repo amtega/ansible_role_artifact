@@ -1,9 +1,9 @@
 ---
-# Role check tasks
 
-- block:
+- name: Check artifacts
+  block:
     - name: Generate undefined value place holder
-      set_fact:
+      ansible.builtin.set_fact:
         artifact_undefined_place_holder: >-
           {{ "__check_platform_undefined_place_holder__"
              + (99999999999999999999999999999999999999999999999999
@@ -11,7 +11,7 @@
                 | to_uuid) }}
 
     - name: Setup fact with artifacts to manage
-      set_fact:
+      ansible.builtin.set_fact:
         _artifact_to_manage: >-
           {{ (artifact_list
               + ((artifact_load_from_hostvars | bool)
@@ -19,14 +19,14 @@
              | map("artifact_reverse_combine", artifact_defaults) }}
 
     - name: Setup fact with artifacts with undefined state
-      set_fact:
+      ansible.builtin.set_fact:
         _artifact_state_undefined: >-
           {{ _artifact_to_manage
              | selectattr("state", "undefined")
              | list }}
 
     - name: Setup facts with artifacts with defined state
-      set_fact:
+      ansible.builtin.set_fact:
         _artifact_state_present: >-
           {{ _artifact_to_manage
              | selectattr("state", "defined")
@@ -41,7 +41,7 @@
              | list }}
 
     - name: Setup fact with artifacts to run once
-      set_fact:
+      ansible.builtin.set_fact:
         _artifact_state_present_run_once: >-
           {{ _artifact_state_present
              | selectattr("run_once", "defined")
@@ -49,7 +49,7 @@
              | list }}
 
     - name: Setup fact with artifacts to unarchive
-      set_fact:
+      ansible.builtin.set_fact:
         _artifact_present_unarchive_run_all: >-
           {{ _artifact_state_present
              | selectattr("unarchive", "defined")
@@ -57,7 +57,7 @@
              | list }}
 
     - name: Setup fact with artifacts to unarchive and run one
-      set_fact:
+      ansible.builtin.set_fact:
         _artifact_present_unarchive_run_once: >-
           {{ _artifact_present_unarchive_run_all
              | selectattr("run_once", "defined")
@@ -65,7 +65,7 @@
              | list }}
 
     - name: Setup facts with artifacts organized by several criteria
-      set_fact:
+      ansible.builtin.set_fact:
         # Artifact list organized by state and type of run
 
         _artifact_state_present_run_n: >-
@@ -116,7 +116,7 @@
              | list }}
 
     - name: Setup facts with artifacts type flags
-      set_fact:
+      ansible.builtin.set_fact:
         _artifact_gitlab_gitlab_exist: >-
           {{ _artifact_type_gitlab_state_present | length > 0 }}
 
@@ -127,7 +127,7 @@
           {{ _artifact_present_unarchive_run_all | length > 0  }}
 
     - name: Check artifacts config
-      assert:
+      ansible.builtin.assert:
         that:
           - >-
             _artifact_state_present

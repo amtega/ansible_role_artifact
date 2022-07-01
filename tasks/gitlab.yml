@@ -1,9 +1,9 @@
 ---
-# GitLab/GitHub artifact download tasks
 
-- block:
-    - name: Check gitlab artifact download
-      stat:
+- name: Download gitlab/github artifacts
+  block:
+    - name: Check gitlab/github artifact download
+      ansible.builtin.stat:
         path: "{{ artifact_gitlab_check_path }}"
       register: artifact_gitlab_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
@@ -17,9 +17,10 @@
              | ternary(artifact_item_unarchive_creates_dest,
                        artifact_gitlab_dest) }}
 
-    - block:
+    - name: Perform gitlab/github artifact download
+      block:
         - name: Create temporary directory for gitlab/github project clone
-          tempfile:
+          ansible.builtin.tempfile:
             path: "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
             state: directory
           register: artifact_gitlab_tmp_result
@@ -30,10 +31,11 @@
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
 
-        - block:
+        - name: Retrieve artifact form gitlab/github project
+          block:
             - name: Clone gitlab/github project into temporay directory
-              expect:
-                command: >-
+              ansible.builtin.expect:
+                community.routeros.command: >-
                   git
                   {{ git_http_proxy_opt }}
                   {{ git_https_proxy_opt }}
@@ -63,7 +65,7 @@
               ignore_errors: yes
 
             - name: Check gitlab/github clone
-              assert:
+              ansible.builtin.assert:
                 that: >-
                     artifact_gitlab_clone_result.results[artifact_item_index]
                     is success
@@ -83,11 +85,13 @@
                 label: "{{ artifact_item.id }}"
 
             - name: Reset gitlab/github project clone to head
-              command: /usr/bin/git reset HEAD .
+              ansible.builtin.command: /usr/bin/git reset HEAD .
               args:
                 chdir: "{{ artifact_gitlab_tmp }}"
+                warn: no
               register: artifact_gitlab_reset_result
               failed_when: artifact_gitlab_reset_result.rc != 0
+              changed_when: yes
               no_log: "{{ artifact_item.no_log | default(true) }}"
               loop: "{{ _artifact_type_state_present }}"
               loop_control:
@@ -97,7 +101,7 @@
               ignore_errors: yes
 
             - name: Check gitlab/github clone reset to head
-              assert:
+              ansible.builtin.assert:
                 that: >-
                     artifact_gitlab_reset_result.results[artifact_item_index]
                     is success
@@ -117,8 +121,8 @@
                 label: "{{ artifact_item.id }}"
 
             - name: Checkout artifact from gitlab/github project
-              expect:
-                command: >-
+              ansible.builtin.expect:
+                community.routeros.command: >-
                   git
                   {{ git_http_proxy_opt }}
                   {{ git_https_proxy_opt }}
@@ -144,7 +148,7 @@
               delay: "{{ artifact_item.delay | default(artifact_delay) }}"
 
             - name: Check gitlab/github checkout
-              assert:
+              ansible.builtin.assert:
                 that: >-
                     artifact_gitlab_checkout_result.results[artifact_item_index]
                     is success
@@ -184,12 +188,13 @@
                            '' ) }}
 
         - name: Move artifact to destination
-          shell: >-
+          ansible.builtin.command: >-
               mv {{ artifact_gitlab_file_path }} {{ artifact_gitlab_dest }}
           args:
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_move_result
           failed_when: artifact_gitlab_move_result.rc != 0
+          changed_when: yes
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: "{{ _artifact_type_state_present }}"
           loop_control:
@@ -198,7 +203,7 @@
             label: "{{ artifact_item.id }}"
 
         - name: Setup artifact attributes
-          file:
+          ansible.builtin.file:
             path: "{{ artifact_gitlab_dest }}"
             attributes: "{{ artifact_item.attributes | default(omit) }}"
             group: "{{ artifact_item.group | default(omit) }}"
@@ -217,7 +222,7 @@
             label: "{{ artifact_item.id }}"
 
         - name: Cleanup temporary directory with gitlab/github project clone
-          file:
+          ansible.builtin.file:
             path: "{{ artifact_gitlab_tmp }}"
             state: absent
           register: artifact_gitlab_cleanup_result
@@ -229,10 +234,12 @@
             label: "{{ artifact_item.id }}"
       when: >-
         not artifact_download_exists
-        or artifact_item.force | default(false)
-        or (artifact_item.version is defined
-            and artifact_item.version | string
-                != artifact_previous_version)
+        or (artifact_item.download | default(true) | bool
+            and (artifact_item.force | default(false) | bool
+                 or artifact_previous_version is none
+                 or (artifact_item.version is defined
+                     and artifact_item.version | string
+                     != artifact_previous_version)))
       vars:
         artifact_gitlab_check_results: >-
           {{ artifact_gitlab_check_result.results }}
