@@ -230,10 +230,9 @@
       when: >-
         not artifact_download_exists
         or artifact_item.force | default(false)
-        or artifact_item.version
-           | default("")
-           | string
-           != artifact_previous_version
+        or (artifact_item.version is defined
+            and artifact_item.version | string
+                != artifact_previous_version)
       vars:
         artifact_gitlab_check_results: >-
           {{ artifact_gitlab_check_result.results }}
