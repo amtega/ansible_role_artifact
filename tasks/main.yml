@@ -1,18 +1,20 @@
 ---
 # Role tasks
 
-- block:
-    - include_tasks: check.yml
+- name: Download artifacts
+  block:
+    - ansible.builtin.include_tasks: check.yml
       tags:
         - role::artifact::check
 
-    - include_tasks: packages.yml
+    - ansible.builtin.include_tasks: packages.yml
       when: not artifact_skip_packages | bool
 
-    - block:
-        - include_tasks: absent.yml
-        - include_tasks: present.yml
-        - include_tasks: facts.yml
+    - name: Manage run once artifacts
+      block:
+        - ansible.builtin.include_tasks: absent.yml
+        - ansible.builtin.include_tasks: present.yml
+        - ansible.builtin.include_tasks: facts.yml
       run_once: yes
       vars:
         artifact_run_once: yes
@@ -20,17 +22,18 @@
         _artifact_state_present_run_once | length > 0
         or _artifact_state_absent_run_once | length > 0
 
-    - block:
-        - include_tasks: absent.yml
-        - include_tasks: present.yml
-        - include_tasks: facts.yml
+    - name: Manage run n artifacts
+      block:
+        - ansible.builtin.include_tasks: absent.yml
+        - ansible.builtin.include_tasks: present.yml
+        - ansible.builtin.include_tasks: facts.yml
       vars:
         artifact_run_once: no
       when: >-
         _artifact_state_present_run_n | length > 0
         or _artifact_state_absent_run_n | length > 0
 
-    - include_tasks: notify.yml
+    - ansible.builtin.include_tasks: notify.yml
       tags:
         - role::artifact::notify
   tags:

@@ -1,9 +1,10 @@
 ---
-# Unarchive tasks
 
-- block:
+- name: Unarchive artifacts
+  block:
     - name: Check artifact archive estructure
-      shell: "set -o pipefail ; {{ artficat_archive_check_command }}"
+      ansible.builtin.shell: >-
+        set -o pipefail ; {{ artficat_archive_check_command }}
       args:
         warn: no
       loop: "{{ _artifact_present_unarchive_force_root }}"
@@ -38,7 +39,7 @@
                        artifact_archive_check_gtar_command) }}
 
     - name: Setup unarchive root directory
-      file:
+      ansible.builtin.file:
         path: "{{ artifact_item_forced_root_dest }}"
         mode: "{{ artifact_item.mode | default(omit) }}"
         others: "{{ artifact_item.others | default(omit) }}"
@@ -61,7 +62,7 @@
         label: "{{ artifact_item.id }}"
 
     - name: Unarchive artifacts
-      unarchive:
+      ansible.builtin.unarchive:
         src: "{{ artifact_item_src }}"
         remote_src: yes
         dest: "{{ artifact_item_dest }}"
@@ -101,7 +102,7 @@
                        artifact_item.dest | default("")) }}
 
     - name: Remove archive files
-      file:
+      ansible.builtin.file:
         path: >-
           {{ artifact_item.dest | default("")
              + "/"

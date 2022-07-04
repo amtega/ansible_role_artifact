@@ -7,11 +7,11 @@
     - amtega.artifact
   tasks:
     - name: Check artifact facts
-      assert:
+      ansible.builtin.assert:
         that: artifact_result.tomcat1 is defined
 
     - name: Check artifact was removed
-      assert:
+      ansible.builtin.assert:
         that: artifact_result.tomcat1.changed
       tags:
         - molecule-idempotence-notest

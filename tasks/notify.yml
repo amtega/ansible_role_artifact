@@ -1,8 +1,7 @@
 ---
-# Role notify tasks
 
 - name: Trigger handers notifications
-  command: /bin/true
+  ansible.builtin.command: /bin/true
   changed_when: artifact_result[artifact_item.id].changed | bool
   when: artifact_item.notify | default([]) | length > 0
   loop: "{{ _artifact_to_manage }}"

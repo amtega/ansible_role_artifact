@@ -1,9 +1,9 @@
 ---
-# http artifact download tasks
 
-- block:
+- name: Download http/https artifacts
+  block:
     - name: Check http/https artifact download
-      stat:
+      ansible.builtin.stat:
         path: "{{ artifact_http_check_path }}"
       register: artifact_http_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
@@ -18,7 +18,7 @@
                        artifact_http_dest) }}
 
     - name: Download artifacts from http/https server
-      get_url:
+      ansible.builtin.get_url:
         attributes: "{{ artifact_item.attributes | default(omit) }}"
         backup: "{{ artifact_item.backup | default(omit) }}"
         client_cert: "{{ artifact_item.client_cert | default(omit) }}"
@@ -59,10 +59,10 @@
         or (artifact_item.download | default(true) | bool
             and (artifact_item.force | default(false) | bool
                  or artifact_previous_version is none
-                 or artifact_item.version
-                    | default("")
-                    | string
-                    != artifact_previous_version))
+                 or (artifact_item.version is defined
+                     and artifact_item.version | string
+                     != artifact_previous_version)))
+
       no_log: "{{ artifact_item.no_log | default(true) }}"
       loop: "{{ _artifact_type_state_present }}"
       loop_control:
@@ -82,7 +82,7 @@
           {{ artifact_http_check_results[artifact_item_index].stat.exists }}
 
     - name: Check http/https artifacts
-      assert:
+      ansible.builtin.assert:
         that: >-
             artifact_http_result.results[artifact_item_index]
             is success

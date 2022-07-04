@@ -5,27 +5,27 @@
   gather_facts: no
   tasks:
     - name: Check http/https artifact1 download
-      stat:
+      ansible.builtin.stat:
         path: /tmp/tomcat.tar.gz
       register: check_http1_result
 
     - name: Check http/https artifact2 download
-      stat:
+      ansible.builtin.stat:
         path: /tmp/tomcat2.tar.gz
       register: check_http2_result
 
     - name: Check http/https artifact1 unarchived content
-      stat:
+      ansible.builtin.stat:
         path: /tmp/apache-tomcat-8.5.9
       register: check_http1_unarchive_result
 
     - name: Check http/https artifact2 local artifact
-      stat:
+      ansible.builtin.stat:
         path: /etc/ansible/facts.d/artifact_tomcat2.fact
       register: check_http2_local_fact_result
 
     - name: Check that artifacts were removed correctly
-      assert:
+      ansible.builtin.assert:
         that:
           - not check_http1_result.stat.exists
           - not check_http2_result.stat.exists

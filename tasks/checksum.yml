@@ -1,9 +1,9 @@
 ---
-# Checksum tasks
 
-- block:
+- name: Calculate artifacts checksum
+  block:
     - name: Calculate artifacts checksum
-      stat:
+      ansible.builtin.stat:
         path: >-
           {{ artifact_item.dest | default("")
              + "/"
@@ -36,7 +36,7 @@
               | default(artifact_undefined_place_holder) }}
 
     - name: Fail if artifacts checksums does not match
-      fail:
+      ansible.builtin.fail:
         msg: downloaded artifact checksum does not match
       when:
         - >-

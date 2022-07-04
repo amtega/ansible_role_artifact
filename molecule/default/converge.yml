@@ -5,7 +5,7 @@
   gather_facts: no
   tasks:
     - name: Setup jenkins artifact
-      set_fact:
+      ansible.builtin.set_fact:
         artifact_jenkins:
           - id: jenkins
             type: jenkins
@@ -28,11 +28,11 @@
         - artifact_tests_jenkins_file | length > 0
 
     - name: Setup artifact
-      include_role:
+      ansible.builtin.include_role:
         name: amtega.artifact
 
     - name: Check artifact facts
-      assert:
+      ansible.builtin.assert:
         that:
           - artifact_result.gitlab is defined
           - artifact_result.ansible is defined
@@ -41,7 +41,7 @@
           - not artifact_result.tomcat3.changed
 
     - name: Check jenkins artifact fact
-      assert:
+      ansible.builtin.assert:
         that: artifact_result.jenkins is defined
       when:
         - artifact_tests_jenkins_host | length > 0

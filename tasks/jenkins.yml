@@ -1,9 +1,9 @@
 ---
-# jenkins artifact download tasks
 
-- block:
+- name: Download jenkins artifacts
+  block:
     - name: Check jenkins artifact download
-      stat:
+      ansible.builtin.stat:
         path: "{{ artifact_jenkins_check_path }}"
       register: artifact_jenkins_check_result
       no_log: "{{ artifact_item.no_log | default(true) }}"
@@ -18,7 +18,7 @@
                        artifact_jenkins_dest) }}
 
     - name: Download artifacts from jenkins server
-      get_url:
+      ansible.builtin.get_url:
         attributes: "{{ artifact_item.attributes | default(omit) }}"
         backup: "{{ artifact_item.backup | default(omit) }}"
         client_cert: "{{ artifact_item.client_cert | default(omit) }}"
@@ -61,13 +61,13 @@
       delay: "{{ artifact_item.delay | default(artifact_delay) }}"
       until: artifact_jenkins_result is succeeded
       when: >-
-        not not artifact_download_exists
+        not artifact_download_exists
         or (artifact_item.download | default(true) | bool
             and (artifact_item.force | default(false) | bool
-                 or artifact_item.version
-                    | default("")
-                    | string
-                    != artifact_previous_version))
+                 or artifact_previous_version is none
+                 or (artifact_item.version is defined
+                     and artifact_item.version | string
+                     != artifact_previous_version)))
       no_log: "{{ artifact_item.no_log | default(true) }}"
       loop: "{{ _artifact_type_state_present }}"
       loop_control:
@@ -87,7 +87,7 @@
           {{ artifact_jenkins_check_results[artifact_item_index].stat.exists }}
 
     - name: Check jenkins artifacts
-      assert:
+      ansible.builtin.assert:
         that: >-
             artifact_jenkins_result.results[artifact_item_index]
             is success
