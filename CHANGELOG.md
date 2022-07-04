@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.26.0] - 2022-07-04
+### Changed
+- Improved management when local facts are not used.
+- Migrated test engine to podman.
+
+### Fixed
+- Coding standards.
+
 ## [1.25.1] - 2022-03-30
 ### Fixed
 - Fixed previous maven artifact not deleted during new deployment.

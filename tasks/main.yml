@@ -7,7 +7,7 @@
       tags:
         - role::artifact::check
 
-    - include_tasks: packages.yml
+    - ansible.builtin.include_tasks: packages.yml
       when: not artifact_skip_packages | bool
 
     - name: Manage run once artifacts

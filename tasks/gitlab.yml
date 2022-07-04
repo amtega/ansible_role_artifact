@@ -35,7 +35,7 @@
           block:
             - name: Clone gitlab/github project into temporay directory
               ansible.builtin.expect:
-                community.routeros.command: >-
+                command: >-
                   git
                   {{ git_http_proxy_opt }}
                   {{ git_https_proxy_opt }}
@@ -122,7 +122,7 @@
 
             - name: Checkout artifact from gitlab/github project
               ansible.builtin.expect:
-                community.routeros.command: >-
+                command: >-
                   git
                   {{ git_http_proxy_opt }}
                   {{ git_https_proxy_opt }}
