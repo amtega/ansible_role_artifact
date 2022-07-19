@@ -103,7 +103,8 @@
     artifact_http_dest: >-
       {{ artifact_item.dest
          + (artifact_item.dest_file | default("") | length > 0)
-           | ternary("/" + artifact_item.dest_file | default(""), "") }}
+           | ternary("/" + artifact_item.dest_file | default(""),
+                     "/" + artifact_item.file) }}
   tags:
     - role::artifact
     - role::artifact::http
