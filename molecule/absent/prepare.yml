@@ -14,7 +14,8 @@
             file: apache-tomcat-8.5.9.tar.gz
             dest_file: tomcat.tar.gz
             checksum_algorithm: sha1
-            checksum: 3c800e7affdf93bf4dbcf44bd852904449b786f6
+            checksum: >-  # pragma: allowlist secret
+              3c800e7affdf93bf4dbcf44bd852904449b786f6
             dest: /tmp
             unarchive: yes
             unarchive_creates: /tmp/apache-tomcat-8.5.9
@@ -29,7 +30,8 @@
             file: apache-tomcat-8.5.9.tar.gz
             dest_file: tomcat2.tar.gz
             checksum_algorithm: sha1
-            checksum: 3c800e7affdf93bf4dbcf44bd852904449b786f6
+            checksum: >-  # pragma: allowlist secret
+              3c800e7affdf93bf4dbcf44bd852904449b786f6
             dest: /tmp
             validate_certs: no
             state: present
