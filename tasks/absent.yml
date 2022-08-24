@@ -1,5 +1,4 @@
 ---
-
 - name: Remove artifacts
   ansible.builtin.file:
     path: "{{ artifact_item_to_remove.1 }}"

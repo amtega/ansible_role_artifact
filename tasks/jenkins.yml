@@ -1,5 +1,4 @@
 ---
-
 - name: Download jenkins artifacts
   block:
     - name: Check jenkins artifact download
@@ -40,7 +39,7 @@
         setype: "{{ artifact_item.setype | default(omit) }}"
         seuser: "{{ artifact_item.seuser | default(omit) }}"
         timeout: "{{ artifact_item.timeout | default(omit) }}"
-        tmp_dest:  "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
+        tmp_dest: "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
         unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
         url: >-
           {{ artifact_item.host
@@ -51,7 +50,7 @@
              + artifact_item.path | default('/')
              + "/"
              + artifact_item.file }}
-        url_password:  "{{ artifact_item.password | default(omit) }}"
+        url_password: "{{ artifact_item.password | default(omit) }}"
         url_username: "{{ artifact_item.username | default(omit) }}"
         use_proxy: "{{ artifact_item.use_proxy | default(omit) }}"
         validate_certs: "{{ artifact_item.validate_certs | default(omit) }}"
@@ -89,8 +88,8 @@
     - name: Check jenkins artifacts
       ansible.builtin.assert:
         that: >-
-            artifact_jenkins_result.results[artifact_item_index]
-            is success
+          artifact_jenkins_result.results[artifact_item_index]
+          is success
         quiet: yes
         fail_msg: >-
           {{ artifact_jenkins_result.results[artifact_item_index].msg

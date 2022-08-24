@@ -1,5 +1,4 @@
 ---
-
 - name: Calculate artifacts checksum
   block:
     - name: Calculate artifacts checksum

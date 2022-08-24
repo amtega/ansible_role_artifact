@@ -1,5 +1,4 @@
 ---
-
 - name: Download gitlab/github artifacts
   block:
     - name: Check gitlab/github artifact download
@@ -67,8 +66,8 @@
             - name: Check gitlab/github clone
               ansible.builtin.assert:
                 that: >-
-                    artifact_gitlab_clone_result.results[artifact_item_index]
-                    is success
+                  artifact_gitlab_clone_result.results[artifact_item_index]
+                  is success
                 quiet: yes
                 fail_msg: >-
                   {{ artifact_gitlab_clone_result.results
@@ -103,8 +102,8 @@
             - name: Check gitlab/github clone reset to head
               ansible.builtin.assert:
                 that: >-
-                    artifact_gitlab_reset_result.results[artifact_item_index]
-                    is success
+                  artifact_gitlab_reset_result.results[artifact_item_index]
+                  is success
                 quiet: yes
                 fail_msg: >-
                   {{ artifact_gitlab_reset_result.results
@@ -150,8 +149,8 @@
             - name: Check gitlab/github checkout
               ansible.builtin.assert:
                 that: >-
-                    artifact_gitlab_checkout_result.results[artifact_item_index]
-                    is success
+                  artifact_gitlab_checkout_result.results[artifact_item_index]
+                  is success
                 quiet: yes
                 fail_msg: >-
                   {{ artifact_gitlab_checkout_result.results
@@ -172,24 +171,24 @@
           vars:
             git_http_proxy_opt: >-
               {{ (proxy_client_environment.http_proxy
-                  | default('')
-                  | length > 0)
+                 | default('')
+                 | length > 0)
                  | ternary('-c "http.proxy='
-                           + proxy_client_environment.http_proxy | default('')
-                           + '"',
-                           '' ) }}
+                        + proxy_client_environment.http_proxy | default('')
+                        + '"',
+                           '') }}
             git_https_proxy_opt: >-
               {{ (proxy_client_environment.https_proxy
                   | default('')
                   | length > 0)
-                 | ternary('-c "https.proxy='
+                  | ternary('-c "https.proxy='
                            + proxy_client_environment.https_proxy | default('')
                            + '"',
-                           '' ) }}
+                           '') }}
 
         - name: Move artifact to destination
           ansible.builtin.command: >-
-              mv {{ artifact_gitlab_file_path }} {{ artifact_gitlab_dest }}
+            mv {{ artifact_gitlab_file_path }} {{ artifact_gitlab_dest }}
           args:
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_move_result

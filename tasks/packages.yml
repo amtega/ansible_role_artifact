@@ -1,5 +1,4 @@
 ---
-
 - name: Setup required packages for artifacts management
   block:
     - name: Setup EPEL
