@@ -1,5 +1,4 @@
 ---
-
 - name: Check artifacts
   block:
     - name: Generate undefined value place holder
@@ -124,7 +123,7 @@
           {{ _artifact_type_maven_state_present | length > 0 }}
 
         _artifact_unarchive_exist: >-
-          {{ _artifact_present_unarchive_run_all | length > 0  }}
+          {{ _artifact_present_unarchive_run_all | length > 0 }}
 
     - name: Check artifacts config
       ansible.builtin.assert:
