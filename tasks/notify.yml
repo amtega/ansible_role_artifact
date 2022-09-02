@@ -1,4 +1,5 @@
 ---
+
 - name: Trigger handers notifications
   ansible.builtin.command: /bin/true
   changed_when: artifact_result[artifact_item.id].changed | bool

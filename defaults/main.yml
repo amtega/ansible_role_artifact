@@ -162,6 +162,7 @@ artifact_list: "{{ (artifact is defined) | ternary([artifact], []) }}"
 # expected for an artifact.
 
 artifact_defaults: {}
+
 # Indicate if artifact local facts should be saved. Usually is better to save
 # local artifacts because it improves role management and efficiency.
 

@@ -1,4 +1,5 @@
 ---
+
 - name: Check artifacts
   block:
     - name: Generate undefined value place holder

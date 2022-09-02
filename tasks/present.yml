@@ -1,4 +1,5 @@
 ---
+
 - ansible.builtin.include_tasks: "{{ _artifact_type }}.yml"
   loop: "{{ artifact_types_supported }}"
   loop_control:

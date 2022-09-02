@@ -1,4 +1,5 @@
 ---
+
 - name: Setup artifacts facts
   block:
     - name: Setup artifacts facts

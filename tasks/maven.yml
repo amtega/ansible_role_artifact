@@ -1,4 +1,5 @@
 ---
+
 - name: Download maven artifacts
   block:
     - name: Check maven artifact download

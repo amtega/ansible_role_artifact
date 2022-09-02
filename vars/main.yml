@@ -50,6 +50,7 @@ artifact_unarchive_packages_os:
       unzip: present
 
 artifact_unarchive_packages_python: {}
+
 # Artficat item vars
 
 artifact_item_unarchive_creates: >-
