@@ -85,8 +85,8 @@
         - name: Check maven artifacts
           ansible.builtin.assert:
             that: >-
-                artifact_maven_result.results[artifact_item_index]
-                is success
+              artifact_maven_result.results[artifact_item_index]
+              is success
             quiet: yes
             fail_msg: >-
               {{ artifact_maven_result.results[artifact_item_index].msg
