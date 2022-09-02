@@ -177,7 +177,7 @@
                  | ternary('-c "http.proxy='
                            + proxy_client_environment.http_proxy | default('')
                            + '"',
-                           '' ) }}
+                           '') }}
             git_https_proxy_opt: >-
               {{ (proxy_client_environment.https_proxy
                   | default('')
@@ -185,7 +185,7 @@
                  | ternary('-c "https.proxy='
                            + proxy_client_environment.https_proxy | default('')
                            + '"',
-                           '' ) }}
+                           '') }}
 
         - name: Move artifact to destination
           ansible.builtin.command: >-
