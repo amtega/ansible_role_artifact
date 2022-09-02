@@ -29,7 +29,7 @@
         - /tmp/root/level1/level2/myfile
 
     - name: Create zip files
-      archive:
+      community.general.archive:
         path: "{{ item.path }}"
         dest: "{{ item.dest }}"
         format: zip
