@@ -94,6 +94,7 @@
 #   client_cert: <cert>
 #   client_key: <key>
 #   headers: <headers>
+#   http_agent: <agent>
 #   others: <others>
 #   timeout: <timeout>
 #   tmp_dest: <tmp_dest>      # Temporary directory for download operations

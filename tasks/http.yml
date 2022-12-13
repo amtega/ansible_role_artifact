@@ -33,6 +33,7 @@
         force_basic_auth: "{{ artifact_item.force_basic_auth | default(omit) }}"
         group: "{{ artifact_item.group | default(omit) }}"
         headers: "{{ artifact_item.headers | default(omit) }}"
+        http_agent: "{{ artifact_item.http_agent | default(omit) }}"
         mode: "{{ artifact_item.mode | default(omit) }}"
         others: "{{ artifact_item.others | default(omit) }}"
         owner: "{{ artifact_item.owner | default(omit) }}"
