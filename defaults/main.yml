@@ -180,3 +180,7 @@ artifact_load_from_hostvars: no
 # something that can be useful if you want to speed up things
 
 artifact_skip_packages: no
+
+# Indicate if EPEL must be setup if necessary
+
+artifact_epel: yes
