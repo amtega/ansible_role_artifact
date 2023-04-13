@@ -4,6 +4,7 @@
     - name: Setup EPEL
       ansible.builtin.include_role:
         name: amtega.epel
+      when: artifact_epel | bool
 
     - name: Setup packages
       ansible.builtin.include_role:
