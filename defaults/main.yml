@@ -18,15 +18,16 @@
 #   dest: <dir>                # Directory where to save the artifact
 #   dest_file <file>           # Filename where to save the artifact. If not
 #                              # not given will use same name as source
-#   download: <yes_no>         # Download or not the artifact. Default is yes
+#   download: <true_false>     # Download or not the artifact. Default is true
 #   retries: <n>               # Number of retries. Default is 3
 #   delay: <s>                 # Seconds between retries. Default is 1
-#   force: <yes_no>            # Force download
-#   unarchive: <yes_no>        # Unarchive the artifact after download using the
+#   force: <true_fale>         # Force download
+#   unarchive: <true_false>    # Unarchive the artifact after download using the
 #                              # ansible `unarchive` module
 #   unarchive_creates: <path>  # If the path given exists, the file will not
 #                              # unarchived
-#   unarchive_remove: <yes_no> # Remove source archive file after being
+#   unarchive_remove: >-
+#     <true_fale>              # Remove source archive file after being
 #                              # unarchived
 #   unarchive_force_root: <d>  # Ensure unarchive process creates the indicated
 #                              # root directory if the artifact package does not
@@ -34,11 +35,11 @@
 #   version: <version>         # Version of the artifact. If not given will
 #                              # use empty string
 #   state: <state>             # Can be present or absent. Default is present
-#   run_once: <yes_no>         # Deploy the artifact only in one host of the
+#   run_once: <true_false>     # Deploy the artifact only in one host of the
 #                              # ansible batch. All artifacts with this value
-#                              # set to yes will be deployed first.
-#                              # Default is no
-#   no_log: <yes_no>           # Hide sensitive info. Default is yes
+#                              # set to true will be deployed first.
+#                              # Default is false
+#   no_log: <true_false>       # Hide sensitive info. Default is true
 #   absent_local_facts: <dict> # Dict with the facts to leave on the host when
 #                              # the fact state is absent
 #   notify: <handlers>         # List of handlers to trigger in changed state
@@ -54,7 +55,7 @@
 #   serole: <serole>
 #   setype: <setype>
 #   seuser: <seuser>
-#   validate_certs: <yes_no>
+#   validate_certs: <true_false>
 #
 # ==============================================================================
 # Attributes supported by gitlab/github artifacts
@@ -89,18 +90,17 @@
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url` module:
 #
-#   force_basic_auth: <yes_no>
-#   backup: <yes_no>
+#   force_basic_auth: <true_false>
+#   backup: <true_false>
 #   client_cert: <cert>
 #   client_key: <key>
 #   headers: <headers>
 #   http_agent: <agent>
-#   others: <others>
 #   timeout: <timeout>
 #   tmp_dest: <tmp_dest>      # Temporary directory for download operations
 #                             # (default is the same as dest)
-#   unsafe_writes: <yes_no>
-#   use_proxy: <yes_no>
+#   unsafe_writes: <true_false>
+#   use_proxy: <true_false>
 #
 # ==============================================================================
 # Attributes supported by maven artifacts
@@ -140,15 +140,14 @@
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url` module:
 #
-#   backup: <yes_no>
+#   backup: <true_false>
 #   client_cert: <cert>
 #   client_key: <key>
-#   others: <others>
 #   timeout: <timeout>
 #   tmp_dest: <tmp_dest>      # Temporary directory for download operations
 #                             # (default is the same as dest)
-#   unsafe_writes: <yes_no>
-#   use_proxy: <yes_no>
+#   unsafe_writes: <true_false>
+#   use_proxy: <true_false>
 # }
 
 # artifact:
@@ -163,24 +162,23 @@ artifact_list: "{{ (artifact is defined) | ternary([artifact], []) }}"
 # expected for an artifact.
 
 artifact_defaults: {}
-
 # Indicate if artifact local facts should be saved. Usually is better to save
 # local artifacts because it improves role management and efficiency.
 
-artifact_local_facts: yes
+artifact_local_facts: true
 
 # Indicate `artifact_list` must be loaded also from host variables. Any host
 # variable that begins with "artifact_*" and contains the necessary attributes
 # will be loaded as an item to manage by the role. The variables must follow the
 # structure detailed before for `artifact`
 
-artifact_load_from_hostvars: no
+artifact_load_from_hostvars: false
 
 # Indicate if the role must skip operating system packages related tasks,
 # something that can be useful if you want to speed up things
 
-artifact_skip_packages: no
+artifact_skip_packages: false
 
 # Indicate if EPEL must be setup if necessary
 
-artifact_epel: yes
+artifact_epel: true

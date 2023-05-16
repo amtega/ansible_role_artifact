@@ -1,8 +1,7 @@
 ---
-
 - name: Prepare
   hosts: molecule_hosts
-  gather_facts: no
+  gather_facts: false
   roles:
     - role: amtega.artifact
       vars:
@@ -17,11 +16,11 @@
             checksum: >-  # pragma: allowlist secret
               3c800e7affdf93bf4dbcf44bd852904449b786f6
             dest: /tmp
-            unarchive: yes
+            unarchive: true
             unarchive_creates: /tmp/apache-tomcat-8.5.9
-            validate_certs: no
+            validate_certs: false
             state: present
-            no_log: no
+            no_log: false
 
           - id: tomcat2
             type: https
@@ -33,6 +32,6 @@
             checksum: >-  # pragma: allowlist secret
               3c800e7affdf93bf4dbcf44bd852904449b786f6
             dest: /tmp
-            validate_certs: no
+            validate_certs: false
             state: present
-            no_log: no
+            no_log: false

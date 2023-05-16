@@ -1,6 +1,6 @@
 ---
-
-- ansible.builtin.include_tasks: "{{ _artifact_type }}.yml"
+- name: Manage artifacts type
+  ansible.builtin.include_tasks: "{{ _artifact_type }}.yml"
   loop: "{{ artifact_types_supported }}"
   loop_control:
     loop_var: _artifact_type
@@ -24,14 +24,16 @@
          | ternary(_artifact_type_state_present_run_once,
                    _artifact_type_state_present_run_n) }}
 
-- ansible.builtin.include_tasks: checksum.yml
+- name: Perform checksum validation
+  ansible.builtin.include_tasks: checksum.yml
   vars:
     artifact_present_checksum: >-
       {{ (artifact_run_once | bool)
          | ternary(_artifact_state_present_run_once,
                    _artifact_state_present_run_n) }}
 
-- ansible.builtin.include_tasks: unarchive.yml
+- name: Unarchive artifacts
+  ansible.builtin.include_tasks: unarchive.yml
   vars:
     artifact_present_unarchive: >-
       {{ (artifact_run_once | bool)

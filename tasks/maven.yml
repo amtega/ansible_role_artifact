@@ -1,6 +1,13 @@
 ---
-
 - name: Download maven artifacts
+  vars:
+    artifact_maven_dest: >-
+      {{ artifact_item.dest
+         + (artifact_item.dest_file | default("") | length > 0)
+           | ternary("/" + artifact_item.dest_file | default(""), "") }}
+  tags:
+    - role::artifact
+    - role::artifact::maven
   block:
     - name: Check maven artifact download
       ansible.builtin.stat:
@@ -18,6 +25,15 @@
                        artifact_maven_dest) }}
 
     - name: Perform maven artifacts download
+      vars:
+        artifact_previous_version: >-
+          {{ (ansible_local["artifact_" + artifact_item.id]
+              | default({}))["version"]
+              | default(artifact_undefined_place_holder) }}
+        artifact_maven_check_results: >-
+          {{ artifact_maven_check_result.results }}
+        artifact_download_exists: >-
+          {{ artifact_maven_check_results[artifact_item_index].stat.exists }}
       block:
         - name: Remove previous maven artifact download
           ansible.builtin.include_tasks: absent.yml
@@ -79,7 +95,7 @@
             loop_var: artifact_item
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
-          ignore_errors: yes
+          ignore_errors: true
           environment: "{{ proxy_client_environment }}"
 
         - name: Check maven artifacts
@@ -87,7 +103,7 @@
             that: >-
               artifact_maven_result.results[artifact_item_index]
               is success
-            quiet: yes
+            quiet: true
             fail_msg: >-
               {{ artifact_maven_result.results[artifact_item_index].msg
                  | default("") }}
@@ -100,21 +116,3 @@
             loop_var: artifact_item
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
-
-      vars:
-        artifact_previous_version: >-
-          {{ (ansible_local["artifact_" + artifact_item.id]
-              | default({}))["version"]
-              | default(artifact_undefined_place_holder) }}
-        artifact_maven_check_results: >-
-          {{ artifact_maven_check_result.results }}
-        artifact_download_exists: >-
-          {{ artifact_maven_check_results[artifact_item_index].stat.exists }}
-  vars:
-    artifact_maven_dest: >-
-      {{ artifact_item.dest
-         + (artifact_item.dest_file | default("") | length > 0)
-           | ternary("/" + artifact_item.dest_file | default(""), "") }}
-  tags:
-    - role::artifact
-    - role::artifact::maven

@@ -1,5 +1,7 @@
 ---
 - name: Setup required packages for artifacts management
+  tags:
+    - role::artifact
   block:
     - name: Setup EPEL
       ansible.builtin.include_role:
@@ -10,7 +12,7 @@
       ansible.builtin.include_role:
         name: amtega.packages
       vars:
-        packages_load_from_hostvars: no
+        packages_load_from_hostvars: false
         packages_os: >-
           {{ {}
              | combine((_artifact_gitlab_gitlab_exist)
@@ -40,5 +42,3 @@
                        | ternary(artifact_unarchive_packages_python, {}),
                        recursive=true,
                        list_merge="append") }}
-  tags:
-    - role::artifact

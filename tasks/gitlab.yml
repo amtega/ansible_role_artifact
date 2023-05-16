@@ -1,6 +1,16 @@
 ---
-
 - name: Download gitlab/github artifacts
+  when: artifact_item.download | default(true) | bool
+  environment: "{{ proxy_client_environment }}"
+  vars:
+    artifact_gitlab_dest: >-
+      {{ artifact_item.dest
+         + (artifact_item.dest_file | default("") | length > 0)
+           | ternary("/" + artifact_item.dest_file | default(""),
+                     "/" + artifact_item.file) }}
+  tags:
+    - role::artifact
+    - role::artifact::gitlab
   block:
     - name: Check gitlab/github artifact download
       ansible.builtin.stat:
@@ -18,6 +28,34 @@
                        artifact_gitlab_dest) }}
 
     - name: Perform gitlab/github artifact download
+      when: >-
+        not artifact_download_exists
+        or (artifact_item.download | default(true) | bool
+            and (artifact_item.force | default(false) | bool
+                 or artifact_previous_version is none
+                 or (artifact_item.version is defined
+                     and artifact_item.version | string
+                     != artifact_previous_version)))
+      vars:
+        artifact_gitlab_check_results: >-
+          {{ artifact_gitlab_check_result.results }}
+        artifact_download_exists: >-
+          {{ artifact_gitlab_check_results[artifact_item_index].stat.exists }}
+        artifact_gitlab_tmp: >-
+          {{ artifact_gitlab_tmp_result.results[artifact_item_index].path }}
+        artifact_gitlab_file_path: >-
+          {{ (artifact_item.path is defined
+               and artifact_item.path | length > 0)
+             | ternary(artifact_item.path
+                       | default("")
+                       | regex_replace("^/(.*)", "\1")
+                       + "/"
+                       + artifact_item.file,
+                       artifact_item.file) }}
+        artifact_previous_version: >-
+          {{ (ansible_local["artifact_" + artifact_item.id]
+              | default({}))["version"]
+              | default(artifact_undefined_place_holder) }}
       block:
         - name: Create temporary directory for gitlab/github project clone
           ansible.builtin.tempfile:
@@ -32,6 +70,25 @@
             label: "{{ artifact_item.id }}"
 
         - name: Retrieve artifact form gitlab/github project
+          environment:
+            GIT_SSL_NO_VERIFY: "{{ (not artifact_item.validate_certs) | int }}"
+          vars:
+            git_http_proxy_opt: >-
+              {{ (proxy_client_environment.http_proxy
+                  | default('')
+                  | length > 0)
+                 | ternary('-c "http.proxy='
+                           + proxy_client_environment.http_proxy | default('')
+                           + '"',
+                           '') }}
+            git_https_proxy_opt: >-
+              {{ (proxy_client_environment.https_proxy
+                  | default('')
+                  | length > 0)
+                 | ternary('-c "https.proxy='
+                           + proxy_client_environment.https_proxy | default('')
+                           + '"',
+                           '') }}
           block:
             - name: Clone gitlab/github project into temporay directory
               ansible.builtin.expect:
@@ -44,13 +101,12 @@
                   {{ artifact_gitlab_tmp }}
                   -b {{ artifact_item.branch }}
                   --depth 1
+                chdir: "{{ artifact_item.dest }}"
                 responses:
                   (?i)username: "{{ artifact_item.username | default('') }}"
                   (?i)password: >-
                     {{ artifact_item.password | default('') | string }}
                 timeout: "{{ artifact_item.timeout | default(omit) }}"
-              args:
-                chdir: "{{ artifact_item.dest }}"
               register: artifact_gitlab_clone_result
               failed_when: artifact_gitlab_clone_result.rc | default(0) != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
@@ -62,14 +118,14 @@
               until: artifact_gitlab_clone_result is succeeded
               retries: "{{ artifact_item.retries | default(artifact_retries) }}"
               delay: "{{ artifact_item.delay | default(artifact_delay) }}"
-              ignore_errors: yes
+              ignore_errors: true
 
             - name: Check gitlab/github clone
               ansible.builtin.assert:
                 that: >-
-                    artifact_gitlab_clone_result.results[artifact_item_index]
-                    is success
-                quiet: yes
+                  artifact_gitlab_clone_result.results[artifact_item_index]
+                  is success
+                quiet: true
                 fail_msg: >-
                   {{ artifact_gitlab_clone_result.results
                      [artifact_item_index].msg
@@ -85,27 +141,27 @@
                 label: "{{ artifact_item.id }}"
 
             - name: Reset gitlab/github project clone to head
-              ansible.builtin.command: /usr/bin/git reset HEAD .
-              args:
+              # noqa command-instead-of-module
+              ansible.builtin.command:
+                cmd: /usr/bin/git reset HEAD .
                 chdir: "{{ artifact_gitlab_tmp }}"
-                warn: no
               register: artifact_gitlab_reset_result
               failed_when: artifact_gitlab_reset_result.rc != 0
-              changed_when: yes
+              changed_when: true
               no_log: "{{ artifact_item.no_log | default(true) }}"
               loop: "{{ _artifact_type_state_present }}"
               loop_control:
                 loop_var: artifact_item
                 index_var: artifact_item_index
                 label: "{{ artifact_item.id }}"
-              ignore_errors: yes
+              ignore_errors: true
 
             - name: Check gitlab/github clone reset to head
               ansible.builtin.assert:
                 that: >-
-                    artifact_gitlab_reset_result.results[artifact_item_index]
-                    is success
-                quiet: yes
+                  artifact_gitlab_reset_result.results[artifact_item_index]
+                  is success
+                quiet: true
                 fail_msg: >-
                   {{ artifact_gitlab_reset_result.results
                      [artifact_item_index].msg
@@ -128,13 +184,12 @@
                   {{ git_https_proxy_opt }}
                   checkout
                   -- {{ artifact_gitlab_file_path }}
+                chdir: "{{ artifact_gitlab_tmp }}"
                 responses:
                   (?i)username: "{{ artifact_item.username | default('') }}"
                   (?i)password: >-
                     {{ artifact_item.password | default('') | string }}
                 timeout: "{{ artifact_item.timeout | default(omit) }}"
-              args:
-                chdir: "{{ artifact_gitlab_tmp }}"
               register: artifact_gitlab_checkout_result
               failed_when: artifact_gitlab_checkout_result.rc != 0
               no_log: "{{ artifact_item.no_log | default(true) }}"
@@ -150,9 +205,9 @@
             - name: Check gitlab/github checkout
               ansible.builtin.assert:
                 that: >-
-                    artifact_gitlab_checkout_result.results[artifact_item_index]
-                    is success
-                quiet: yes
+                  artifact_gitlab_checkout_result.results[artifact_item_index]
+                  is success
+                quiet: true
                 fail_msg: >-
                   {{ artifact_gitlab_checkout_result.results
                      [artifact_item_index].msg
@@ -167,34 +222,14 @@
                 index_var: artifact_item_index
                 label: "{{ artifact_item.id }}"
 
-          environment:
-            GIT_SSL_NO_VERIFY: "{{ (not artifact_item.validate_certs) | int }}"
-          vars:
-            git_http_proxy_opt: >-
-              {{ (proxy_client_environment.http_proxy
-                  | default('')
-                  | length > 0)
-                 | ternary('-c "http.proxy='
-                           + proxy_client_environment.http_proxy | default('')
-                           + '"',
-                           '') }}
-            git_https_proxy_opt: >-
-              {{ (proxy_client_environment.https_proxy
-                  | default('')
-                  | length > 0)
-                 | ternary('-c "https.proxy='
-                           + proxy_client_environment.https_proxy | default('')
-                           + '"',
-                           '') }}
-
         - name: Move artifact to destination
-          ansible.builtin.command: >-
+          ansible.builtin.command:
+            cmd: >-
               mv {{ artifact_gitlab_file_path }} {{ artifact_gitlab_dest }}
-          args:
             chdir: "{{ artifact_gitlab_tmp }}"
           register: artifact_gitlab_move_result
           failed_when: artifact_gitlab_move_result.rc != 0
-          changed_when: yes
+          changed_when: true
           no_log: "{{ artifact_item.no_log | default(true) }}"
           loop: "{{ _artifact_type_state_present }}"
           loop_control:
@@ -232,42 +267,3 @@
             loop_var: artifact_item
             index_var: artifact_item_index
             label: "{{ artifact_item.id }}"
-      when: >-
-        not artifact_download_exists
-        or (artifact_item.download | default(true) | bool
-            and (artifact_item.force | default(false) | bool
-                 or artifact_previous_version is none
-                 or (artifact_item.version is defined
-                     and artifact_item.version | string
-                     != artifact_previous_version)))
-      vars:
-        artifact_gitlab_check_results: >-
-          {{ artifact_gitlab_check_result.results }}
-        artifact_download_exists: >-
-          {{ artifact_gitlab_check_results[artifact_item_index].stat.exists }}
-        artifact_gitlab_tmp: >-
-          {{ artifact_gitlab_tmp_result.results[artifact_item_index].path }}
-        artifact_gitlab_file_path: >-
-          {{ (artifact_item.path is defined
-               and artifact_item.path | length > 0)
-             | ternary(artifact_item.path
-                       | default("")
-                       | regex_replace("^/(.*)", "\1")
-                       + "/"
-                       + artifact_item.file,
-                       artifact_item.file) }}
-        artifact_previous_version: >-
-          {{ (ansible_local["artifact_" + artifact_item.id]
-              | default({}))["version"]
-              | default(artifact_undefined_place_holder) }}
-  when: artifact_item.download | default(true) | bool
-  environment: "{{ proxy_client_environment }}"
-  vars:
-    artifact_gitlab_dest: >-
-      {{ artifact_item.dest
-         + (artifact_item.dest_file | default("") | length > 0)
-           | ternary("/" + artifact_item.dest_file | default(""),
-                     "/" + artifact_item.file) }}
-  tags:
-    - role::artifact
-    - role::artifact::gitlab

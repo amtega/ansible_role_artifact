@@ -1,6 +1,8 @@
 ---
-
 - name: Calculate artifacts checksum
+  tags:
+    - role::artifact
+    - role::artifact::checksum
   block:
     - name: Calculate artifacts checksum
       ansible.builtin.stat:
@@ -12,7 +14,7 @@
         checksum_algorithm: >-
           {{ artifact_item.checksum_algorithm
              | default(artifact_checksum_algorithm) }}
-        get_checksum: yes
+        get_checksum: true
       register: artifact_checksum_stat_result
       when: >-
         artifact_item.download | default(true) | bool
@@ -60,6 +62,3 @@
           {{ artifact_checksum_stat_result.results
              | map(attribute="stat.checksum")
              | list }}
-  tags:
-    - role::artifact
-    - role::artifact::checksum

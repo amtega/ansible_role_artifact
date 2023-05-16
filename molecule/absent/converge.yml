@@ -1,8 +1,7 @@
 ---
-
 - name: Converge
   hosts: molecule_hosts
-  gather_facts: no
+  gather_facts: false
   roles:
     - amtega.artifact
   tasks:

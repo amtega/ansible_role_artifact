@@ -1,6 +1,7 @@
 ---
-
 - name: Check artifacts
+  tags:
+    - role::artifact
   block:
     - name: Generate undefined value place holder
       ansible.builtin.set_fact:
@@ -137,5 +138,3 @@
         fail_msg: artifact `id` attribute is required
       tags:
         - role::artifact::check
-  tags:
-    - role::artifact

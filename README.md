@@ -15,7 +15,7 @@ artifact_result:
     unarchived_files: <list of files unarchived>
     changed: <true if artifact changed, false in other case>
   <artifact1_id>: ...
-  <artifactN_id>: ...  
+  <artifactN_id>: ...
 ```
 
 ## Example Playbook
@@ -26,7 +26,7 @@ This is an example playbook:
 ---
 - name: Artifact role sample
   hosts: localhost
-  roles:  
+  roles:
     - amtega.artifact
   vars:
     artifact:
