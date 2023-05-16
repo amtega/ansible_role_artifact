@@ -1,8 +1,7 @@
 ---
-
 - name: Verify
   hosts: molecule_hosts
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Check http/https artifact1 download
       ansible.builtin.stat:

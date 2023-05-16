@@ -1,6 +1,13 @@
 ---
-
 - name: Download jenkins artifacts
+  vars:
+    artifact_jenkins_dest: >-
+      {{ artifact_item.dest
+         + (artifact_item.dest_file | default("") | length > 0)
+           | ternary("/" + artifact_item.dest_file | default(""), "") }}
+  tags:
+    - role::artifact
+    - role::artifact::jenkins
   block:
     - name: Check jenkins artifact download
       ansible.builtin.stat:
@@ -30,10 +37,9 @@
                 | default("")
                 | string
                 != artifact_previous_version }}
-        force_basic_auth: yes
+        force_basic_auth: true
         group: "{{ artifact_item.group | default(omit) }}"
         mode: "{{ artifact_item.mode | default(omit) }}"
-        others: "{{ artifact_item.others | default(omit) }}"
         owner: "{{ artifact_item.owner | default(omit) }}"
         selevel: "{{ artifact_item.selevel | default(omit) }}"
         serole: "{{ artifact_item.serole | default(omit) }}"
@@ -74,7 +80,7 @@
         loop_var: artifact_item
         index_var: artifact_item_index
         label: "{{ artifact_item.id }}"
-      ignore_errors: yes
+      ignore_errors: true
       environment: "{{ proxy_client_environment }}"
       vars:
         artifact_previous_version: >-
@@ -91,7 +97,7 @@
         that: >-
           artifact_jenkins_result.results[artifact_item_index]
           is success
-        quiet: yes
+        quiet: true
         fail_msg: >-
           {{ artifact_jenkins_result.results[artifact_item_index].msg
              | default("") }}
@@ -104,11 +110,3 @@
         loop_var: artifact_item
         index_var: artifact_item_index
         label: "{{ artifact_item.id }}"
-  vars:
-    artifact_jenkins_dest: >-
-      {{ artifact_item.dest
-         + (artifact_item.dest_file | default("") | length > 0)
-           | ternary("/" + artifact_item.dest_file | default(""), "") }}
-  tags:
-    - role::artifact
-    - role::artifact::jenkins

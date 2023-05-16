@@ -1,43 +1,42 @@
 ---
-
 dependency:
   name: galaxy
-  enabled: yes
+  enabled: true
   options:
-    ignore-certs: yes
-    ignore-errors: yes
+    ignore-certs: true
+    ignore-errors: true
     role-file: >-
       ${MOLECULE_SCENARIO_DIRECTORY}/../resources/requirements.yml
     requirements-file: >-
       ${MOLECULE_SCENARIO_DIRECTORY}/../resources/requirements.yml
 driver:
   name: podman
-lint: "${MOLECULE_SCENARIO_DIRECTORY}/../resources/linters.sh"
+lint: ${MOLECULE_SCENARIO_DIRECTORY}/../resources/linters.sh
 platforms:
-  - name: "centos7-${INSTANCE_UUID:-1}"
+  - name: centos7-${INSTANCE_UUID:-1}
     image: quay.io/centos/centos:centos7
     groups:
       - molecule_hosts
       - molecule_hosts_centos
       - molecule_hosts_centos_7
-  - name: "centos8-${INSTANCE_UUID:-1}"
+  - name: centos8-${INSTANCE_UUID:-1}
     image: quay.io/centos/centos:stream8
     groups:
       - molecule_hosts
       - molecule_hosts_centos
       - molecule_hosts_centos_8
-  - name: "fedora34-${INSTANCE_UUID:-1}"
-    image: quay.io/fedora/fedora:34
+  - name: fedora37-${INSTANCE_UUID:-1}
+    image: quay.io/fedora/fedora:37
     groups:
       - molecule_hosts
       - molecule_hosts_fedora
-      - molecule_hosts_fedora_34
-  - name: "fedora35-${INSTANCE_UUID:-1}"
-    image: quay.io/fedora/fedora:35
+      - molecule_hosts_fedora_37
+  - name: fedora38-${INSTANCE_UUID:-1}
+    image: quay.io/fedora/fedora:38
     groups:
       - molecule_hosts
       - molecule_hosts_fedora
-      - molecule_hosts_fedora_35
+      - molecule_hosts_fedora_38
 provisioner:
   name: ansible
   playbooks:
@@ -58,12 +57,12 @@ provisioner:
               path: /tmp
               file: noroot.zip
               dest: /var/tmp
-              unarchive: yes
+              unarchive: true
               unarchive_creates: /var/tmp/noroot/level1
-              unarchive_remove: yes
+              unarchive_remove: true
               unarchive_force_root: noroot
-              validate_certs: no
-              no_log: no
+              validate_certs: false
+              no_log: false
 
             - id: root
               type: http
@@ -71,11 +70,11 @@ provisioner:
               path: /tmp
               file: root.zip
               dest: /var/tmp
-              unarchive: yes
+              unarchive: true
               unarchive_creates: /var/tmp/root/level1
-              unarchive_remove: yes
+              unarchive_remove: true
               unarchive_force_root: root
-              validate_certs: no
-              no_log: no
+              validate_certs: false
+              no_log: false
 verifier:
   name: ansible

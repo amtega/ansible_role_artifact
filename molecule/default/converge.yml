@@ -1,8 +1,7 @@
 ---
-
 - name: Converge
   hosts: molecule_hosts
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Setup jenkins artifact
       ansible.builtin.set_fact:
@@ -18,8 +17,8 @@
             username: "{{ artifact_tests_jenkins_username | default(omit) }}"
             password: "{{ artifact_tests_jenkins_password | default(omit) }}"
             dest: /tmp
-            validate_certs: no
-            no_log: no
+            validate_certs: false
+            no_log: false
       when:
         - artifact_tests_jenkins_host | length > 0
         - artifact_tests_jenkins_jenkins_path | length > 0

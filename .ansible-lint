@@ -3,5 +3,7 @@
 exclude_paths:
   - .cz.yaml
 
+offline: true
+
 kinds:
   - yaml: "**/molecule/**/requirements.yml"

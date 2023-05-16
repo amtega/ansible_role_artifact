@@ -1,6 +1,23 @@
 ---
-
 - name: Setup artifacts facts
+  vars:
+    artifact_present_facts: >-
+      {{ (artifact_run_once | bool)
+         | ternary(_artifact_state_present_run_once,
+                   _artifact_state_present_run_n) }}
+
+    artifact_absent_facts: >-
+      {{ (artifact_run_once | bool)
+         | ternary(_artifact_state_absent_run_once,
+                   _artifact_state_absent_run_n) }}
+
+    artifact_absent_local_facts: >-
+      {{ artifact_absent_facts
+         | selectattr("absent_local_facts", "defined")
+         | list }}
+  tags:
+    - role::artifact
+    - role::artifact::facts
   block:
     - name: Setup artifacts facts
       ansible.builtin.set_fact:
@@ -16,7 +33,7 @@
           ansible.builtin.file:
             path: /etc/ansible/facts.d
             state: directory
-            mode: 0755
+            mode: "0755"
 
         - name: Setup artifact local facts
           ansible.builtin.template:
@@ -26,7 +43,7 @@
               /etc/ansible/facts.d/artifact_{{ artifact_id }}.fact
             owner: root
             group: root
-            mode: 0640
+            mode: "0640"
           when: >-
             (artifact_result[artifact_id].state == "present"
              and artifact_result[artifact_id].changed)
@@ -74,23 +91,3 @@
       ansible.builtin.file:
         path: /etc/ansible/facts.d/artifact.fact
         state: absent
-
-  vars:
-    artifact_present_facts: >-
-      {{ (artifact_run_once | bool)
-         | ternary(_artifact_state_present_run_once,
-                   _artifact_state_present_run_n) }}
-
-    artifact_absent_facts: >-
-      {{ (artifact_run_once | bool)
-         | ternary(_artifact_state_absent_run_once,
-                   _artifact_state_absent_run_n) }}
-
-    artifact_absent_local_facts: >-
-      {{ artifact_absent_facts
-         | selectattr("absent_local_facts", "defined")
-         | list }}
-
-  tags:
-    - role::artifact
-    - role::artifact::facts

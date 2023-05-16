@@ -1,12 +1,40 @@
 ---
-
 - name: Unarchive artifacts
+  vars:
+    artifact_item_download_result: >-
+      {{ ((artifact_gitlab_clone_result.results | default([])
+           + artifact_gitlab_reset_result.results | default([])
+           + artifact_gitlab_checkout_result.results | default([])
+           + artifact_gitlab_move_result.results | default([])
+           + artifact_gitlab_cleanup_result.results | default([])
+           + artifact_gitlab_attributes_result.results | default([])
+           + artifact_http_result.results | default([])
+           + artifact_maven_result.results | default([])
+           + artifact_jenkins_result.results | default([]))
+          | selectattr("artifact_item", "defined")
+          | selectattr("artifact_item.id", "defined")
+          | selectattr("artifact_item.id", "equalto", artifact_item.id)
+          | list).0 | default({}) }}
+
+    artifact_item_src: >-
+      {{ artifact_item.dest | default("")
+         + "/"
+         + artifact_item.dest_file
+           | default(artifact_item.file) }}
+
+    artifact_item_forced_root_dest: >-
+      {{ artifact_item.dest | default("")
+         + "/"
+         + artifact_item.unarchive_force_root | default("") }}
+  tags:
+    - role::artifact
+    - role::artifact::unarchive
   block:
     - name: Check artifact archive estructure
-      ansible.builtin.shell: >-
-        set -o pipefail ; {{ artficat_archive_check_command }}
-      args:
-        warn: no
+      # noqa command-instead-of-module no-handler
+      ansible.builtin.shell:
+        cmd: >
+          set -o pipefail ; {{ artficat_archive_check_command }}
       loop: "{{ _artifact_present_unarchive_force_root }}"
       loop_control:
         loop_var: artifact_item
@@ -14,7 +42,7 @@
       register: artifact_check_archive_structure_result
       when: artifact_item_download_result is changed
       failed_when: artifact_check_archive_structure_result.stderr | length > 0
-      changed_when: no
+      changed_when: false
       vars:
         artifact_archive_check_zip_command: >-
           /usr/bin/unzip -l {{ artifact_item_src }}
@@ -42,7 +70,6 @@
       ansible.builtin.file:
         path: "{{ artifact_item_forced_root_dest }}"
         mode: "{{ artifact_item.mode | default(omit) }}"
-        others: "{{ artifact_item.others | default(omit) }}"
         owner: "{{ artifact_item.owner | default(omit) }}"
         selevel: "{{ artifact_item.selevel | default(omit) }}"
         serole: "{{ artifact_item.serole | default(omit) }}"
@@ -61,15 +88,14 @@
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
 
-    - name: Unarchive artifacts
+    - name: Unarchive artifacts # noqa no-handler
       ansible.builtin.unarchive:
         src: "{{ artifact_item_src }}"
-        remote_src: yes
+        remote_src: true
         dest: "{{ artifact_item_dest }}"
-        list_files: yes
+        list_files: true
         group: "{{ artifact_item.group | default(omit) }}"
         mode: "{{ artifact_item.mode | default(omit) }}"
-        others: "{{ artifact_item.others | default(omit) }}"
         owner: "{{ artifact_item.owner | default(omit) }}"
         selevel: "{{ artifact_item.selevel | default(omit) }}"
         serole: "{{ artifact_item.serole | default(omit) }}"
@@ -117,33 +143,3 @@
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"
-
-  vars:
-    artifact_item_download_result: >-
-      {{ ((artifact_gitlab_clone_result.results | default([])
-           + artifact_gitlab_reset_result.results | default([])
-           + artifact_gitlab_checkout_result.results | default([])
-           + artifact_gitlab_move_result.results | default([])
-           + artifact_gitlab_cleanup_result.results | default([])
-           + artifact_gitlab_attributes_result.results | default([])
-           + artifact_http_result.results | default([])
-           + artifact_maven_result.results | default([])
-           + artifact_jenkins_result.results | default([]))
-          | selectattr("artifact_item", "defined")
-          | selectattr("artifact_item.id", "defined")
-          | selectattr("artifact_item.id", "equalto", artifact_item.id)
-          | list).0 | default({}) }}
-
-    artifact_item_src: >-
-      {{ artifact_item.dest | default("")
-         + "/"
-         + artifact_item.dest_file
-           | default(artifact_item.file) }}
-
-    artifact_item_forced_root_dest: >-
-      {{ artifact_item.dest | default("")
-         + "/"
-         + artifact_item.unarchive_force_root | default("") }}
-  tags:
-    - role::artifact
-    - role::artifact::unarchive

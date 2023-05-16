@@ -1,14 +1,13 @@
 ---
-
 - name: Prepare
   hosts: molecule_hosts
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Setup directories for zip structures
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        mode: 0755
+        mode: "0755"
       loop:
         - /tmp/noroot
         - /tmp/noroot/level1
@@ -21,7 +20,7 @@
       ansible.builtin.copy:
         content: This is a test
         dest: "{{ item }}"
-        mode: 0755
+        mode: "0755"
       loop:
         - /tmp/noroot/myfile
         - /tmp/noroot/level1/level2/myfile
@@ -33,7 +32,7 @@
         path: "{{ item.path }}"
         dest: "{{ item.dest }}"
         format: zip
-        mode: 0755
+        mode: "0755"
       loop:
         - path: /tmp/noroot/*
           dest: /tmp/noroot.zip
