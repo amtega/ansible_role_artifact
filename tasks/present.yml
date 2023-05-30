@@ -29,13 +29,13 @@
   vars:
     artifact_present_checksum: >-
       {{ (artifact_run_once | bool)
-         | ternary(_artifact_state_present_run_once,
-                   _artifact_state_present_run_n) }}
+         | ternary(__artifact_state_present_run_once,
+                   __artifact_state_present_run_n) }}
 
 - name: Unarchive artifacts
   ansible.builtin.include_tasks: unarchive.yml
   vars:
     artifact_present_unarchive: >-
       {{ (artifact_run_once | bool)
-         | ternary(_artifact_present_unarchive_run_once,
+         | ternary(__artifact_present_unarchive_run_once,
                    _artifact_present_unarchive_run_n) }}

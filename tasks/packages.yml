@@ -15,7 +15,7 @@
         packages_load_from_hostvars: false
         packages_os: >-
           {{ {}
-             | combine((_artifact_gitlab_gitlab_exist)
+             | combine((__artifact_gitlab_gitlab_exist)
                        | ternary(artifact_gitlab_github_packages_os, {}),
                        recursive=true,
                        list_merge="append")
@@ -30,7 +30,7 @@
 
         packages_python: >-
           {{ {}
-             | combine((_artifact_gitlab_gitlab_exist)
+             | combine((__artifact_gitlab_gitlab_exist)
                        | ternary(artifact_gitlab_github_packages_python, {}),
                        recursive=true,
                        list_merge="append")

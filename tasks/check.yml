@@ -13,7 +13,7 @@
 
     - name: Setup fact with artifacts to manage
       ansible.builtin.set_fact:
-        _artifact_to_manage: >-
+        __artifact_to_manage: >-
           {{ (artifact_list
               + ((artifact_load_from_hostvars | bool)
                  | ternary(artifact_hostvars | default([]) | flatten, [])))
@@ -21,46 +21,46 @@
 
     - name: Setup fact with artifacts with undefined state
       ansible.builtin.set_fact:
-        _artifact_state_undefined: >-
-          {{ _artifact_to_manage
+        __artifact_state_undefined: >-
+          {{ __artifact_to_manage
              | selectattr("state", "undefined")
              | list }}
 
     - name: Setup facts with artifacts with defined state
       ansible.builtin.set_fact:
-        _artifact_state_present: >-
-          {{ _artifact_to_manage
+        __artifact_state_present: >-
+          {{ __artifact_to_manage
              | selectattr("state", "defined")
              | selectattr("state", "equalto", "present")
              | list
-             + _artifact_state_undefined }}
+             + __artifact_state_undefined }}
 
         _artifact_state_absent: >-
-          {{ _artifact_to_manage
+          {{ __artifact_to_manage
              | selectattr("state", "defined")
              | selectattr("state", "equalto", "absent")
              | list }}
 
     - name: Setup fact with artifacts to run once
       ansible.builtin.set_fact:
-        _artifact_state_present_run_once: >-
-          {{ _artifact_state_present
+        __artifact_state_present_run_once: >-
+          {{ __artifact_state_present
              | selectattr("run_once", "defined")
              | selectattr("run_once", "equalto", True)
              | list }}
 
     - name: Setup fact with artifacts to unarchive
       ansible.builtin.set_fact:
-        _artifact_present_unarchive_run_all: >-
-          {{ _artifact_state_present
+        __artifact_present_unarchive_run_all: >-
+          {{ __artifact_state_present
              | selectattr("unarchive", "defined")
              | selectattr("unarchive", "equalto", True)
              | list }}
 
     - name: Setup fact with artifacts to unarchive and run one
       ansible.builtin.set_fact:
-        _artifact_present_unarchive_run_once: >-
-          {{ _artifact_present_unarchive_run_all
+        __artifact_present_unarchive_run_once: >-
+          {{ __artifact_present_unarchive_run_all
              | selectattr("run_once", "defined")
              | selectattr("run_once", "equalto", True)
              | list }}
@@ -69,9 +69,9 @@
       ansible.builtin.set_fact:
         # Artifact list organized by state and type of run
 
-        _artifact_state_present_run_n: >-
-          {{ _artifact_state_present
-             | difference(_artifact_state_present_run_once) }}
+        __artifact_state_present_run_n: >-
+          {{ __artifact_state_present
+             | difference(__artifact_state_present_run_once) }}
 
         _artifact_state_absent_run_once: >-
           {{ _artifact_state_absent
@@ -81,57 +81,57 @@
 
         _artifact_state_absent_run_n: >-
           {{ _artifact_state_absent
-             | difference(_artifact_state_present_run_once) }}
+             | difference(__artifact_state_present_run_once) }}
 
         # Artifact present list organized by type
 
         _artifact_type_gitlab_state_present: >-
-          {{ _artifact_state_present
+          {{ __artifact_state_present
              | selectattr("type", "in", ["gitlab", "github"])
              | list }}
 
         _artifact_type_http_state_present: >-
-          {{ _artifact_state_present
+          {{ __artifact_state_present
              | selectattr('type', "in", ["http", "https"])
              | list }}
 
         _artifact_type_jenkins_state_present: >-
-          {{ _artifact_state_present
+          {{ __artifact_state_present
              | selectattr("type", "in", ["jenkins"])
              | list }}
 
         _artifact_type_maven_state_present: >-
-          {{ _artifact_state_present
+          {{ __artifact_state_present
              | selectattr("type", "in", ["maven"])
              | list }}
 
         # Artifact list organized by unarchive attribute
 
         _artifact_present_unarchive_run_n: >-
-          {{ _artifact_present_unarchive_run_all
-             | difference(_artifact_present_unarchive_run_once) }}
+          {{ __artifact_present_unarchive_run_all
+             | difference(__artifact_present_unarchive_run_once) }}
 
         _artifact_present_unarchive_force_root: >-
-          {{ _artifact_state_present
+          {{ __artifact_state_present
              | selectattr("unarchive_force_root", "defined")
              | list }}
 
     - name: Setup facts with artifacts type flags
       ansible.builtin.set_fact:
-        _artifact_gitlab_gitlab_exist: >-
+        __artifact_gitlab_gitlab_exist: >-
           {{ _artifact_type_gitlab_state_present | length > 0 }}
 
         _artifact_maven_exist: >-
           {{ _artifact_type_maven_state_present | length > 0 }}
 
         _artifact_unarchive_exist: >-
-          {{ _artifact_present_unarchive_run_all | length > 0 }}
+          {{ __artifact_present_unarchive_run_all | length > 0 }}
 
     - name: Check artifacts config
       ansible.builtin.assert:
         that:
           - >-
-            _artifact_state_present
+            __artifact_state_present
             | selectattr("id", "undefined")
             | list
             | length == 0

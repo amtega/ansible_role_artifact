@@ -17,7 +17,7 @@
       vars:
         artifact_run_once: true
       when: >-
-        _artifact_state_present_run_once | length > 0
+        __artifact_state_present_run_once | length > 0
         or _artifact_state_absent_run_once | length > 0
       block:
         - name: Manage run once absent artifacts
@@ -33,7 +33,7 @@
       vars:
         artifact_run_once: false
       when: >-
-        _artifact_state_present_run_n | length > 0
+        __artifact_state_present_run_n | length > 0
         or _artifact_state_absent_run_n | length > 0
       block:
         - name: Manage run n absent
