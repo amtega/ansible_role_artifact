@@ -6,6 +6,10 @@
          + (artifact_item.dest_file | default("") | length > 0)
            | ternary("/" + artifact_item.dest_file | default(""),
                      "/" + artifact_item.file) }}
+
+    artifact_http_url: >-
+      {{ artifact_item.host }}{{ artifact_item.path
+                                 | default('/') }}/{{ artifact_item.file }}
   tags:
     - role::artifact
     - role::artifact::http
@@ -51,9 +55,7 @@
         timeout: "{{ artifact_item.timeout | default(omit) }}"
         tmp_dest: "{{ artifact_item.tmp_dest | default(artifact_item.dest) }}"
         unsafe_writes: "{{ artifact_item.unsafe_writes | default(omit) }}"
-        url: >-
-          {{ artifact_item.host }}{{ artifact_item.path
-                                     | default('/') }}/{{ artifact_item.file }}
+        url: "{{ artifact_http_url }}"
         url_password: "{{ artifact_item.password | default(omit) }}"
         url_username: "{{ artifact_item.username | default(omit) }}"
         use_proxy: "{{ artifact_item.use_proxy | default(omit) }}"
@@ -76,7 +78,7 @@
       loop_control:
         loop_var: artifact_item
         index_var: artifact_item_index
-        label: "{{ artifact_item.id }}"
+        label: "{{ artifact_item.id }} - {{ artifact_http_url }}"
       ignore_errors: true
       environment: "{{ proxy_client_environment }}"
       vars:
@@ -106,4 +108,4 @@
       loop_control:
         loop_var: artifact_item
         index_var: artifact_item_index
-        label: "{{ artifact_item.id }}"
+        label: "{{ artifact_item.id }} - {{ artifact_http_url }}"

@@ -34,6 +34,8 @@
           {{ artifact_maven_check_result.results }}
         artifact_download_exists: >-
           {{ artifact_maven_check_results[artifact_item_index].stat.exists }}
+        artifact_maven_repository_url: >-
+          {{ artifact_item.host }}{{ artifact_item.path | default('/') }}
       block:
         - name: Remove previous maven artifact download
           ansible.builtin.include_tasks: absent.yml
@@ -63,8 +65,7 @@
             mode: "{{ artifact_item.mode | default(omit) }}"
             owner: "{{ artifact_item.owner | default(omit) }}"
             password: "{{ artifact_item.password | default(omit) }}"
-            repository_url: >-
-              {{ artifact_item.host }}{{ artifact_item.path | default('/') }}
+            repository_url: "{{ artifact_maven_repository_url }}"
             selevel: "{{ artifact_item.selevel | default(omit) }}"
             serole: "{{ artifact_item.serole | default(omit) }}"
             setype: "{{ artifact_item.setype | default(omit) }}"
@@ -94,7 +95,8 @@
           loop_control:
             loop_var: artifact_item
             index_var: artifact_item_index
-            label: "{{ artifact_item.id }}"
+            label: >-
+              {{ artifact_item.id }} - {{ artifact_maven_repository_url }}
           ignore_errors: true
           environment: "{{ proxy_client_environment }}"
 
@@ -115,4 +117,5 @@
           loop_control:
             loop_var: artifact_item
             index_var: artifact_item_index
-            label: "{{ artifact_item.id }}"
+            label: >-
+              {{ artifact_item.id }} - {{ artifact_maven_repository_url }}
