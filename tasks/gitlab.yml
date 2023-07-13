@@ -89,6 +89,8 @@
                            + proxy_client_environment.https_proxy | default('')
                            + '"',
                            '') }}
+            artifact_git_clone_repository: >-
+                  {{ artifact_item.host }}/{{ artifact_item.project }}.git
           block:
             - name: Clone gitlab/github project into temporay directory
               ansible.builtin.expect:
@@ -97,7 +99,7 @@
                   {{ git_http_proxy_opt }}
                   {{ git_https_proxy_opt }}
                   clone -n
-                  {{ artifact_item.host }}/{{ artifact_item.project }}.git
+                  {{ artifact_git_clone_repository }}
                   {{ artifact_gitlab_tmp }}
                   -b {{ artifact_item.branch }}
                   --depth 1
@@ -114,7 +116,8 @@
               loop_control:
                 loop_var: artifact_item
                 index_var: artifact_item_index
-                label: "{{ artifact_item.id }}"
+                label: >-
+                  {{ artifact_item.id }} - {{ artifact_git_clone_repository }}
               until: artifact_gitlab_clone_result is succeeded
               retries: "{{ artifact_item.retries | default(artifact_retries) }}"
               delay: "{{ artifact_item.delay | default(artifact_delay) }}"
@@ -138,7 +141,8 @@
               loop_control:
                 loop_var: artifact_item
                 index_var: artifact_item_index
-                label: "{{ artifact_item.id }}"
+                label: >-
+                  {{ artifact_item.id }} - {{ artifact_git_clone_repository }}
 
             - name: Reset gitlab/github project clone to head
               # noqa command-instead-of-module
