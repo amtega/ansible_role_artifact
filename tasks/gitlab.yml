@@ -29,7 +29,8 @@
 
     - name: Perform gitlab/github artifact download
       when: >-
-        not artifact_download_exists
+        (not artifact_download_exists
+         and artifact_item.check_download | default(true) | bool)
         or (artifact_item.download | default(true) | bool
             and (artifact_item.force | default(false) | bool
                  or artifact_previous_version is none

@@ -1,0 +1,26 @@
+---
+- name: Verify
+  hosts: molecule_hosts
+  gather_facts: false
+  tasks:
+    - name: Check http/https unarchived artifact download
+      ansible.builtin.stat:
+        path: /tmp/tomcat.tar.gz
+      register: check_http_result
+
+    - name: Check http/https artifact download
+      ansible.builtin.stat:
+        path: /tmp/tomcat2.tar.gz
+      register: check_http2_result
+
+    - name: Check http/https artifact unarchived content
+      ansible.builtin.stat:
+        path: /tmp/apache-tomcat-8.5.9
+      register: check_http_unarchive_result
+
+    - name: Check that artifacts are correct
+      ansible.builtin.assert:
+        that:
+          - not check_http_result.stat.exists
+          - not check_http2_result.stat.exists
+          - check_http_unarchive_result.stat.exists

@@ -43,6 +43,11 @@
 #   absent_local_facts: <dict> # Dict with the facts to leave on the host when
 #                              # the fact state is absent
 #   notify: <handlers>         # List of handlers to trigger in changed state
+#   check_download: >-
+#     <true_false>             # Check if the artifact is already downloaded.
+#                              # If set to false the role will use local facts
+#                              # managed by the role to determine if the
+#                              # artifact should be downloaded. Default is true
 #
 # Additionally the following list of attributes are also supported, with the
 # same restrictions that the ansible `get_url/maven_artifact` modules:

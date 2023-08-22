@@ -1,0 +1,17 @@
+---
+- name: Converge
+  hosts: molecule_hosts
+  gather_facts: false
+  tasks:
+    - name: Setup artifact
+      ansible.builtin.include_role:
+        name: amtega.artifact
+
+    - name: Remove artifacts
+      ansible.builtin.file:
+        path: "/tmp/{{ artifact.dest_file }}"
+        state: absent
+      loop: "{{ artifact_list }}"
+      loop_control:
+        loop_var: artifact
+        label: "{{ artifact.id }}"
