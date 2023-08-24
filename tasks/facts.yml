@@ -35,18 +35,20 @@
             state: directory
             mode: "0755"
 
+
         - name: Setup artifact local facts
           ansible.builtin.template:
             src: >-
               facts_{{ artifact_result[artifact_id].state | lower }}.fact.j2
             dest: >-
-              /etc/ansible/facts.d/artifact_{{ artifact_id }}.fact
+              /etc/ansible/facts.d/{{ artifact_local_fact_name }}.fact
             owner: root
             group: root
             mode: "0640"
           when: >-
             (artifact_result[artifact_id].state == "present"
-             and artifact_result[artifact_id].changed)
+              and (artifact_result[artifact_id].changed
+                   or ansible_local[artifact_local_fact_name] is undefined))
             or (artifact_result[artifact_id].state == "absent"
                 and artifact_item.absent_local_facts is defined)
           loop: >-
@@ -65,6 +67,7 @@
                  | selectattr("id", "equalto", artifact_id)
                  | list
                  | first }}
+            artifact_local_fact_name: "artifact_{{ artifact_id }}"
 
         - name: Remove artifact local facts
           ansible.builtin.file:
