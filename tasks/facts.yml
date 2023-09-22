@@ -35,7 +35,6 @@
             state: directory
             mode: "0755"
 
-
         - name: Setup artifact local facts
           ansible.builtin.template:
             src: >-

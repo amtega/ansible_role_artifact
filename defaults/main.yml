@@ -11,6 +11,8 @@
 #
 #   id: <artifactid>           # For identification purposes. Same restrictions
 #                              # as ansible variable names
+#   old_id: <artifactid>       # If the artifact id changes, this attribute
+#                              # must point to the old one
 #   type: <type>               # Can be http, https, maven, gitlab and github
 #   host: <host>               # Host where the artifact resides
 #   path: <path>               # Path that contains the file. If

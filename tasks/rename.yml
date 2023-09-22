@@ -1,0 +1,65 @@
+---
+- name: Rename artifacts id
+  tags:
+    - role::artifact
+    - role::artifact::rename
+  vars:
+    artifact_artifacts_to_rename: >-
+      {{ artifact_present_rename
+         | selectattr("old_id", "defined")
+         | rejectattr("old_id", "equalto", "")
+         | list }}
+
+    artifact_local_fact_name: "artifact_{{ artifact_item.id }}"
+    artifact_old_local_fact_name: "artifact_{{ artifact_item.old_id }}"
+
+    artifact_local_fact_path: >-
+      /etc/ansible/facts.d/{{ artifact_local_fact_name }}.fact
+
+    artifact_local_fact_old_path: >-
+      /etc/ansible/facts.d/{{ artifact_old_local_fact_name }}.fact
+  block:
+    - name: Check artifacts local facts file
+      ansible.builtin.stat:
+        path: "{{ artifact_local_fact_old_path }}"
+      register: artifact_local_fact_stat_result
+      loop: "{{ artifact_artifacts_to_rename }}"
+      loop_control:
+        loop_var: artifact_item
+        label: "{{ artifact_item.id }}"
+      no_log: "{{ artifact_item.no_log | default(true) }}"
+
+    - name: Copy artifacts local facts file
+      ansible.builtin.copy:
+        src: "{{ artifact_local_fact_old_path }}"
+        dest: "{{ artifact_local_fact_path }}"
+        mode: 0644
+        remote_src: true
+      when: artifact_local_fact_stat_result.results[artifact_index].stat.exists
+      register: artifact_local_fact_copy_result
+      loop: "{{ artifact_artifacts_to_rename }}"
+      loop_control:
+        loop_var: artifact_item
+        index_var: artifact_index
+        label: "{{ artifact_item.id }}"
+
+    - name: Remove artifacts old local facts file
+      # noqa no-handler
+      ansible.builtin.file:
+        path: "{{ artifact_local_fact_old_path }}"
+        state: absent
+      register: artifact_local_fact_remove_result
+      loop: "{{ artifact_artifacts_to_rename }}"
+      loop_control:
+        loop_var: artifact_item
+        index_var: artifact_index
+        label: "{{ artifact_item.id }}"
+
+    - name: Gather facts
+      ansible.builtin.setup:
+      when: >-
+        (artifact_local_fact_copy_result.results
+         + artifact_local_fact_copy_result.results)
+        | select("changed")
+        | list
+        | length > 0
