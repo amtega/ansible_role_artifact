@@ -2,8 +2,8 @@
 
 {% for artifact in artifact_state_absent_transient
                    | default((artifact_run_once | bool)
-                             | ternary(_artifact_state_absent_run_once,
-                                       _artifact_state_absent_run_n)) %}
+                             | ternary(__artifact_state_absent_run_once,
+                                       __artifact_state_absent_run_n)) %}
 
 {% set download_path = ansible_local["artifact_" + artifact.id].download_path
                        | default(artifact_result[artifact.id].download_path)

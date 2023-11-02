@@ -1,0 +1,6 @@
+---
+- name: amtega.check_platform
+- name: amtega.select_hostvars
+- name: amtega.proxy_client
+- name: amtega.epel
+- name: amtega.packages
