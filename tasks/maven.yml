@@ -29,7 +29,7 @@
         artifact_previous_version: >-
           {{ (ansible_local["artifact_" + artifact_item.id]
               | default({}))["version"]
-              | default(artifact_undefined_place_holder) }}
+              | default(__artifact_undefined_place_holder) }}
         artifact_maven_check_results: >-
           {{ artifact_maven_check_result.results }}
         artifact_download_exists: >-

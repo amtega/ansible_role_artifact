@@ -56,7 +56,7 @@
         artifact_previous_version: >-
           {{ (ansible_local["artifact_" + artifact_item.id]
               | default({}))["version"]
-              | default(artifact_undefined_place_holder) }}
+              | default(__artifact_undefined_place_holder) }}
       block:
         - name: Create temporary directory for gitlab/github project clone
           ansible.builtin.tempfile:

@@ -18,7 +18,7 @@
         artifact_run_once: true
       when: >-
         __artifact_state_present_run_once | length > 0
-        or _artifact_state_absent_run_once | length > 0
+        or __artifact_state_absent_run_once | length > 0
       block:
         - name: Manage run once absent artifacts
           ansible.builtin.include_tasks: absent.yml
@@ -34,7 +34,7 @@
         artifact_run_once: false
       when: >-
         __artifact_state_present_run_n | length > 0
-        or _artifact_state_absent_run_n | length > 0
+        or __artifact_state_absent_run_n | length > 0
       block:
         - name: Manage run n absent
           ansible.builtin.include_tasks: absent.yml

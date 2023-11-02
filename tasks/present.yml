@@ -16,7 +16,7 @@
   vars:
     _artifact_type_state_present_run_all: >-
       {{ lookup("vars",
-                "_artifact_type_" + _artifact_type + "_state_present") }}
+                "__artifact_type_" + _artifact_type + "_state_present") }}
 
     _artifact_type_state_present_run_once: >-
       {{ _artifact_type_state_present_run_all
@@ -47,4 +47,4 @@
     artifact_present_unarchive: >-
       {{ (artifact_run_once | bool)
          | ternary(__artifact_present_unarchive_run_once,
-                   _artifact_present_unarchive_run_n) }}
+                   __artifact_present_unarchive_run_n) }}

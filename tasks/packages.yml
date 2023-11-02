@@ -19,11 +19,11 @@
                        | ternary(artifact_gitlab_github_packages_os, {}),
                        recursive=true,
                        list_merge="append")
-             | combine((_artifact_maven_exist)
+             | combine((__artifact_maven_exist)
                        | ternary(artifact_maven_packages_os, {}),
                        recursive=true,
                        list_merge="append")
-             | combine((_artifact_unarchive_exist)
+             | combine((__artifact_unarchive_exist)
                        | ternary(artifact_unarchive_packages_os, {}),
                        recursive=true,
                        list_merge="append") }}
@@ -34,11 +34,11 @@
                        | ternary(artifact_gitlab_github_packages_python, {}),
                        recursive=true,
                        list_merge="append")
-             | combine((_artifact_maven_exist)
+             | combine((__artifact_maven_exist)
                        | ternary(artifact_maven_packages_python, {}),
                        recursive=true,
                        list_merge="append")
-             | combine((_artifact_unarchive_exist)
+             | combine((__artifact_unarchive_exist)
                        | ternary(artifact_unarchive_packages_python, {}),
                        recursive=true,
                        list_merge="append") }}
