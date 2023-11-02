@@ -38,7 +38,8 @@
           {{ artifact_item.host }}{{ artifact_item.path | default('/') }}
       block:
         - name: Remove previous maven artifact download
-          ansible.builtin.include_tasks: absent.yml
+          ansible.builtin.include_tasks:
+            file: absent.yml
           when:
             - artifact_download_exists
             - artifact_item.download | default(true) | bool

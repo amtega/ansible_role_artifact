@@ -3,13 +3,19 @@
   tags:
     - role::artifact
   block:
+    - name: Setup prerequisites
+      ansible.builtin.include_tasks:
+        file: prerequisites.yml
+
     - name: Check artifacts
-      ansible.builtin.include_tasks: check.yml
+      ansible.builtin.include_tasks:
+        file: check.yml
       tags:
         - role::artifact::check
 
     - name: Setup required packages
-      ansible.builtin.include_tasks: packages.yml
+      ansible.builtin.include_tasks:
+        file: packages.yml
       when: not artifact_skip_packages | bool
 
     - name: Manage run once artifacts
@@ -21,13 +27,16 @@
         or __artifact_state_absent_run_once | length > 0
       block:
         - name: Manage run once absent artifacts
-          ansible.builtin.include_tasks: absent.yml
+          ansible.builtin.include_tasks:
+            file: absent.yml
 
         - name: Manage run once
-          ansible.builtin.include_tasks: present.yml
+          ansible.builtin.include_tasks:
+            file: present.yml
 
         - name: Manage run once artifacts facts
-          ansible.builtin.include_tasks: facts.yml
+          ansible.builtin.include_tasks:
+            file: facts.yml
 
     - name: Manage run n artifacts
       vars:
@@ -37,13 +46,16 @@
         or __artifact_state_absent_run_n | length > 0
       block:
         - name: Manage run n absent
-          ansible.builtin.include_tasks: absent.yml
+          ansible.builtin.include_tasks:
+            file: absent.yml
 
         - name: Manage run n present artifacts
-          ansible.builtin.include_tasks: present.yml
+          ansible.builtin.include_tasks:
+            file: present.yml
 
         - name: Manage run n artifacts facts
-          ansible.builtin.include_tasks: facts.yml
+          ansible.builtin.include_tasks:
+            file: facts.yml
 
     - name: Manage notifications
       ansible.builtin.include_tasks: notify.yml

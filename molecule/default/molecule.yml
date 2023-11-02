@@ -9,9 +9,12 @@ dependency:
       ${MOLECULE_SCENARIO_DIRECTORY}/../resources/requirements.yml
     requirements-file: >-
       ${MOLECULE_SCENARIO_DIRECTORY}/../resources/requirements.yml
+
 driver:
   name: podman
+
 lint: ${MOLECULE_SCENARIO_DIRECTORY}/../resources/linters.sh
+
 platforms:
   - name: centos7-${INSTANCE_UUID:-1}
     image: quay.io/centos/centos:centos7
@@ -25,18 +28,12 @@ platforms:
       - molecule_hosts
       - molecule_hosts_centos
       - molecule_hosts_centos_8
-  - name: fedora37-${INSTANCE_UUID:-1}
-    image: quay.io/fedora/fedora:37
+  - name: fedora-${INSTANCE_UUID:-1}
+    image: quay.io/fedora/fedora:latest
     groups:
       - molecule_hosts
       - molecule_hosts_fedora
-      - molecule_hosts_fedora_37
-  - name: fedora38-${INSTANCE_UUID:-1}
-    image: quay.io/fedora/fedora:38
-    groups:
-      - molecule_hosts
-      - molecule_hosts_fedora
-      - molecule_hosts_fedora_38
+
 provisioner:
   name: ansible
   playbooks:
@@ -108,7 +105,7 @@ provisioner:
               file: apache-tomcat-8.5.9.tar.gz
               dest_file: tomcat.tar.gz
               checksum_algorithm: sha1
-              checksum: >-  # pragma: allowlist secret
+              checksum: >-
                 3c800e7affdf93bf4dbcf44bd852904449b786f6
               dest: /tmp
               unarchive: true
@@ -136,5 +133,6 @@ provisioner:
               dest: /tmp
               validate_certs: false
               no_log: false
+
 verifier:
   name: ansible

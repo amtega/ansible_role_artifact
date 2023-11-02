@@ -1,7 +1,7 @@
 ---
-
 - name: Rename artifacts id
-  ansible.builtin.include_tasks: rename.yml
+  ansible.builtin.include_tasks:
+    file: rename.yml
   vars:
     artifact_present_rename: >-
       {{ (artifact_run_once | bool)
@@ -9,7 +9,8 @@
                    __artifact_state_present_run_n) }}
 
 - name: Manage artifacts type
-  ansible.builtin.include_tasks: "{{ _artifact_type }}.yml"
+  ansible.builtin.include_tasks:
+    file: "{{ _artifact_type }}.yml"
   loop: "{{ artifact_types_supported }}"
   loop_control:
     loop_var: _artifact_type
@@ -34,7 +35,8 @@
                    _artifact_type_state_present_run_n) }}
 
 - name: Perform checksum validation
-  ansible.builtin.include_tasks: checksum.yml
+  ansible.builtin.include_tasks:
+    file: checksum.yml
   vars:
     artifact_present_checksum: >-
       {{ (artifact_run_once | bool)
@@ -42,7 +44,8 @@
                    __artifact_state_present_run_n) }}
 
 - name: Unarchive artifacts
-  ansible.builtin.include_tasks: unarchive.yml
+  ansible.builtin.include_tasks:
+    file: unarchive.yml
   vars:
     artifact_present_unarchive: >-
       {{ (artifact_run_once | bool)

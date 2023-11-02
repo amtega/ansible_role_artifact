@@ -1,6 +1,4 @@
 ---
-# Role variables
-
 # Artifact types supported
 
 artifact_types_supported:
