@@ -29,7 +29,7 @@
         artifact_previous_version: >-
           {{ (ansible_local["artifact_" + artifact_item.id]
               | default({}))["version"]
-              | default(artifact_undefined_place_holder) }}
+              | default(__artifact_undefined_place_holder) }}
         artifact_maven_check_results: >-
           {{ artifact_maven_check_result.results }}
         artifact_download_exists: >-
@@ -38,7 +38,8 @@
           {{ artifact_item.host }}{{ artifact_item.path | default('/') }}
       block:
         - name: Remove previous maven artifact download
-          ansible.builtin.include_tasks: absent.yml
+          ansible.builtin.include_tasks:
+            file: absent.yml
           when:
             - artifact_download_exists
             - artifact_item.download | default(true) | bool

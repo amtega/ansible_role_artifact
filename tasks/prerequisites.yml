@@ -1,0 +1,27 @@
+---
+- name: Check platform
+  ansible.builtin.include_role:
+    name: amtega.check_platform
+  vars:
+    check_platform_distributions:
+      centos: 7
+      fedora: all
+      redhat: 7
+
+- name: Gather artifact host variables
+  ansible.builtin.include_role:
+    name: amtega.select_hostvars
+  vars:
+    select_hostvars_query:
+      pattern: ^artifact_.*
+      exclude_pattern: ^artifact_list|artifact_defaults$
+      attributes:
+        - id
+      fact_name: artifact_hostvars
+      output_type: list
+
+- name: Setup proxy client
+  ansible.builtin.include_role:
+    name: amtega.proxy_client
+  vars:
+    proxy_client_permanent: false

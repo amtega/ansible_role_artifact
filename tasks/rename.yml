@@ -10,8 +10,8 @@
          | rejectattr("old_id", "equalto", "")
          | list }}
 
-    artifact_local_fact_name: "artifact_{{ artifact_item.id }}"
-    artifact_old_local_fact_name: "artifact_{{ artifact_item.old_id }}"
+    artifact_local_fact_name: artifact_{{ artifact_item.id }}
+    artifact_old_local_fact_name: artifact_{{ artifact_item.old_id }}
 
     artifact_local_fact_path: >-
       /etc/ansible/facts.d/{{ artifact_local_fact_name }}.fact
@@ -33,7 +33,7 @@
       ansible.builtin.copy:
         src: "{{ artifact_local_fact_old_path }}"
         dest: "{{ artifact_local_fact_path }}"
-        mode: 0644
+        mode: "0644"
         remote_src: true
       when: artifact_local_fact_stat_result.results[artifact_index].stat.exists
       register: artifact_local_fact_copy_result

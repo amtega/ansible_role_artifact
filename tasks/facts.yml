@@ -8,8 +8,8 @@
 
     artifact_absent_facts: >-
       {{ (artifact_run_once | bool)
-         | ternary(_artifact_state_absent_run_once,
-                   _artifact_state_absent_run_n) }}
+         | ternary(__artifact_state_absent_run_once,
+                   __artifact_state_absent_run_n) }}
 
     artifact_absent_local_facts: >-
       {{ artifact_absent_facts
@@ -66,7 +66,7 @@
                  | selectattr("id", "equalto", artifact_id)
                  | list
                  | first }}
-            artifact_local_fact_name: "artifact_{{ artifact_id }}"
+            artifact_local_fact_name: artifact_{{ artifact_id }}
 
         - name: Remove artifact local facts
           ansible.builtin.file:

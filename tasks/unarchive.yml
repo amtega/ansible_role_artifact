@@ -35,7 +35,7 @@
       ansible.builtin.shell:
         cmd: >
           set -o pipefail ; {{ artficat_archive_check_command }}
-      loop: "{{ _artifact_present_unarchive_force_root }}"
+      loop: "{{ __artifact_present_unarchive_force_root }}"
       loop_control:
         loop_var: artifact_item
         label: "{{ artifact_item.id }}"

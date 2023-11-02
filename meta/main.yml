@@ -1,6 +1,4 @@
 ---
-# Role dependencies
-
 galaxy_info:
   role_name: artifact
   namespace: amtega
@@ -16,8 +14,7 @@ galaxy_info:
         - "8"
     - name: Fedora
       versions:
-        - "37"
-        - "38"
+        - all
   galaxy_tags:
     - download
     - artifact
@@ -25,34 +22,3 @@ galaxy_info:
     - https
     - gitlab
     - github
-
-dependencies:
-  - role: amtega.check_platform
-    vars:
-      check_platform_distributions:
-        centos: 7
-        fedora: 37
-        redhat: 7
-
-  - role: amtega.select_hostvars
-    vars:
-      select_hostvars_query:
-        pattern: ^artifact_.*
-        exclude_pattern: ^artifact_list|artifact_defaults$
-        attributes:
-          - id
-        fact_name: artifact_hostvars
-        output_type: list
-    when: artifact_load_from_hostvars | bool
-
-  - role: amtega.proxy_client
-    vars:
-      proxy_client_permanent: false
-
-  - role: amtega.epel
-    tags:
-      - never
-
-  - role: amtega.packages
-    tags:
-      - never

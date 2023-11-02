@@ -9,7 +9,7 @@
 
     - name: Remove artifacts
       ansible.builtin.file:
-        path: "/tmp/{{ artifact.dest_file }}"
+        path: /tmp/{{ artifact.dest_file }}
         state: absent
       loop: "{{ artifact_list }}"
       loop_control:
