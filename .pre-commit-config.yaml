@@ -33,6 +33,13 @@ repos:
           - --markdown-linebreak-ext=md
       - id: check-executables-have-shebangs
       - id: end-of-file-fixer
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args:
+          - --baseline
+          - .secrets.baseline
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.17
     hooks:

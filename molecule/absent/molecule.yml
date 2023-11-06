@@ -55,7 +55,7 @@ provisioner:
               file: apache-tomcat-8.5.9.tar.gz
               dest_file: tomcat.tar.gz
               checksum_algorithm: sha1
-              checksum: >- # pragma: allowlist secret
+              checksum: >-
                 3c800e7affdf93bf4dbcf44bd852904449b786f6
               dest: /tmp
               unarchive: true
@@ -72,7 +72,7 @@ provisioner:
               file: apache-tomcat-8.5.9.tar.gz
               dest_file: tomcat2.tar.gz
               checksum_algorithm: sha1
-              checksum: >- # pragma: allowlist secret
+              checksum: >-
                 3c800e7affdf93bf4dbcf44bd852904449b786f6
               dest: /tmp
               validate_certs: false
