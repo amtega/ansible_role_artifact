@@ -95,16 +95,15 @@
           block:
             - name: Clone gitlab/github project into temporay directory
               ansible.builtin.expect:
-                command:
-                  cmd: >-
-                    git
-                    {{ git_http_proxy_opt }}
-                    {{ git_https_proxy_opt }}
-                    clone -n
-                    {{ artifact_git_clone_repository }}
-                    {{ artifact_gitlab_tmp }}
-                    -b {{ artifact_item.branch }}
-                    --depth 1
+                command: >-
+                  git
+                  {{ git_http_proxy_opt }}
+                  {{ git_https_proxy_opt }}
+                  clone -n
+                  {{ artifact_git_clone_repository }}
+                  {{ artifact_gitlab_tmp }}
+                  -b {{ artifact_item.branch }}
+                  --depth 1
                 chdir: "{{ artifact_item.dest }}"
                 responses:
                   (?i)username: "{{ artifact_item.username | default('') }}"
@@ -184,13 +183,12 @@
 
             - name: Checkout artifact from gitlab/github project
               ansible.builtin.expect:
-                command:
-                  cmd: >-
-                    git
-                    {{ git_http_proxy_opt }}
-                    {{ git_https_proxy_opt }}
-                    checkout
-                    -- {{ artifact_gitlab_file_path }}
+                command: >-
+                  git
+                  {{ git_http_proxy_opt }}
+                  {{ git_https_proxy_opt }}
+                  checkout
+                  -- {{ artifact_gitlab_file_path }}
                 chdir: "{{ artifact_gitlab_tmp }}"
                 responses:
                   (?i)username: "{{ artifact_item.username | default('') }}"
